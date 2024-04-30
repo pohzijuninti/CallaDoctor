@@ -1,32 +1,23 @@
 import flet as ft
-from flet import TextField
-from flet_core.control_event import ControlEvent
+from flet import *
+from flet_route import Routing, path
 
-# Hello
+# Interfaces
+from loginPage import LoginPage
+from homePage import HomePage
 
-def main(page: ft.Page) -> None:
-    page.title = 'Increment counter'
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.theme_mode = 'light'
 
-    text_number: TextField = TextField(value='0',text_align=ft.TextAlign.RIGHT, width=100)
+def main(mainPage: Page):
+    mainPage.theme_mode = ft.ThemeMode.DARK
 
-    def decrement(e: ControlEvent) -> None:
-        text_number.value = str(int(text_number.value) -1)
-        page.update()
+    app_routes = [
+        # Interfaces' path
+        path(url='/', clear=False, view=LoginPage().view),  # first page url must be '/'
+        path(url='/homePage', clear=False, view=HomePage().view),
+    ]
+    Routing(page=mainPage, app_routes=app_routes)
+    mainPage.go(mainPage.route)
 
-    def increment(e: ControlEvent) -> None:
-        text_number.value = str(int(text_number.value) +1)
-        page.update()
 
-    page.add(
-        ft.Row(
-            [ft.IconButton(ft.icons.REMOVE, on_click=decrement),
-             text_number,
-             ft.IconButton(ft.icons.ADD, on_click=increment)
-             ],
-            alignment=ft.MainAxisAlignment.CENTER
-        )
-    )
 if __name__ == '__main__':
     ft.app(target=main)
