@@ -2,19 +2,19 @@ import flet as ft
 from flet import *
 from flet_route import Params, Basket
 
-class HomePage:
+class Home:
     def __init__(self):
         pass
 
     def view(self, page: Page, params: Params, basket: Basket):
-        page.title = 'Home Page'
+        page.title = 'Call a Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.theme_mode = ft.ThemeMode.DARK
         # page.window_full_screen = True
         page.window_resizable = True
 
         return View(
-            "/homePage",
+            "/home",
             [
                 Container(
                     Row(
