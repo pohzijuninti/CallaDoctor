@@ -3,21 +3,19 @@ from flet import *
 from flet_route import Routing, path
 
 # Interfaces
-from loginPage import LoginPage
-from homePage import HomePage
+from pages.login import LoginPage
+from pages.home import HomePage
 
-
-def main(mainPage: Page):
-    mainPage.theme_mode = ft.ThemeMode.DARK
+def main(page: Page):
+    page.theme_mode = ft.ThemeMode.DARK
 
     app_routes = [
         # Interfaces' path
         path(url='/', clear=False, view=LoginPage().view),  # first page url must be '/'
         path(url='/homePage', clear=False, view=HomePage().view),
     ]
-    Routing(page=mainPage, app_routes=app_routes)
-    mainPage.go(mainPage.route)
-
+    Routing(page=page, app_routes=app_routes)
+    page.go(page.route)
 
 if __name__ == '__main__':
-    ft.app(target=main)
+    ft.app(target=main, assets_dir="assets")
