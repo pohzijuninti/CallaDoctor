@@ -5,6 +5,7 @@ from flet_route import Routing, path
 # Interfaces
 from pages.login import Login
 from pages.home import Home
+from pages.loading import Loading
 
 def main(page: Page):
     page.theme_mode = ft.ThemeMode.DARK
@@ -13,6 +14,7 @@ def main(page: Page):
         # Interfaces' path
         path(url='/', clear=False, view=Login().view),  # first page url must be '/'
         path(url='/home', clear=False, view=Home().view),
+        # path(url='/loading', clear=False, view=Loading().view),
     ]
     Routing(page=page, app_routes=app_routes)
     page.go(page.route)

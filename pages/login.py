@@ -2,7 +2,8 @@ import flet as ft
 from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
-from db.config import Signup
+from db.config import register, login
+from time import sleep
 
 class Login:
     def __init__(self):
@@ -14,17 +15,20 @@ class Login:
         page.window_min_width = 800
         page.window_min_height = 400
         page.window_resizable = True
-        page.theme_mode = ft.ThemeMode.DARK
+
+        def temp_go_home(e):
+            page.go("/home")
 
         # Setup fields
         img: Image = Image(src=f'login.png', width=350, height=350) # 90CFF9
         email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', width=250, border=InputBorder.UNDERLINE, text_size=14)
         password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', width=250, border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
-        login: ElevatedButton = ElevatedButton(text='Login', width=250, disabled=True)
+        login_button: ElevatedButton = ElevatedButton(text='Login', width=250, disabled=True)
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
+        temp_button: TextButton = TextButton(text='Temp Home', on_click=temp_go_home)
 
         def close_dlg(e):
             dlg_modal.open = False
@@ -34,7 +38,7 @@ class Login:
 
         def signup(e):
             dlg_modal.open = False
-            Signup(new_email.value, new_password.value)
+            register(new_email.value, new_password.value)
             new_email.value = ''
             new_password.value = ''
             page.update()
@@ -64,33 +68,36 @@ class Login:
 
         def validate(e: ControlEvent):
             if all([email.value, password.value]):
-                login.disabled = False
+                login_button.disabled = False
             else:
-                login.disabled = True
+                login_button.disabled = True
             page.update()
 
         def loginToHome(e: ControlEvent):
-            print(email.value)
-            print(password.value)
-            page.go("/home")
+            if login(email.value, password.value):
+                page.go("/home")
+
 
         email.on_change = validate
         password.on_change = validate
-        login.on_click = loginToHome
+        login_button.on_click = loginToHome
 
         return View(
             route="/",
-            controls = [
+            controls=[
                 Container(
                     Row(
-                        controls = [img,
+                        controls=[img,
                                     Column(
-                                        controls = [
-                                            Text('Welcome to Call A Doctor! '),
+                                        controls=[
+                                            Text(value='Welcome to Call A Doctor! ',
+                                                 style=TextStyle(size=18)),
                                             email,
                                             password,
-                                            login,
-                                            TextButton(text='Create new account', width=250, on_click=open_dlg_modal)],
+                                            login_button,
+                                            TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
+                                            temp_button
+                                        ],
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 alignment=MainAxisAlignment.CENTER,
                                 spacing=20,

@@ -1,4 +1,8 @@
+import flet as ft
+from flet import *
 import pyrebase
+from flet_route import Params, Basket
+from flet_core.control_event import ControlEvent
 
 firebaseConfig = {
     "apiKey": "AIzaSyDvZsBy92nHhTwkqOOQ4tEt9yocgYd77zM",
@@ -13,7 +17,18 @@ firebaseConfig = {
 firebase=pyrebase.initialize_app(firebaseConfig)
 auth=firebase.auth()
 
-def Signup(email, password):
-    # email = input("Enter email: ")
-    # password = input("Enter password: ")
-    user = auth.create_user_with_email_and_password(email, password)
+def register(email, password):
+    try:
+        user = auth.create_user_with_email_and_password(email, password)
+    except:
+        print("Email already exists")
+    return
+
+def login(email, password):
+    try:
+        login = auth.sign_in_with_email_and_password(email, password)
+        print( auth.get_account_info(login['idToken'])['users'][0]['localId'])
+        return True
+    except:
+        print("Invalid email or password")
+    return
