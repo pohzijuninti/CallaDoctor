@@ -5,6 +5,7 @@ import datetime
 import calendar
 from calendar import HTMLCalendar
 from dateutil import relativedelta
+import time
 
 
 class FletCalendar(ft.UserControl):
@@ -139,7 +140,7 @@ class MordernNavBar(UserControl):
             width=180,
             height=45,
             border_radius=10,
-            on_hover=None,
+            on_hover=lambda e: self.HighLight(e),
             content=Row(
                 controls=[
                     IconButton(
@@ -166,9 +167,19 @@ class MordernNavBar(UserControl):
             ),
         )
 
-    # def HighLight(self, e):
-    #     if e.data == 'true':
-    #         e.control.
+    def HighLight(self, e):
+        if e.data == 'true':
+            e.control.bgcolor = 'white10'
+            e.control.update()
+            e.control.content.controls[0].icon_color = 'white'
+            e.control.content.controls[1].color = 'white'
+            e.control.content.update()
+        else:
+            e.control.bgcolor = None
+            e.control.update()
+            e.control.content.controls[0].icon_color = 'white54'
+            e.control.content.controls[1].color = 'white54'
+            e.control.content.update()
 
     def UserData(self, initials: str, name: str, description: str):
 
@@ -245,7 +256,9 @@ class Home:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_resizable = True
+        page.window_full_screen = True
+        page.window_min_width = 1050
+        page.window_min_height = 600
 
         def logout(e):
             page.route = "/"
@@ -281,35 +294,70 @@ class Home:
                     expand=True,
                     controls=[
                         Container(
-                            width=200,
-                            height=580,
                             bgcolor="black",
                             border_radius=10,
                             animate=animation.Animation(500, "decelerate"),
-                            alignment=alignment.center,
+                            alignment=alignment.top_left,
                             padding=10,
                             content=MordernNavBar(),
                         ),
+
                         Container(
-                            Column(
+                            expand=True,
+                            content=Column(
+                                expand=True,
                                 alignment=MainAxisAlignment.START,
                                 # vertical_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
-                                    Row(
-                                        controls=[
-                                            Container(content=CircleAvatar(content=Icon(icons.PERSON, size=40), radius=30),),
-                                            Text('Name'),
-                                        ]
-                                    ),
                                     mycal,
                                     mycal.output,
-                                    TextField(value='Home Page', border=ft.InputBorder.NONE, text_align=ft.TextAlign.CENTER),
-                                    Row(controls=[TextButton(text='Logout', on_click=logout)], alignment=MainAxisAlignment.CENTER)
+                                    TextField(value='Home Page', border=ft.InputBorder.NONE,
+                                              text_align=ft.TextAlign.CENTER),
+                                    Row(controls=[TextButton(text='Logout', on_click=logout)],
+                                        alignment=MainAxisAlignment.CENTER)
                                 ],
                             ),
-                            expand=True,
-                            bgcolor=ft.colors.AMBER,
-                        )
+                        ),
+
+                        Column(
+                            alignment=alignment.top_right,
+                            controls=[
+                                Container(
+                                    height=400,
+                                    width=410,
+                                    bgcolor='red',
+                                    content=Text('Calendar'),
+                                ),
+
+                                Container(
+                                    expand=True,
+                                    content=Row(
+                                        controls=[
+                                            Column(
+                                                controls=[
+                                                    Container(
+                                                        expand=True,
+                                                        bgcolor='green',
+                                                        width=200,
+                                                        content=Text('Medical Report'),
+                                                    ),
+                                                ]
+                                            ),
+                                            Column(
+                                                controls=[
+                                                    Container(
+                                                        expand=True,
+                                                        bgcolor='blue',
+                                                        width=200,
+                                                        content=Text('Graph'),
+                                                    ),
+                                                ]
+                                            ),
+                                        ]
+                                    ),
+                                ),
+                            ]
+                        ),
                     ]
                 )
             ]

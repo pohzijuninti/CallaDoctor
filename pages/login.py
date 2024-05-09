@@ -11,13 +11,13 @@ class Login:
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Login'
-
         page.window_min_width = 800
         page.window_min_height = 400
         page.window_resizable = True
 
         def temp_go_home(e):
             page.go("/home")
+            page.update()
 
         # Setup fields
         img: Image = Image(src=f'login.png', width=350, height=350) # 90CFF9
