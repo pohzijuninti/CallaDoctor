@@ -16,6 +16,10 @@ class Home:
         page.window_min_width = 1050
         page.window_min_height = 600
 
+        def go_add_appointment(e):
+            page.go("/addAppointment")
+            page.update()
+
         return View(
             route="/home",
             controls=[
@@ -56,7 +60,112 @@ class Home:
                                                 border_radius=10,
                                                 bgcolor="amber",
                                                 width=400,
-                                                height=100,
+                                                height=125,
+                                                # here
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                    controls=[
+                                                        Container(
+                                                            expand=2,
+                                                            content=Column(
+                                                                expand=True,
+                                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    Container(
+                                                                        expand=True,
+                                                                        content=Row(
+                                                                            expand=True,
+                                                                            alignment=MainAxisAlignment.START,
+                                                                            controls=[
+                                                                                Icon(name=icons.DATE_RANGE_OUTLINED,
+                                                                                     color="white"),
+                                                                                Text(value="Date")
+                                                                            ]
+                                                                        ),
+                                                                    ),
+                                                                    Container(
+                                                                        expand=True,
+                                                                        content=Row(
+                                                                            expand=True,
+                                                                            alignment=MainAxisAlignment.START,
+                                                                            controls=[
+                                                                                Icon(name=icons.ACCESS_TIME_OUTLINED,
+                                                                                     color="white"),
+                                                                                Text(value="Time")
+                                                                            ]
+                                                                        )
+                                                                    ),
+                                                                    Container(
+                                                                        expand=True,
+                                                                        content=Row(
+                                                                            expand=True,
+                                                                            alignment=MainAxisAlignment.START,
+                                                                            controls=[
+                                                                                Icon(name=icons.LOCAL_HOSPITAL_OUTLINED,
+                                                                                     color="white"),
+                                                                                Text(value="Hospital")
+                                                                            ]
+                                                                        )
+                                                                    ),
+                                                                    Container(
+                                                                        expand=True,
+                                                                        content=Row(
+                                                                            expand=True,
+                                                                            alignment=MainAxisAlignment.START,
+                                                                            controls=[
+                                                                                Icon(name=icons.PEOPLE_OUTLINED,
+                                                                                     color="white"),
+                                                                                Text(value="Doctor")
+                                                                            ]
+                                                                        )
+                                                                    ),
+                                                                ]
+                                                            )
+                                                        ),
+                                                        Container(
+                                                            expand=1,
+                                                            content=Column(
+                                                                alignment=MainAxisAlignment.CENTER,
+                                                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    IconButton(icon=icons.DELETE_OUTLINED, icon_size=40,
+                                                                               icon_color="white", tooltip="Delete")
+                                                                ]
+                                                            )
+                                                        )
+                                                    ]
+                                                ),
+                                            ),
+                                        ),
+                                        Container(
+                                            padding=5,
+                                            content=Container(
+                                                border_radius=10,
+                                                bgcolor="amber",
+                                                width=400,
+                                                height=125,
+                                                content=Text('Appointment'),
+                                            ),
+                                        ),
+                                        Container(
+                                            padding=5,
+                                            content=Container(
+                                                border_radius=10,
+                                                bgcolor="amber",
+                                                width=400,
+                                                height=125,
+                                                content=Text('Appointment'),
+                                            ),
+                                        ),
+                                        Container(
+                                            padding=5,
+                                            content=Container(
+                                                border_radius=10,
+                                                bgcolor="amber",
+                                                width=400,
+                                                height=125,
                                                 content=Text('Appointment'),
                                             ),
                                         ),
@@ -76,37 +185,7 @@ class Home:
                                                 border_radius=10,
                                                 bgcolor="amber",
                                                 width=400,
-                                                height=100,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=100,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=100,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=100,
+                                                height=125,
                                                 content=Text('Appointment'),
                                             ),
                                         ),
@@ -118,7 +197,7 @@ class Home:
                         Column(
                             horizontal_alignment=CrossAxisAlignment.END,
                             controls=[
-                                ElevatedButton(text='Add Appointment'),
+                                ElevatedButton(text='Add Appointment', on_click=go_add_appointment),
                                 Container(
                                     expand=True,
                                     padding=padding.only(left=5, top=5),
@@ -132,7 +211,7 @@ class Home:
                                                     bgcolor="red",
                                                     width=300,
                                                     height=300,
-                                                    content=Text('Calander'),
+                                                    content=Text('Calendar'),
                                                 ),
                                             ),
                                             Row(
