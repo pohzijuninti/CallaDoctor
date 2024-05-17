@@ -1,7 +1,6 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
-import datetime
 
 
 class AddAppointment:
@@ -14,6 +13,10 @@ class AddAppointment:
         page.window_full_screen = True
         page.window_min_width = 1050
         page.window_min_height = 600
+
+        def go_home(e):
+            page.go("/home")
+            page.update()
 
         hospital = GridView(
             max_extent=200,
@@ -60,6 +63,7 @@ class AddAppointment:
             route="/addAppointment",
             padding=80,
             controls=[
+                ElevatedButton(text='Back to Home', on_click=go_home),
                 Row(
                     expand=True,
                     alignment=MainAxisAlignment.SPACE_BETWEEN,

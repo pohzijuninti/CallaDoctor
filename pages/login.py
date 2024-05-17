@@ -5,6 +5,7 @@ from flet_core.control_event import ControlEvent
 from db.config import register, login
 from time import sleep
 
+
 class Login:
     def __init__(self):
         pass
