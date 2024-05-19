@@ -15,35 +15,52 @@ class SelectHospital:
         page.window_min_width = 1050
         page.window_min_height = 600
 
+        hospital_id = GestureDetector.data
+        # is_tapped = False
+
         def go_home(e):
             page.go("/home")
             page.update()
 
         def go_select_doctor(e):
-            page.go("/selectDoctor")
+            page.go("/selectDoctor")  # page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
+        def on_tap(e):
+            if e.control.content.border is None:
+                print(hospital_id)
+                e.control.content.border = border.all(10, "blue")
+                e.control.update()
+            else:
+                e.control.content.border = None
+                e.control.update()
+
         hospital = GridView(
-            max_extent=500,
+            max_extent=400,
             spacing=30,
             padding=30,
         )
 
         for i in range(len(server.hospitalList)):
             hospital.controls.append(
-                Container(
-                    border_radius=10,
-                    bgcolor="white",
-                    width=300,
-                    height=300,
-                    content=Column(
-                        alignment=MainAxisAlignment.SPACE_EVENLY,
-                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Image(src=f'{server.hospitalList[i]["image"]}', width=400, height=250),
-                            Text(value=f'{server.hospitalList[i]["name"]}', color='black', size=25),
-                        ]
-                    )
+                GestureDetector(
+                    mouse_cursor=MouseCursor.CLICK,
+                    on_tap=on_tap,
+                    data=int(server.hospitalList[i]["hospitalID"]),  # wrong
+                    content=Container(
+                        border_radius=10,
+                        bgcolor="white",
+                        width=300,
+                        height=300,
+                        content=Column(
+                            alignment=MainAxisAlignment.SPACE_EVENLY,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Image(src=f'{server.hospitalList[i]["image"]}', width=400, height=250),
+                                Text(value=f'{server.hospitalList[i]["name"]}', color='black', size=20),
+                            ]
+                         ),
+                    ),
                 ),
             )
 

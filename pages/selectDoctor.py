@@ -16,6 +16,8 @@ class SelectDoctor:
         page.window_min_width = 1050
         page.window_min_height = 600
 
+        # hospital_id = int(params.get('hospital_id'))
+
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
@@ -24,29 +26,41 @@ class SelectDoctor:
             page.go("/selectDateTime")
             page.update()
 
+        def on_tap(e):
+            if e.control.content.border is None:
+                e.control.content.border = border.all(10, "blue")
+                e.control.update()
+            else:
+                e.control.content.border = None
+                e.control.update()
+
         doctor = GridView(
-            max_extent=500,
+            max_extent=400,
             spacing=30,
             padding=30,
         )
 
         for i in range(len(server.doctorList)):
             doctor.controls.append(
-                Container(
-                    border_radius=10,
-                    bgcolor="white",
-                    width=300,
-                    height=300,
-                    content=Column(
-                        alignment=MainAxisAlignment.SPACE_EVENLY,
-                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Image(src=f'{server.doctorList[i]["image"]}', width=400, height=250),  # {i}
-                            Text(value=f'{server.doctorList[i]["name"]}', color='black', size=25),
-                            Text(value=f'{get_specialty_name(server.doctorList[i]["specialityID"])}', color='black', size=20),
-                        ]
-                    )
-                ),
+                GestureDetector(
+                    mouse_cursor=MouseCursor.CLICK,
+                    on_tap=on_tap,
+                    content=Container(
+                        border_radius=10,
+                        bgcolor="white",
+                        width=300,
+                        height=300,
+                        content=Column(
+                            alignment=MainAxisAlignment.SPACE_EVENLY,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Image(src=f'{server.doctorList[i]["image"]}', width=400, height=250),  # {i}
+                                Text(value=f'{server.doctorList[i]["name"]}', color='black', size=20),
+                                Text(value=f'{get_specialty_name(server.doctorList[i]["specialityID"])}', color='black', size=18),
+                            ]
+                        )
+                    ),
+                )
             )
 
         return View(

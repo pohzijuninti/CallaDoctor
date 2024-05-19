@@ -19,7 +19,6 @@ def main(page: Page):
         path(url='/', clear=False, view=Login().view),  # first page url must be '/'
         path(url='/home', clear=False, view=Home().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
-        path(url='/selectHospital', clear=False, view=SelectHospital().view),
         path(url='/selectDoctor', clear=False, view=SelectDoctor().view),
         path(url='/selectDateTime', clear=False, view=SelectDateTime().view),
 
