@@ -1,7 +1,10 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
-import pages.server as server
+import pages.server as svr
+
+selected_container = None
+hospital_id = None
 
 
 class SelectHospital:
@@ -15,25 +18,32 @@ class SelectHospital:
         page.window_min_width = 1050
         page.window_min_height = 600
 
-        hospital_id = GestureDetector.data
-        # is_tapped = False
-
         def go_home(e):
             page.go("/home")
             page.update()
 
         def go_select_doctor(e):
-            page.go("/selectDoctor")  # page.go(f'/selectDoctor/{hospital_id}')
-            page.update()
+            if hospital_id is not None:
+                page.go(f'/selectDoctor/{hospital_id}')
+                page.update()
 
         def on_tap(e):
-            if e.control.content.border is None:
-                print(hospital_id)
+            global selected_container
+            global hospital_id
+
+            if selected_container is not None and selected_container != e.control:
+                selected_container.content.border = None
+                selected_container.update()
+
+            if e.control.content.border is None or selected_container != e.control:
                 e.control.content.border = border.all(10, "blue")
-                e.control.update()
+                selected_container = e.control
+                hospital_id = e.control.data
             else:
                 e.control.content.border = None
-                e.control.update()
+                selected_container = None
+
+            e.control.update()
 
         hospital = GridView(
             max_extent=400,
@@ -41,12 +51,12 @@ class SelectHospital:
             padding=30,
         )
 
-        for i in range(len(server.hospitalList)):
+        for i in range(len(svr.hospitalList)):
             hospital.controls.append(
                 GestureDetector(
                     mouse_cursor=MouseCursor.CLICK,
                     on_tap=on_tap,
-                    data=int(server.hospitalList[i]["hospitalID"]),  # wrong
+                    data=int(svr.hospitalList[i]["hospitalID"]),
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
@@ -56,8 +66,8 @@ class SelectHospital:
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Image(src=f'{server.hospitalList[i]["image"]}', width=400, height=250),
-                                Text(value=f'{server.hospitalList[i]["name"]}', color='black', size=20),
+                                Image(src=f'{svr.hospitalList[i]["image"]}', width=400, height=250),
+                                Text(value=f'{svr.hospitalList[i]["name"]}', color='black', size=18),
                             ]
                          ),
                     ),

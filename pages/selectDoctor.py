@@ -1,8 +1,10 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
-import pages.server as server
-from pages.server import get_specialty_name
+import pages.server as svr
+
+selected_container = None
+doctor_id = None
 
 
 class SelectDoctor:
@@ -16,23 +18,33 @@ class SelectDoctor:
         page.window_min_width = 1050
         page.window_min_height = 600
 
-        # hospital_id = int(params.get('hospital_id'))
+        hospital_id = int(params.hospital_id)
 
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
 
         def go_select_datetime(e):
-            page.go("/selectDateTime")
+            page.go(f'/selectDateTime/{hospital_id}{doctor_id}')
             page.update()
 
         def on_tap(e):
-            if e.control.content.border is None:
+            global selected_container
+            global doctor_id
+
+            if selected_container is not None and selected_container != e.control:
+                selected_container.content.border = None
+                selected_container.update()
+
+            if e.control.content.border is None or selected_container != e.control:
                 e.control.content.border = border.all(10, "blue")
-                e.control.update()
+                selected_container = e.control
+                doctor_id = e.control.data
             else:
                 e.control.content.border = None
-                e.control.update()
+                selected_container = None
+
+            e.control.update()
 
         doctor = GridView(
             max_extent=400,
@@ -40,11 +52,14 @@ class SelectDoctor:
             padding=30,
         )
 
-        for i in range(len(server.doctorList)):
+        svr.get_doctor_details(hospital_id)
+
+        for i in range(len(svr.doctorFilteredList)):
             doctor.controls.append(
                 GestureDetector(
                     mouse_cursor=MouseCursor.CLICK,
                     on_tap=on_tap,
+                    data=int(svr.doctorFilteredList[i]["doctorID"]),
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
@@ -54,9 +69,9 @@ class SelectDoctor:
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Image(src=f'{server.doctorList[i]["image"]}', width=400, height=250),  # {i}
-                                Text(value=f'{server.doctorList[i]["name"]}', color='black', size=20),
-                                Text(value=f'{get_specialty_name(server.doctorList[i]["specialityID"])}', color='black', size=18),
+                                Image(src=f'{svr.doctorFilteredList[i]["image"]}', width=400, height=250),
+                                Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=18),
+                                Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}', color='black', size=15),
                             ]
                         )
                     ),
@@ -64,14 +79,14 @@ class SelectDoctor:
             )
 
         return View(
-            route="/selectDoctor",
+            route="/selectDoctor/:hospital_id",
             padding=50,
             spacing=50,
             controls=[
                 Row(
                     alignment=MainAxisAlignment.START,
                     controls=[
-                        TextButton(text="Pantai Hospital", style=ButtonStyle(color=colors.WHITE),
+                        TextButton(text=f'{svr.get_hospital_name(hospital_id)}', style=ButtonStyle(color=colors.WHITE),
                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white",
                                    on_click=go_select_hospital)
                     ]

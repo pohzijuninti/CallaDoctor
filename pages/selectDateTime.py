@@ -1,6 +1,7 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
+import pages.server as svr
 
 
 class SelectDateTime:
@@ -13,6 +14,9 @@ class SelectDateTime:
         page.window_full_screen = True
         page.window_min_width = 1050
         page.window_min_height = 600
+
+        hospital_id = int(params.hospital_id)
+        doctor_id = int(params.doctor_id)
 
         def go_select_doctor(e):
             page.go("/selectDoctor")
@@ -28,8 +32,8 @@ class SelectDateTime:
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[Text(value="Date"),
                                   Text(value="Time"),
-                                  Text(value="Hospital"),
-                                  Text(value="Doctor"),
+                                  Text(value=f'{svr.get_hospital_name(hospital_id)}'),
+                                  Text(value=f'{svr.get_doctor_name(doctor_id)}'),
                         ]
                     ))
             ],
@@ -42,16 +46,15 @@ class SelectDateTime:
             dlg_modal.open = True
             page.update()
 
-
         return View(
-            route="/selectDateTime",
+            route="/selectDateTime/:hospital_id:doctor_id",
             padding=50,
             spacing=50,
             controls=[
                 Row(
                     alignment=MainAxisAlignment.START,
                     controls=[
-                        TextButton(text="Pantai Hospital, Dr. Lim Guan Choon", style=ButtonStyle(color=colors.WHITE),
+                        TextButton(text=f'{svr.get_hospital_name(hospital_id)}, {svr.get_doctor_name(doctor_id)}', style=ButtonStyle(color=colors.WHITE),
                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white",
                                    on_click=go_select_doctor)
                     ]

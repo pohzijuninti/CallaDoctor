@@ -16,11 +16,11 @@ def main(page: Page):
 
     app_routes = [
         # Interfaces' path
-        path(url='/', clear=False, view=Login().view),  # first page url must be '/'
+        path(url='/', clear=True, view=Login().view),  # first page url must be '/'
         path(url='/home', clear=False, view=Home().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
-        path(url='/selectDoctor', clear=False, view=SelectDoctor().view),
-        path(url='/selectDateTime', clear=False, view=SelectDateTime().view),
+        path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),
+        path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
 
     ]
     Routing(page=page, app_routes=app_routes)

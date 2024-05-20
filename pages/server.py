@@ -3,6 +3,7 @@ import requests
 hospitalList = []
 doctorList = []
 specialityList = []
+doctorFilteredList = []
 
 # URL of the server.js endpoint
 url = 'http://localhost:3000/'
@@ -35,8 +36,29 @@ else:
     print('Error:', speciality_response.status_code)
 
 
-def get_specialty_name(specialty_id):
-    for specialty in specialityList:
-        if specialty['specialityID'] == specialty_id:
-            return specialty['name']
+def get_hospital_name(hospital_id):
+    for hospital in hospitalList:
+        if hospital['hospitalID'] == hospital_id:
+            return hospital['name']
+    return None
+
+
+def get_doctor_details(hospital_id):
+    for doctor in doctorList:
+        if doctor['hospitalID'] == hospital_id:
+            doctorFilteredList.append(doctor)
+    return None
+
+
+def get_doctor_name(doctor_id):
+    for doctor in doctorFilteredList:
+        if doctor['doctorID'] == doctor_id:
+            return doctor['name']
+    return None
+
+
+def get_speciality_name(specialty_id):
+    for speciality in specialityList:
+        if speciality['specialityID'] == specialty_id:
+            return speciality['name']
     return None
