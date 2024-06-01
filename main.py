@@ -14,7 +14,7 @@ def main(page: Page):
     app_routes = [
         # Interfaces' path
         path(url='/', clear=False, view=Login().view),  # first page url must be '/'
-        path(url='/home', clear=False, view=Home().view),
+        path(url='/home', clear=True, view=Home().view),
         path(url='/addAppointment', clear=False, view=AddAppointment().view),
     ]
     Routing(page=page, app_routes=app_routes)
