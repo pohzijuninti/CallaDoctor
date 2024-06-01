@@ -5,6 +5,7 @@ from flet_core.control_event import ControlEvent
 from db.config import register, login
 from time import sleep
 
+
 class Home:
     def __init__(self):
         pass
@@ -16,8 +17,8 @@ class Home:
         page.window_min_width = 1050
         page.window_min_height = 600
 
-        def go_add_appointment(e):
-            page.go("/addAppointment")
+        def go_select_hospital(e):
+            page.go("/selectHospital")
             page.update()
 
         return View(
@@ -81,7 +82,7 @@ class Home:
                                                                             controls=[
                                                                                 Icon(name=icons.DATE_RANGE_OUTLINED,
                                                                                      color="white"),
-                                                                                Text(value="Date")
+                                                                                Text(value="Date", color="white")
                                                                             ]
                                                                         ),
                                                                     ),
@@ -93,7 +94,7 @@ class Home:
                                                                             controls=[
                                                                                 Icon(name=icons.ACCESS_TIME_OUTLINED,
                                                                                      color="white"),
-                                                                                Text(value="Time")
+                                                                                Text(value="Time", color="white")
                                                                             ]
                                                                         )
                                                                     ),
@@ -105,7 +106,7 @@ class Home:
                                                                             controls=[
                                                                                 Icon(name=icons.LOCAL_HOSPITAL_OUTLINED,
                                                                                      color="white"),
-                                                                                Text(value="Hospital")
+                                                                                Text(value="Hospital", color="white")
                                                                             ]
                                                                         )
                                                                     ),
@@ -117,7 +118,7 @@ class Home:
                                                                             controls=[
                                                                                 Icon(name=icons.PEOPLE_OUTLINED,
                                                                                      color="white"),
-                                                                                Text(value="Doctor")
+                                                                                Text(value="Doctor", color="white")
                                                                             ]
                                                                         )
                                                                     ),
@@ -127,11 +128,13 @@ class Home:
                                                         Container(
                                                             expand=1,
                                                             content=Column(
-                                                                alignment=MainAxisAlignment.CENTER,
+                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
                                                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                                                 controls=[
                                                                     IconButton(icon=icons.DELETE_OUTLINED, icon_size=40,
-                                                                               icon_color="white", tooltip="Delete")
+                                                                               icon_color="white"),
+                                                                    TextButton(text="Delete",
+                                                                               style=ButtonStyle(color=colors.WHITE))
                                                                 ]
                                                             )
                                                         )
@@ -197,7 +200,7 @@ class Home:
                         Column(
                             horizontal_alignment=CrossAxisAlignment.END,
                             controls=[
-                                ElevatedButton(text='Add Appointment', on_click=go_add_appointment),
+                                ElevatedButton(text='Add Appointment', on_click=go_select_hospital),
                                 Container(
                                     expand=True,
                                     padding=padding.only(left=5, top=5),
