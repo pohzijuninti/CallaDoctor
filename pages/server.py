@@ -44,6 +44,8 @@ def get_hospital_name(hospital_id):
 
 
 def get_doctor_details(hospital_id):
+    global doctorFilteredList
+    doctorFilteredList = []
     for doctor in doctorList:
         if doctor['hospitalID'] == hospital_id:
             doctorFilteredList.append(doctor)

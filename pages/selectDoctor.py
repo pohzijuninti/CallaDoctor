@@ -18,6 +18,7 @@ class SelectDoctor:
         page.window_min_height = 630
 
         hospital_id = int(params.hospital_id)
+        svr.get_doctor_details(hospital_id),
 
         def go_select_hospital(e):
             page.go("/selectHospital")
@@ -47,12 +48,26 @@ class SelectDoctor:
 
         doctor = GridView(
             runs_count=3,
-            child_aspect_ratio=10 / 9,
+            child_aspect_ratio=10/9,
             spacing=30,
             padding=30,
         )
 
-        svr.get_doctor_details(hospital_id)
+        def display_button():
+            return Row(
+                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    Column(
+                        expand=True,
+                        horizontal_alignment=CrossAxisAlignment.END,
+                        controls=[
+                            TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
+                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
+                                       on_click=go_select_datetime)
+                        ]
+                    ),
+                ],
+            )
 
         for i in range(len(svr.doctorFilteredList)):
             doctor.controls.append(
@@ -63,15 +78,14 @@ class SelectDoctor:
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
-                        width=300,
-                        height=300,
                         content=Column(
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
                                 Image(src=f'{svr.doctorFilteredList[i]["image"]}', width=400, height=250),
-                                Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=18),
-                                Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}', color='black', size=15),
+                                Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
+                                Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
+                                     color='black', size=10),
                             ]
                         )
                     ),
@@ -83,49 +97,27 @@ class SelectDoctor:
             padding=50,
             spacing=50,
             controls=[
-                Row(
-                    alignment=MainAxisAlignment.START,
-                    controls=[
-                        TextButton(text=f'{svr.get_hospital_name(hospital_id)}', style=ButtonStyle(color=colors.WHITE),
-                                   icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white",
-                                   on_click=go_select_hospital)
-                    ]
-                ),
-                Row(
+                Column(
                     expand=True,
-                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                    alignment=MainAxisAlignment.CENTER,
                     controls=[
-                        Column(
-                            expand=True,
-                            alignment=MainAxisAlignment.CENTER,
+                        Row(
                             controls=[
-                                Container(
-                                    padding=padding.only(left=5),
-                                    content=Text(value='Select Doctor',
-                                                 style=TextStyle(size=24, weight=FontWeight.BOLD)),
-                                ),
-                                Container(
-                                    expand=True,
-                                    border_radius=10,
-                                    content=doctor
+                                TextButton(
+                                    text=f'{svr.get_hospital_name(hospital_id)}',
+                                    style=ButtonStyle(color=colors.WHITE),
+                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color=colors.WHITE,
+                                    on_click=go_select_hospital
                                 ),
                             ]
                         ),
+                        Container(
+                            expand=True,
+                            border_radius=10,
+                            content=doctor,
+                        ),
+                        display_button(),
                     ]
                 ),
-                Row(
-                    alignment=MainAxisAlignment.SPACE_BETWEEN,
-                    controls=[
-                        Column(
-                            expand=True,
-                            horizontal_alignment=CrossAxisAlignment.END,
-                            controls=[
-                                TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
-                                           icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color="white",
-                                           on_click=go_select_datetime)
-                            ]
-                        ),
-                    ],
-                )
             ]
         )

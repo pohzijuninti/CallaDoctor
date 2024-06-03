@@ -2,13 +2,18 @@ import flet as ft
 from flet import *
 from flet_route import Params, Basket
 import pages.server as svr
+import datetime
 
 
-# Remove this comment
 class SelectDateTime:
     def __init__(self):
         pass
 
+    def generate_calendar(self, page):
+        current_date = datetime.date.today()
+        current_year = current_date.year
+        current_month = current_date.month
+        
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Date & Time'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -20,7 +25,7 @@ class SelectDateTime:
         doctor_id = int(params.doctor_id)
 
         def go_select_doctor(e):
-            page.go("/selectDoctor")
+            page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
         dlg_modal = AlertDialog(
@@ -31,10 +36,11 @@ class SelectDateTime:
                 Container(
                     content=Column(
                         horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[Text(value="Date"),
-                                  Text(value="Time"),
-                                  Text(value=f'{svr.get_hospital_name(hospital_id)}'),
-                                  Text(value=f'{svr.get_doctor_name(doctor_id)}'),
+                        controls=[
+                            Text(value="Date"),
+                            Text(value="Time"),
+                            Text(value=f'{svr.get_hospital_name(hospital_id)}'),
+                            Text(value=f'{svr.get_doctor_name(doctor_id)}'),
                         ]
                     ))
             ],
@@ -65,22 +71,27 @@ class SelectDateTime:
                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         Column(
-                            expand=True,
+                            expand=2,
                             alignment=MainAxisAlignment.CENTER,
                             controls=[
                                 Container(
-                                    padding=padding.only(left=5),
-                                    content=Text(value='Select Date & Time',
-                                                 style=TextStyle(size=24, weight=FontWeight.BOLD)),
-                                ),
-                                Container(
                                     expand=True,
-                                    border_radius=10,
                                     bgcolor="yellow",
-                                    # content=
+                                    # content,
                                 ),
+
                             ]
                         ),
+                        Column(
+                            expand=1,
+                            alignment=MainAxisAlignment.CENTER,
+                            controls=[
+                                Container(
+                                    expand=True,
+                                    bgcolor="red"
+                                )
+                            ]
+                        )
                     ]
                 ),
                 Row(
@@ -95,5 +106,5 @@ class SelectDateTime:
                         ),
                     ],
                 )
-            ]
+            ],
         )

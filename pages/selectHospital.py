@@ -6,6 +6,7 @@ import pages.server as svr
 selected_container = None
 hospital_id = None
 
+
 class SelectHospital:
     def __init__(self):
         pass
@@ -15,7 +16,6 @@ class SelectHospital:
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 800
         page.window_min_height = 630
-
 
         def go_home(e):
             page.go("/home")
@@ -60,7 +60,7 @@ class SelectHospital:
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
                             TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
-                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color="white",
+                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
                                        on_click=go_select_doctor)
                         ]
                     ),
