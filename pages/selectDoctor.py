@@ -14,9 +14,8 @@ class SelectDoctor:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_full_screen = True
-        page.window_min_width = 1050
-        page.window_min_height = 600
+        page.window_min_width = 800
+        page.window_min_height = 630
 
         hospital_id = int(params.hospital_id)
 
@@ -47,7 +46,8 @@ class SelectDoctor:
             e.control.update()
 
         doctor = GridView(
-            max_extent=400,
+            runs_count=3,
+            child_aspect_ratio=10 / 9,
             spacing=30,
             padding=30,
         )

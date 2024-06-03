@@ -6,7 +6,6 @@ import pages.server as svr
 selected_container = None
 hospital_id = None
 
-
 class SelectHospital:
     def __init__(self):
         pass
@@ -14,9 +13,9 @@ class SelectHospital:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Hospital'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_full_screen = True
-        page.window_min_width = 1050
-        page.window_min_height = 600
+        page.window_min_width = 800
+        page.window_min_height = 630
+
 
         def go_home(e):
             page.go("/home")
@@ -46,10 +45,27 @@ class SelectHospital:
             e.control.update()
 
         hospital = GridView(
-            max_extent=400,
+            runs_count=3,
+            child_aspect_ratio=10/9,
             spacing=30,
             padding=30,
         )
+
+        def display_button():
+            return Row(
+                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    Column(
+                        expand=True,
+                        horizontal_alignment=CrossAxisAlignment.END,
+                        controls=[
+                            TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
+                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color="white",
+                                       on_click=go_select_doctor)
+                        ]
+                    ),
+                ],
+            )
 
         for i in range(len(svr.hospitalList)):
             hospital.controls.append(
@@ -60,14 +76,12 @@ class SelectHospital:
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
-                        width=300,
-                        height=300,
                         content=Column(
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Image(src=f'{svr.hospitalList[i]["image"]}', width=400, height=250),
-                                Text(value=f'{svr.hospitalList[i]["name"]}', color='black', size=18),
+                                Image(src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),
+                                Text(value=f'{svr.hospitalList[i]["name"]}', color='black', size=12),
                             ]
                          ),
                     ),
@@ -79,47 +93,27 @@ class SelectHospital:
             padding=50,
             spacing=50,
             controls=[
-                Row(
-                    alignment=MainAxisAlignment.START,
-                    controls=[
-                        ElevatedButton(text='Back to Home', on_click=go_home),
-                    ]
-                ),
-                Row(
+                Column(
                     expand=True,
-                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                    alignment=MainAxisAlignment.CENTER,
                     controls=[
-                        Column(
-                            expand=True,
-                            alignment=MainAxisAlignment.CENTER,
+                        Row(
                             controls=[
-                                Container(
-                                    padding=padding.only(left=5),
-                                    content=Text(value='Select Hospital',
-                                                 style=TextStyle(size=24, weight=FontWeight.BOLD)),
+                                IconButton(
+                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
+                                    icon_color=colors.WHITE,
+                                    on_click=go_home,
                                 ),
-                                Container(
-                                    expand=True,
-                                    border_radius=10,
-                                    content=hospital
-                                ),
+                                Text(value='Select Hospital', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]
                         ),
+                        Container(
+                            expand=True,
+                            border_radius=10,
+                            content=hospital
+                        ),
+                        display_button(),
                     ]
                 ),
-                Row(
-                    alignment=MainAxisAlignment.SPACE_BETWEEN,
-                    controls=[
-                        Column(
-                            expand=True,
-                            horizontal_alignment=CrossAxisAlignment.END,
-                            controls=[
-                                TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
-                                           icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color="white",
-                                           on_click=go_select_doctor)
-                            ]
-                        ),
-                    ],
-                )
             ]
         )

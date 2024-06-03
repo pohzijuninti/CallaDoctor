@@ -13,9 +13,8 @@ class Home:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_full_screen = True
-        page.window_min_width = 1050
-        page.window_min_height = 600
+        page.window_min_width = 800
+        page.window_min_height = 630
 
         def go_select_hospital(e):
             page.go("/selectHospital")
@@ -52,7 +51,6 @@ class Home:
                                 ),
 
                                 ListView(
-                                    auto_scroll=True,
                                     expand=True,
                                     controls=[
                                         Container(

@@ -13,7 +13,7 @@ class Login:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Login'
         page.window_min_width = 800
-        page.window_min_height = 400
+        page.window_min_height = 630
         page.window_resizable = True
 
         def temp_go_home(e):
