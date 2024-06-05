@@ -18,6 +18,9 @@ class SelectHospital:
         page.window_min_height = 630
 
         def go_home(e):
+            global selected_container
+            selected_container = None
+
             page.go("/home")
             page.update()
 
