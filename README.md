@@ -15,6 +15,9 @@ npm i express
 touch index.js
 sudo npm i -g nodemon
 
+# Install body-parser
+npm install body-parser
+
 
 # Run Server
 nodemon server.js

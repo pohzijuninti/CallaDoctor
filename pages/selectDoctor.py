@@ -48,7 +48,7 @@ class SelectDoctor:
 
         doctor = GridView(
             runs_count=3,
-            child_aspect_ratio=10/9,
+            child_aspect_ratio=8/9,
             spacing=30,
             padding=30,
         )
@@ -78,15 +78,27 @@ class SelectDoctor:
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
-                        content=Column(
-                            alignment=MainAxisAlignment.SPACE_EVENLY,
-                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                            controls=[
-                                Image(src=f'{svr.doctorFilteredList[i]["image"]}', width=400, height=250),
-                                Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
-                                Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
-                                     color='black', size=10),
-                            ]
+                        content=Container(
+                            content=Column(
+                                alignment=MainAxisAlignment.CENTER,
+                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                controls=[
+                                    Container(
+                                        expand=3,
+                                        padding=padding.only(top=10),
+                                        content=Image(src=f'{svr.doctorFilteredList[i]["image"]}', fit=ImageFit.FIT_HEIGHT),
+                                    ),
+                                    Column(
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        expand=1,
+                                        controls=[
+                                            Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
+                                            Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
+                                                 color='black', size=10),
+                                        ]
+                                    )
+                                ]
+                            )
                         )
                     ),
                 )

@@ -36,6 +36,13 @@ else:
     print('Error:', speciality_response.status_code)
 
 
+def get_time_slot(hospital_id):
+    for hospital in hospitalList:
+        if hospital['hospitalID'] == hospital_id:
+            return hospital['name']
+    return None
+
+
 def get_hospital_name(hospital_id):
     for hospital in hospitalList:
         if hospital['hospitalID'] == hospital_id:
@@ -64,3 +71,6 @@ def get_speciality_name(specialty_id):
         if speciality['specialityID'] == specialty_id:
             return speciality['name']
     return None
+
+
+
