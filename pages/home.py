@@ -20,6 +20,10 @@ class Home:
             page.go("/selectHospital")
             page.update()
 
+        def go_medical_record(e):
+            page.go("/medicalRecord")
+            page.update()
+
         return View(
             route="/home",
             controls=[
@@ -36,8 +40,96 @@ class Home:
                                         border_radius=10,
                                         width=200,
                                         bgcolor="pink",
-                                        content=Text('NavBar')
-                                    )
+                                        content=Column(
+                                            alignment=MainAxisAlignment.START,
+                                            controls=[
+                                                Row(
+                                                    controls=[
+                                                        Container(
+                                                            expand=True,
+                                                            height=100,
+                                                            bgcolor="grey",
+                                                            content=Text("User Info")
+                                                        ),
+                                                    ]
+                                                ),
+                                                Row(
+                                                    controls=[
+                                                        Container(
+                                                            expand=True,
+                                                            height=50,
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
+                                                                vertical_alignment=CrossAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    IconButton(
+                                                                        icon=icons.INSERT_DRIVE_FILE_OUTLINED,
+                                                                        icon_color=colors.WHITE,
+                                                                        on_click=go_medical_record
+                                                                    ),
+                                                                    TextButton(
+                                                                        text="Medical Record",
+                                                                        style=ButtonStyle(color=colors.WHITE),
+                                                                        on_click=go_medical_record
+                                                                    )
+                                                                ]
+                                                            ),
+                                                        ),
+                                                    ]
+                                                ),
+                                                Row(
+                                                    controls=[
+                                                        Container(
+                                                            expand=True,
+                                                            height=50,
+                                                            bgcolor="grey",
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
+                                                                vertical_alignment=CrossAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    IconButton(
+                                                                        icon=icons.CATCHING_POKEMON_OUTLINED,
+                                                                        icon_color=colors.WHITE,
+                                                                        # on_click=
+                                                                    ),
+                                                                    TextButton(
+                                                                        text="XXX",
+                                                                        style=ButtonStyle(color=colors.WHITE),
+                                                                        # on_click=
+                                                                    )
+                                                                ]
+                                                            ),
+                                                        ),
+                                                    ]
+                                                ),
+                                                Row(
+                                                    controls=[
+                                                        Container(
+                                                            expand=True,
+                                                            height=50,
+                                                            bgcolor="grey",
+                                                            content=Row(
+                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
+                                                                vertical_alignment=CrossAxisAlignment.CENTER,
+                                                                controls=[
+                                                                    IconButton(
+                                                                        icon=icons.CATCHING_POKEMON_OUTLINED,
+                                                                        icon_color=colors.WHITE,
+                                                                        # on_click=
+                                                                    ),
+                                                                    TextButton(
+                                                                        text="XXX",
+                                                                        style=ButtonStyle(color=colors.WHITE),
+                                                                        # on_click=
+                                                                    )
+                                                                ]
+                                                            ),
+                                                        ),
+                                                    ]
+                                                )
+                                            ]
+                                        )
+                                    ),
                                 ]
                             ),
                         ),

@@ -6,6 +6,7 @@ from flet_route import Routing, path
 from pages.login import Login
 from pages.homeold import HomeOld
 from pages.home import Home
+from pages.medicalRecord import MedicalRecord
 from pages.selectHospital import SelectHospital
 from pages.selectDoctor import SelectDoctor
 from pages.selectDateTime import SelectDateTime
@@ -18,6 +19,7 @@ def main(page: Page):
         # Interfaces' path
         path(url='/', clear=True, view=Login().view),  # first page url must be '/'
         path(url='/home', clear=True, view=Home().view),
+        path(url='/medicalRecord', clear=False, view=MedicalRecord().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
         path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),
         path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
