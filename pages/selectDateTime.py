@@ -7,13 +7,15 @@ import calendar
 import requests
 import json
 
+selected_container = None
+selected_date = None
+selected_time = None
+
+
 class SelectDateTime:
     def __init__(self):
         self.calendar_grid = None
         self.chosen_date = None
-        self.selected_time_slot = None
-        self.time_slots_column = None
-        self.appointment_date = None
         today = datetime.date.today()
         self.url = "http://localhost:3000/timeslots/21/" + today.isoformat()
         self.payload = {}
@@ -27,12 +29,10 @@ class SelectDateTime:
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
 
-
     def generate_calendar(self, page):
         current_date = datetime.date.today()
         current_year = current_date.year
         current_month = current_date.month
-        days_in_month = calendar.monthrange(current_year, current_month)[1]
 
         self.calendar_grid = Column(
             wrap=True,
@@ -47,7 +47,7 @@ class SelectDateTime:
                 content=Text(
                     f"{calendar.month_name[month]} {current_year}",
                     size=14,
-                    weight="bold",
+                    weight=FontWeight.BOLD,
                     color=colors.BLACK,
                     text_align=TextAlign.CENTER
                 )
@@ -111,7 +111,6 @@ class SelectDateTime:
 
                     if day < current_date.day:
                         if day_container.content:
-                            # day_container.bgcolor = colors.GREY_800
                             day_container.content.color = colors.GREY_500
                             day_container.disabled = True
 
@@ -136,6 +135,8 @@ class SelectDateTime:
         )
 
     def date_clicked(self, date):
+        global selected_date
+
         if date:
             # Reset the previously chosen date
             if self.chosen_date:
@@ -165,118 +166,6 @@ class SelectDateTime:
                         day_container.content.color = colors.BLACK  # Reset the text color
                         day_container.update()
 
-    def generate_time_slots(self, working_time):
-        start_time, end_time = working_time.split(" - ")
-        start_time = datetime.datetime.strptime(start_time, "%I:%M %p")
-        end_time = datetime.datetime.strptime(end_time, "%I:%M %p")
-
-        time_slots = []
-
-        while start_time < end_time:
-            end_of_slot = start_time + datetime.timedelta(hours=1.5)
-            start_time_str = start_time.strftime("%I:%M %p")
-            end_of_slot_str = end_of_slot.strftime("%I:%M %p")
-
-            # Check if the current time slot is the selected time slot
-            is_selected = start_time_str == self.selected_time_slot
-
-            # Define the button's bgcolor based on selection
-            bgcolor = colors.WHITE if is_selected else "#3386C5"
-            text_color = "#3386C5" if is_selected else colors.WHITE
-
-            def on_time_slot_click(control, time=start_time_str):
-                self.time_slot_clicked(control, time, is_selected)
-
-            time_slot_button = Container(
-                margin=margin.only(left=10, bottom=5),
-                content=TextButton(
-                    content=Text(start_time_str, size=14, color=text_color, font_family="RobotoSlab"),
-                    width=95,
-                    height=45,
-                    style=ButtonStyle(bgcolor={"": bgcolor}, shape={"": RoundedRectangleBorder(radius=7)},
-                                      side={"": BorderSide(1, "#3386C5")}, ),
-                    on_click=on_time_slot_click,
-                )
-            )
-
-            time_slots.append(time_slot_button)
-
-            start_time = end_of_slot
-
-        rows = [time_slots[i:i + 3] for i in range(0, len(time_slots), 3)]
-
-        self.time_slots_column = Column(
-            controls=[Row(controls=row, spacing=10) for row in rows]
-        )
-
-        return self.time_slots_column
-
-    def time_slot_clicked(self, button, time, is_selected):
-        # Reset the previously selected time slot
-        if self.selected_time_slot:
-            self.reset_time_slot_color(self.selected_time_slot)
-
-        # Set the new selected time slot
-        self.selected_time_slot = time
-        print(self.selected_time_slot)
-
-        for row in self.time_slots_column.controls:
-            for i, button in enumerate(row.controls):
-                # Get the stored text for the button
-                button_text = button.content.content.value
-                if button_text == time:
-                    # Create a new button with the original style and the same text
-                    new_button = Container(
-                        margin=margin.only(left=10, bottom=5),
-                        content=TextButton(
-                            content=Text(button_text, size=14, color="#3386C5", font_family="RobotoSlab"),
-                            width=95,
-                            height=45,
-                            style=ButtonStyle(bgcolor={"": colors.WHITE}, shape={"": RoundedRectangleBorder(radius=7)},
-                                              side={"": BorderSide(1, "#3386C5")}, ),
-                            on_click=lambda control, time_slot=button_text: self.time_slot_clicked(control, time_slot,
-                                                                                                   True)
-                        )
-                    )
-
-                    # Replace the old button with the new one in the time_slots_column controls
-                    row.controls[i] = new_button
-
-        # Update your layout to reflect the changes
-        self.time_slots_column.update()
-
-        if self.chosen_date:
-            current_date = datetime.date.today()
-            current_month = current_date.month
-            current_year = current_date.year  # Get the current year
-            month_name = calendar.month_name[current_month]
-            self.appointment_date = f"{self.chosen_date} {month_name} {current_year}"
-
-    def reset_time_slot_color(self, time):
-        for row in self.time_slots_column.controls:
-            for i, button in enumerate(row.controls):
-                # Get the stored text for the button
-                button_text = button.content.content.value
-                if button_text == time:
-                    # Create a new button with the original style and the same text
-                    new_button = Container(
-                        margin=margin.only(left=10, bottom=5),
-                        content=TextButton(
-                            content=Text(button_text, size=14, color=colors.WHITE, font_family="RobotoSlab"),
-                            width=95,
-                            height=45,
-                            style=ButtonStyle(bgcolor={"": "#3386C5"}, shape={"": RoundedRectangleBorder(radius=7)}),
-                            on_click=lambda control, time_slot=button_text: self.time_slot_clicked(control, time_slot,
-                                                                                                   False)
-                        )
-                    )
-
-                    # Replace the old button with the new one in the time_slots_column controls
-                    row.controls[i] = new_button
-
-        # Update your layout to reflect the changes
-        self.time_slots_column.update()
-        
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Date & Time'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -289,18 +178,27 @@ class SelectDateTime:
         doctor_id = int(params.doctor_id)
 
         def on_tap(e):
+            global selected_container
+            global selected_time
 
-            # print(response.text)
+            container = e.control.content  # Access the Container inside the GestureDetector
 
-            # if e.control.content.border is None:
-            #     e.control.content.border = border.all(10, "blue")
-            #     selected_container = e.control
-            #     doctor_id = e.control.data
-            # else:
-            #     e.control.content.border = None
-            #     selected_container = None
+            if selected_container is not None and selected_container != container:
+                selected_container.bgcolor = colors.WHITE
+                selected_container.content.color = colors.GREY_800
+                selected_container.update()
 
-            e.control.update()
+            if container.bgcolor == colors.WHITE:
+                container.bgcolor = colors.GREY_200
+                container.content.color = colors.RED
+                selected_container = container
+                selected_time = e.control.data
+                print(f"Chosen Time: {selected_time}")
+            else:
+                container.bgcolor = colors.WHITE
+                container.content.color = colors.GREY_800
+
+            container.update()
 
         timeslot = GridView(
             runs_count=3,
@@ -317,6 +215,7 @@ class SelectDateTime:
             timeslot.controls.append(
                 GestureDetector(
                     on_tap=on_tap,
+                    data=time,
                     mouse_cursor=MouseCursor.CLICK,
                     content=Container(
                         border_radius=10,
@@ -334,29 +233,46 @@ class SelectDateTime:
             page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
-        dlg_modal = AlertDialog(
-            modal=False,
-            title=Text("Successful"),
-            content=Text("Thanks for choosing us."),
-            actions=[
-                Container(
-                    content=Column(
-                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Text(value="Date"),
-                            Text(value="Time"),
-                            Text(value=f'{svr.get_hospital_name(hospital_id)}'),
-                            Text(value=f'{svr.get_doctor_name(doctor_id)}'),
-                        ]
-                    ))
-            ],
-            actions_alignment=MainAxisAlignment.CENTER,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
-        )
-
         def open_dlg_modal(e):
+            global selected_date
+            global selected_time
+
+            current_date = datetime.date.today()
+            current_month = current_date.month
+            current_year = current_date.year
+            month_name = calendar.month_name[current_month]
+
+            if self.chosen_date is None:
+                selected_date = f'{current_date.day} {month_name} {current_year}'
+            else:
+                selected_date = f'{self.chosen_date} {month_name} {current_year}'
+
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Successful"),
+                content=Text("Thanks for choosing us."),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=f'{selected_date}'),
+                                Text(value=f'{selected_time}'),
+                                Text(value=f'{svr.get_hospital_name(hospital_id)}'),
+                                Text(value=f'{svr.get_doctor_name(doctor_id)}'),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+                on_dismiss=lambda e: print("Modal dialog dismissed!"),
+            )
+
             page.dialog = dlg_modal
-            dlg_modal.open = True
+
+            if selected_time is not None:
+                dlg_modal.open = True
+
+            page.go("/home")
             page.update()
 
         return View(
@@ -370,7 +286,6 @@ class SelectDateTime:
                                    style=ButtonStyle(color=colors.WHITE),
                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white",
                                    on_click=go_select_doctor),
-
                         Row(
                             expand=True,
                             controls=[
@@ -406,23 +321,7 @@ class SelectDateTime:
                                 ),
                             ],
                         )
-
-
                     ]
                 ),
-
-
-                # Row(
-                #     alignment=MainAxisAlignment.SPACE_BETWEEN,
-                #     controls=[
-                #         Column(
-                #             expand=True,
-                #             horizontal_alignment=CrossAxisAlignment.END,
-                #             controls=[
-                #                 ElevatedButton(text='Confirm Appointment', on_click=open_dlg_modal),
-                #             ]
-                #         ),
-                #     ],
-                # )
             ],
         )
