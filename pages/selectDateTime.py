@@ -135,8 +135,6 @@ class SelectDateTime:
         )
 
     def date_clicked(self, date):
-        global selected_date
-
         if date:
             # Reset the previously chosen date
             if self.chosen_date:

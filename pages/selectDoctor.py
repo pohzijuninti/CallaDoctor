@@ -37,7 +37,7 @@ class SelectDoctor:
                 selected_container.update()
 
             if e.control.content.border is None or selected_container != e.control:
-                e.control.content.border = border.all(10, "blue")
+                e.control.content.border = border.all(10, colors.BLUE_100)
                 selected_container = e.control
                 doctor_id = e.control.data
             else:

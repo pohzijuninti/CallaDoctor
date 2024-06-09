@@ -167,6 +167,44 @@ const doctor = [
   },
 ];
 
+const description = [
+  {
+    "descriptionID": 201,
+    "datetime": 1717830000,
+    "caution": "High blood pressure",
+    "description": "Routine checkup for heart condition",
+    "userID": 101,
+  },
+  {
+    "descriptionID": 202,
+    "datetime": 1717992000,
+    "caution": "Appendicitis",
+    "description": "Surgery scheduled for appendectomy",
+    "userID": 102,
+  },
+  {
+    "descriptionID": 203,
+    "datetime": 1718445600,
+    "caution": "Vision blurry in right eye",
+    "description": "Consultation for possible cataracts",
+    "userID": 103,
+  },
+  {
+    "descriptionID": 204,
+    "datetime": 1718866800,
+    "caution": "Eczema flare-up",
+    "description": "Prescription refill for eczema cream",
+    "userID": 104,
+  },
+  {
+    "descriptionID": 205,
+    "datetime": 1719104400,
+    "caution": "Toothache in lower left molar",
+    "description": "Extraction of infected tooth",
+    "userID": 105,
+  },
+];
+
 
 app.get('/', (req, res) => {
     res.send('CallaDoctor API');
@@ -182,6 +220,10 @@ app.get('/speciality', (req, res) => {
 
 app.get('/doctor', (req, res) => {
   res.send(doctor);
+});
+
+app.get('/description', (req, res) => {
+  res.send(description);
 });
 
 
@@ -252,6 +294,25 @@ app.post('/timeslots/:doctorID/:time', (req, res) => {
   }
 });
 
+const appointments = [];
+
+app.post('/book/hospital', (req, res) => {
+  const appointment = {
+      bookID: counter.length + 1,
+      date: parseInt(req.body.date),
+      time: parseInt(req.body.time),
+      hospitalID: parseInt(req.body. hospitalID),
+      doctorID: parseInt(req.body.doctorID),
+  };
+  counter.push(1);
+  appointments.push(appointment);
+  res.send(appointment);
+});
+
+
+app.get('/appointment', (req, res) => {
+  res.send(appointments);
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

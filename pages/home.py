@@ -3,12 +3,109 @@ from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
 from db.config import register, login
-from time import sleep
+import datetime
+import calendar
 
 
 class Home:
     def __init__(self):
-        pass
+        self.calendar_grid = None
+
+    def generate_calendar(self, page):
+        current_date = datetime.date.today()
+        current_year = current_date.year
+        current_month = current_date.month
+
+        self.calendar_grid = Column(
+            wrap=True,
+            alignment=MainAxisAlignment.CENTER,
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+        )
+
+        for month in range(current_month, current_month + 1):
+            month_label = Container(
+                margin=margin.only(bottom=-10),
+                alignment=alignment.center,
+                content=Text(
+                    f"{calendar.month_name[month]} {current_year}",
+                    size=14,
+                    weight=FontWeight.BOLD,
+                    color=colors.BLACK,
+                    text_align=TextAlign.CENTER
+                )
+            )
+
+            month_matrix = calendar.monthcalendar(current_year, month)
+            month_grid = Column(alignment=MainAxisAlignment.CENTER,
+                                spacing=25)
+            month_grid.controls.append(
+                Row(
+                    alignment=MainAxisAlignment.START,
+                    controls=[month_label]
+                )
+            )
+
+            weekday_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            weekday_row = Row()
+            for weekday in weekday_labels:
+                day_container = Container(
+                    width=20,
+                    height=20,
+                    alignment=alignment.center,
+                    content=Text(weekday, size=12, color=colors.BLACK),
+                    margin=margin.only(right=10, bottom=-10)
+                )
+                weekday_row.controls.append(day_container)
+
+            month_grid.controls.append(weekday_row)
+
+            for week in month_matrix:
+                week_container = Row()
+                for day in week:
+                    if day == 0:
+                        day_container = Container(
+                            width=20,
+                            height=20,
+                            alignment=alignment.center,
+                            content=None,
+                            margin=margin.only(right=10)
+                        )
+                    else:
+                        day_container = Container(
+                            width=20,
+                            height=20,
+                            border=None,
+                            alignment=alignment.center,
+                            content=Text(str(day), size=12, color=colors.BLACK, weight=FontWeight.W_500),
+                            margin=margin.only(right=10, bottom=-10),
+                        )
+
+                    if day == current_date.day and month == current_date.month and current_year == current_date.year:
+                        day_container.border_radius = 14
+                        day_container.bgcolor = colors.RED
+                        day_container.content.color = colors.WHITE
+
+                    if day < current_date.day:
+                        if day_container.content:
+                            day_container.content.color = colors.GREY_500
+                            day_container.disabled = True
+
+                    week_container.controls.append(day_container)
+
+                month_grid.controls.append(week_container)
+
+            self.calendar_grid.controls.append(month_grid)
+
+        return Container(
+            border_radius=10,
+            bgcolor=colors.WHITE,
+            padding=padding.only(left=5, right=5, top=15, bottom=15),
+            content=Container(
+                alignment=alignment.center,
+                margin=margin.only(left=10, right=10),
+                content=self.calendar_grid  # Use self.calendar_grid here
+            )
+        )
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor'
@@ -22,6 +119,10 @@ class Home:
 
         def go_medical_record(e):
             page.go("/medicalRecord")
+            page.update()
+
+        def go_clinic_form(e):
+            page.go("/clinicForm")
             page.update()
 
         return View(
@@ -82,20 +183,19 @@ class Home:
                                                         Container(
                                                             expand=True,
                                                             height=50,
-                                                            bgcolor="grey",
                                                             content=Row(
                                                                 alignment=MainAxisAlignment.SPACE_EVENLY,
                                                                 vertical_alignment=CrossAxisAlignment.CENTER,
                                                                 controls=[
                                                                     IconButton(
-                                                                        icon=icons.CATCHING_POKEMON_OUTLINED,
+                                                                        icon=icons.MEDICAL_INFORMATION_OUTLINED,
                                                                         icon_color=colors.WHITE,
                                                                         # on_click=
                                                                     ),
                                                                     TextButton(
-                                                                        text="XXX",
+                                                                        text="Clinic Form",
                                                                         style=ButtonStyle(color=colors.WHITE),
-                                                                        # on_click=
+                                                                        on_click=go_clinic_form
                                                                     )
                                                                 ]
                                                             ),
@@ -150,9 +250,9 @@ class Home:
                                             content=Container(
                                                 border_radius=10,
                                                 bgcolor="amber",
+                                                padding=padding.only(left=10, top=5, bottom=5),
                                                 width=400,
                                                 height=125,
-                                                # here
                                                 content=Row(
                                                     expand=True,
                                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -304,7 +404,7 @@ class Home:
                                                     bgcolor="red",
                                                     width=300,
                                                     height=300,
-                                                    content=Text('Calendar'),
+                                                    content=self.generate_calendar(page),
                                                 ),
                                             ),
                                             Row(
@@ -318,7 +418,110 @@ class Home:
                                                                 bgcolor="green",
                                                                 width=145,
                                                                 height=100,
-                                                                content=Text('Booking History'),
+                                                                content=ListView(
+                                                                    expand=True,
+                                                                    controls=[
+                                                                        Container(
+                                                                            padding=5,
+                                                                            content=Container(
+                                                                                border_radius=10,
+                                                                                bgcolor="amber",
+                                                                                padding=5,
+                                                                                width=400,
+                                                                                height=125,
+                                                                                content=Row(
+                                                                                    expand=True,
+                                                                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                                                    controls=[
+                                                                                        Container(
+                                                                                            expand=True,
+                                                                                            content=Column(
+                                                                                                expand=True,
+                                                                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                                                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                                                                controls=[
+                                                                                                    Container(
+                                                                                                        expand=True,
+                                                                                                        content=Row(
+                                                                                                            expand=True,
+                                                                                                            alignment=MainAxisAlignment.START,
+                                                                                                            controls=[
+                                                                                                                Icon(name=icons.DATE_RANGE_OUTLINED,
+                                                                                                                    color="white", size=20),
+                                                                                                                Text(value="Date", color="white", size=10)
+                                                                                                            ]
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                    Container(
+                                                                                                        expand=True,
+                                                                                                        content=Row(
+                                                                                                            expand=True,
+                                                                                                            alignment=MainAxisAlignment.START,
+                                                                                                            controls=[
+                                                                                                                Icon(
+                                                                                                                    name=icons.ACCESS_TIME_OUTLINED,
+                                                                                                                    color="white",
+                                                                                                                    size=20),
+                                                                                                                Text(
+                                                                                                                    value="Time",
+                                                                                                                    color="white",
+                                                                                                                    size=10)
+                                                                                                            ]
+                                                                                                        )
+                                                                                                    ),
+                                                                                                    Container(
+                                                                                                        expand=True,
+                                                                                                        content=Row(
+                                                                                                            expand=True,
+                                                                                                            alignment=MainAxisAlignment.START,
+                                                                                                            controls=[
+                                                                                                                Icon(
+                                                                                                                    name=icons.LOCAL_HOSPITAL_OUTLINED,
+                                                                                                                    color="white",
+                                                                                                                    size=20),
+                                                                                                                Text(
+                                                                                                                    value="Hospital",
+                                                                                                                    color="white",
+                                                                                                                    size=10)
+                                                                                                            ]
+                                                                                                        )
+                                                                                                    ),
+                                                                                                    Container(
+                                                                                                        expand=True,
+                                                                                                        content=Row(
+                                                                                                            expand=True,
+                                                                                                            alignment=MainAxisAlignment.START,
+                                                                                                            controls=[
+                                                                                                                Icon(
+                                                                                                                    name=icons.PEOPLE_OUTLINED,
+                                                                                                                    color="white",
+                                                                                                                    size=20),
+                                                                                                                Text(
+                                                                                                                    value="Doctor",
+                                                                                                                    color="white",
+                                                                                                                    size=10)
+                                                                                                            ]
+                                                                                                        )
+                                                                                                    ),
+                                                                                                ]
+                                                                                            )
+                                                                                        ),
+                                                                                    ]
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Container(
+                                                                            padding=5,
+                                                                            content=Container(
+                                                                                border_radius=10,
+                                                                                bgcolor="amber",
+                                                                                width=400,
+                                                                                height=125,
+                                                                                content=Text('Booking History'),
+                                                                            ),
+                                                                        ),
+                                                                    ]
+                                                                ),
                                                             ),
                                                         ]
                                                     ),

@@ -9,7 +9,7 @@ class MedicalRecord:
         pass
 
     def view(self, page: Page, params: Params, basket: Basket):
-        page.title = 'Call a Doctor - MedicalRecord'
+        page.title = 'Call a Doctor - Medical Record'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 800
         page.window_min_height = 630

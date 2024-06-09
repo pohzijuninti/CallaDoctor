@@ -29,6 +29,8 @@ class SelectHospital:
                 page.go(f'/selectDoctor/{hospital_id}')
                 page.update()
 
+        # def search_hospital(e):
+
         def on_tap(e):
             global selected_container
             global hospital_id
@@ -38,7 +40,7 @@ class SelectHospital:
                 selected_container.update()
 
             if e.control.content.border is None or selected_container != e.control:
-                e.control.content.border = border.all(10, "blue")
+                e.control.content.border = border.all(10, colors.BLUE_100)
                 selected_container = e.control
                 hospital_id = e.control.data
             else:
@@ -102,12 +104,36 @@ class SelectHospital:
                     controls=[
                         Row(
                             controls=[
-                                IconButton(
-                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
-                                    icon_color=colors.WHITE,
-                                    on_click=go_home,
+                                Column(
+                                    expand=2,
+                                    controls=[
+                                        Row(
+                                            controls=[
+                                                IconButton(
+                                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
+                                                    icon_color=colors.WHITE,
+                                                    on_click=go_home,
+                                                ),
+                                                Text(value='Select Hospital',
+                                                     style=TextStyle(size=24, weight=FontWeight.BOLD)),
+                                            ]
+                                        ),
+
+                                    ]
                                 ),
-                                Text(value='Select Hospital', style=TextStyle(size=24, weight=FontWeight.BOLD)),
+                                Column(
+                                    expand=1,
+                                    horizontal_alignment=CrossAxisAlignment.END,
+                                    controls=[
+                                        IconButton(
+                                            icon=icons.SEARCH_OUTLINED,
+                                            icon_color=colors.WHITE,
+                                            hover_color=colors.BLUE_100,
+                                            # on_click=search_hospital,
+                                        ),
+                                    ]
+                                )
+
                             ]
                         ),
                         Container(
