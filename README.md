@@ -7,7 +7,6 @@ flet run main.py
 
 pip install plotly
 
-
 # Setup Server
 # Create a Server Folder
 npm init -yes
@@ -18,14 +17,14 @@ sudo npm i -g nodemon
 # Install body-parser
 npm install body-parser
 
+# For CSV file
+npm install csv-writer
 
 # Run Server
 nodemon server.js
 
-
 # Stop Server
 ctrl + c
-
 
 # Find server link
 ifconfig

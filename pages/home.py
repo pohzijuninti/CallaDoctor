@@ -5,6 +5,9 @@ from flet_core.control_event import ControlEvent
 from db.config import register, login
 import datetime
 import calendar
+import requests
+import json
+from db.config import get_name
 
 
 class Home:
@@ -113,6 +116,7 @@ class Home:
         page.window_min_width = 800
         page.window_min_height = 630
 
+        name = get_name()
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
@@ -144,16 +148,17 @@ class Home:
                                         content=Column(
                                             alignment=MainAxisAlignment.START,
                                             controls=[
-                                                Row(
+                                                Container(
+                                                    padding=10,
+                                                    content=Row(
+                                                    alignment=MainAxisAlignment.START,
                                                     controls=[
-                                                        Container(
-                                                            expand=True,
-                                                            height=100,
-                                                            bgcolor="grey",
-                                                            content=Text("User Info")
-                                                        ),
+                                                        Icon(icons.PERSON),
+                                                        Text(name)
                                                     ]
                                                 ),
+                                                ),
+
                                                 Row(
                                                     controls=[
                                                         Container(
@@ -190,7 +195,7 @@ class Home:
                                                                     IconButton(
                                                                         icon=icons.MEDICAL_INFORMATION_OUTLINED,
                                                                         icon_color=colors.WHITE,
-                                                                        # on_click=
+                                                                        # on_click=print('name')
                                                                     ),
                                                                     TextButton(
                                                                         text="Clinic Form",
@@ -218,7 +223,7 @@ class Home:
                                                                         # on_click=
                                                                     ),
                                                                     TextButton(
-                                                                        text="XXX",
+                                                                        text='name',
                                                                         style=ButtonStyle(color=colors.WHITE),
                                                                         # on_click=
                                                                     )

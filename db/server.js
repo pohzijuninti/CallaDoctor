@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const fs = require('fs');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const app = express();
 app.use(express.json());
 
@@ -205,7 +206,6 @@ const description = [
   },
 ];
 
-
 app.get('/', (req, res) => {
     res.send('CallaDoctor API');
 });
@@ -226,6 +226,55 @@ app.get('/description', (req, res) => {
   res.send(description);
 });
 
+let users = [];
+
+const csvWriter = createCsvWriter({
+  path: 'user.csv',
+  header: [
+    { id: 'userID', title: 'userID' },
+    { id: 'name', title: 'name' }
+  ],
+  append: true // Append mode to avoid overwriting existing data
+});
+
+if (fs.existsSync('user.csv')) {
+  const csv = fs.readFileSync('user.csv', 'utf8');
+  const lines = csv.split('\n').slice(1); // Remove header
+  lines.forEach(line => {
+    if (line) {
+      const [userID, name] = line.split(',');
+      users.push({ userID, name });
+    }
+  });
+}
+
+app.post('/user', (req, res) => {
+  const user = {
+      userID: req.body.userID,
+      name: req.body.name,
+  };
+  users.push(user);
+  csvWriter.writeRecords([user])
+    .then(() => {
+      console.log('User added to CSV file');
+      res.send(user);
+    })
+    .catch(err => {
+      console.error('Error writing to CSV file', err);
+      res.status(500).send({ error: 'Internal Server Error' });
+    });
+});
+
+app.get('/username/:userID', (req, res) => {
+  const userID = req.params.userID;
+  const user = users.find(u => u.userID == userID);
+
+  if (user) {
+    res.send({ name: user.name });
+  } else {
+    res.status(404).send({ error: 'User not found' });
+  }
+});
 
 let timeSlots = [];
 

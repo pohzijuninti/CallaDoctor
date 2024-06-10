@@ -3,6 +3,7 @@ from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
 from db.config import register, login
+import requests
 from time import sleep
 
 class Login:
@@ -33,6 +34,7 @@ class Login:
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
+        new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
         temp_button: TextButton = TextButton(text='Temp Home', on_click=temp_go_home)
         tabs: Tabs = Tabs(
                     height=100,
@@ -66,13 +68,16 @@ class Login:
             dlg_modal.open = False
             new_email.value = ''
             new_password.value = ''
+            new_name.value = ''
             page.update()
 
         def signup(e):
             dlg_modal.open = False
-            register(new_email.value, new_password.value)
+            register(new_email.value, new_password.value, new_name.value)
+
             new_email.value = ''
             new_password.value = ''
+            new_name.value = ''
             page.update()
 
         dlg_modal = AlertDialog(
@@ -84,7 +89,8 @@ class Login:
                     content=
                 Column(
                     horizontal_alignment=CrossAxisAlignment.CENTER,
-                    controls=[new_email,
+                    controls=[new_name,
+                              new_email,
                               new_password,
                               Container(padding=padding.only(top=20, bottom=10),content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
                 ))
@@ -107,7 +113,7 @@ class Login:
 
         def loginToHome(e: ControlEvent):
             if login(email.value, password.value):
-                page.go("/home")
+                page.go('/home')
 
 
         email.on_change = validate
