@@ -27,7 +27,7 @@ def register(email, password):
 def login(email, password):
     try:
         login = auth.sign_in_with_email_and_password(email, password)
-        print( auth.get_account_info(login['idToken'])['users'][0]['localId'])
+        print(auth.get_account_info(login['idToken'])['users'][0]['localId'])
         return True
     except:
         print("Invalid email or password")

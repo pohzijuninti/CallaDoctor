@@ -5,7 +5,6 @@ from flet_core.control_event import ControlEvent
 from db.config import register, login
 from time import sleep
 
-
 class Login:
     def __init__(self):
         pass
@@ -15,6 +14,11 @@ class Login:
         page.window_min_width = 800
         page.window_min_height = 630
         page.window_resizable = True
+        page.theme = Theme(
+            tabs_theme = TabsTheme(
+                indicator_tab_size=True,
+            )
+        )
 
         def temp_go_home(e):
             page.go("/home")
@@ -30,6 +34,33 @@ class Login:
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         temp_button: TextButton = TextButton(text='Temp Home', on_click=temp_go_home)
+        tabs: Tabs = Tabs(
+                    height=100,
+                    width=165,
+                    selected_index=0,
+                    animation_duration=400,
+                    tabs=[
+                        Tab(
+                            tab_content=Icon(icons.PERSON),
+                            content=Container(
+                                content=Text(value='User', size=14,
+                                             text_align=TextAlign.CENTER),
+                            )
+                        ),
+                        Tab(
+                            tab_content=Icon(icons.HEALTH_AND_SAFETY),
+                            content=Container(
+                                content=Text(value='Doctor', size=14, text_align=TextAlign.CENTER),
+                            )
+                        ),
+                        Tab(
+                            tab_content=Icon(icons.ADMIN_PANEL_SETTINGS_OUTLINED),
+                            content=Container(
+                                content=Text(value='Admin', size=14, text_align=TextAlign.CENTER),
+                            )
+                        ),
+                                                ]
+                                            )
 
         def close_dlg(e):
             dlg_modal.open = False
@@ -88,16 +119,27 @@ class Login:
             controls=[
                 Container(
                     Row(
-                        controls=[img,
+                        controls=[
                                     Column(
+                                        alignment=MainAxisAlignment.CENTER,
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        expand=True,
                                         controls=[
+                                            img,
+                                        ]
+                                    ),
+                                    Column(
+                                        expand=True,
+                                        controls=[
+                                            tabs,
                                             Text(value='Welcome to Call A Doctor! ',
                                                  style=TextStyle(size=18)),
                                             email,
                                             password,
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
-                                            temp_button
+                                            TextButton(text='Join us', width=250, on_click=open_dlg_modal),
+                                            # temp_button,
                                         ],
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 alignment=MainAxisAlignment.CENTER,

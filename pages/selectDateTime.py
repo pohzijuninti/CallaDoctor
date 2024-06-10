@@ -187,7 +187,7 @@ class SelectDateTime:
                 selected_container.update()
 
             if container.bgcolor == colors.WHITE:
-                container.bgcolor = colors.GREY_200
+                container.bgcolor = colors.GREY_300
                 container.content.color = colors.RED
                 selected_container = container
                 selected_time = e.control.data
