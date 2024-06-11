@@ -144,20 +144,31 @@ class Home:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor="pink",
+                                        bgcolor=colors.GREY_800,
                                         content=Column(
                                             alignment=MainAxisAlignment.START,
                                             controls=[
-                                                Container(
-                                                    padding=10,
-                                                    content=Row(
-                                                    alignment=MainAxisAlignment.START,
+                                                Row(
                                                     controls=[
-                                                        Icon(icons.PERSON),
-                                                        Text(name)
+                                                        TextButton(
+                                                            text=name,
+                                                            icon=icons.PERSON,
+                                                            icon_color=colors.WHITE,
+                                                            col=colors.RED,
+
+                                                        ),
                                                     ]
                                                 ),
+
+                                                Row(
+                                                    controls=[
+                                                        TextButton(
+                                                            text='Medical Record',
+                                                            icon=icons.PERSON,
+                                                        ),
+                                                    ]
                                                 ),
+
 
                                                 Row(
                                                     controls=[
@@ -231,7 +242,17 @@ class Home:
                                                             ),
                                                         ),
                                                     ]
-                                                )
+                                                ),
+                                                Container(
+                                                    padding=10,
+                                                    content=Row(
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(icons.LOGOUT_OUTLINED),
+                                                            Text('Logout')
+                                                        ]
+                                                    ),
+                                                ),
                                             ]
                                         )
                                     ),
