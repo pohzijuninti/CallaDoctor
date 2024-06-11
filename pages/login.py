@@ -115,6 +115,10 @@ class Login:
             if login(email.value, password.value):
                 page.go('/home')
 
+        def go_clinic_form(e):
+            page.go("/clinicForm")
+            page.update()
+
 
         email.on_change = validate
         password.on_change = validate
@@ -144,7 +148,7 @@ class Login:
                                             password,
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
-                                            TextButton(text='Join us', width=250, on_click=open_dlg_modal),
+                                            TextButton(text='Join us', width=250, on_click=go_clinic_form),
                                             # temp_button,
                                         ],
                                 horizontal_alignment=CrossAxisAlignment.CENTER,

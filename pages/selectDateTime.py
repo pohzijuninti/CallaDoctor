@@ -191,7 +191,7 @@ class SelectDateTime:
                 container.content.color = colors.RED
                 selected_container = container
                 selected_time = e.control.data
-                print(f"Chosen Time: {selected_time}")
+                # print(f"Chosen Time: {selected_time}")
             else:
                 container.bgcolor = colors.WHITE
                 container.content.color = colors.GREY_800
@@ -264,6 +264,10 @@ class SelectDateTime:
                 actions_alignment=MainAxisAlignment.CENTER,
                 on_dismiss=lambda e: print("Modal dialog dismissed!"),
             )
+            print(selected_date)
+            print(selected_time)
+            print(svr.get_hospital_name(hospital_id))
+            print(svr.get_doctor_name(doctor_id))
 
             page.dialog = dlg_modal
 

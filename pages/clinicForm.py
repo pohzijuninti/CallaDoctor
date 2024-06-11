@@ -14,8 +14,8 @@ class ClinicForm:
         page.window_min_width = 800
         page.window_min_height = 630
 
-        def go_home(e):
-            page.go("/home")
+        def go_login(e):
+            page.go("/")
             page.update()
 
         name: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.BLACK)
@@ -56,7 +56,7 @@ class ClinicForm:
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
                                     icon_color=colors.WHITE,
-                                    on_click=go_home,
+                                    on_click=go_login,
                                 ),
                                 Text(value='Clinic Form', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]

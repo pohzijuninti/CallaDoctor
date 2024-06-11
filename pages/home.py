@@ -117,16 +117,16 @@ class Home:
         page.window_min_height = 630
 
         name = get_name()
+
+        def go_login(e):
+            page.go("/")
+            page.update()
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
 
         def go_medical_record(e):
             page.go("/medicalRecord")
-            page.update()
-
-        def go_clinic_form(e):
-            page.go("/clinicForm")
             page.update()
 
         return View(
@@ -146,111 +146,37 @@ class Home:
                                         width=200,
                                         bgcolor=colors.GREY_800,
                                         content=Column(
-                                            alignment=MainAxisAlignment.START,
+                                            alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
-                                                Row(
-                                                    controls=[
-                                                        TextButton(
-                                                            text=name,
-                                                            icon=icons.PERSON,
-                                                            icon_color=colors.WHITE,
-                                                            col=colors.RED,
 
-                                                        ),
-                                                    ]
-                                                ),
-
-                                                Row(
-                                                    controls=[
-                                                        TextButton(
-                                                            text='Medical Record',
-                                                            icon=icons.PERSON,
-                                                        ),
-                                                    ]
-                                                ),
-
-
-                                                Row(
-                                                    controls=[
-                                                        Container(
-                                                            expand=True,
-                                                            height=50,
-                                                            content=Row(
-                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
-                                                                vertical_alignment=CrossAxisAlignment.CENTER,
-                                                                controls=[
-                                                                    IconButton(
-                                                                        icon=icons.INSERT_DRIVE_FILE_OUTLINED,
-                                                                        icon_color=colors.WHITE,
-                                                                        on_click=go_medical_record
-                                                                    ),
-                                                                    TextButton(
-                                                                        text="Medical Record",
-                                                                        style=ButtonStyle(color=colors.WHITE),
-                                                                        on_click=go_medical_record
-                                                                    )
-                                                                ]
-                                                            ),
-                                                        ),
-                                                    ]
-                                                ),
-                                                Row(
-                                                    controls=[
-                                                        Container(
-                                                            expand=True,
-                                                            height=50,
-                                                            content=Row(
-                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
-                                                                vertical_alignment=CrossAxisAlignment.CENTER,
-                                                                controls=[
-                                                                    IconButton(
-                                                                        icon=icons.MEDICAL_INFORMATION_OUTLINED,
-                                                                        icon_color=colors.WHITE,
-                                                                        # on_click=print('name')
-                                                                    ),
-                                                                    TextButton(
-                                                                        text="Clinic Form",
-                                                                        style=ButtonStyle(color=colors.WHITE),
-                                                                        on_click=go_clinic_form
-                                                                    )
-                                                                ]
-                                                            ),
-                                                        ),
-                                                    ]
-                                                ),
-                                                Row(
-                                                    controls=[
-                                                        Container(
-                                                            expand=True,
-                                                            height=50,
-                                                            bgcolor="grey",
-                                                            content=Row(
-                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
-                                                                vertical_alignment=CrossAxisAlignment.CENTER,
-                                                                controls=[
-                                                                    IconButton(
-                                                                        icon=icons.CATCHING_POKEMON_OUTLINED,
-                                                                        icon_color=colors.WHITE,
-                                                                        # on_click=
-                                                                    ),
-                                                                    TextButton(
-                                                                        text='name',
-                                                                        style=ButtonStyle(color=colors.WHITE),
-                                                                        # on_click=
-                                                                    )
-                                                                ]
-                                                            ),
-                                                        ),
-                                                    ]
-                                                ),
                                                 Container(
                                                     padding=10,
-                                                    content=Row(
-                                                        alignment=MainAxisAlignment.START,
+                                                    content=Column(
                                                         controls=[
-                                                            Icon(icons.LOGOUT_OUTLINED),
-                                                            Text('Logout')
+                                                            TextButton(
+                                                                text=name,
+                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                icon=icons.PERSON,
+                                                            ),
+
+                                                            TextButton(
+                                                                text='Medical Record',
+                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                icon=icons.FILE_COPY_OUTLINED,
+                                                                on_click=go_medical_record
+                                                            ),
+
                                                         ]
+                                                    ),
+                                                ),
+
+                                                Container(
+                                                    padding=10,
+                                                    content=TextButton(
+                                                        text='Logout',
+                                                        style=ButtonStyle(color=colors.WHITE),
+                                                        icon=icons.LOGOUT_OUTLINED,
+                                                        on_click=go_login
                                                     ),
                                                 ),
                                             ]
