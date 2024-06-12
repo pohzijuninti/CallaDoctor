@@ -343,24 +343,50 @@ app.post('/timeslots/:doctorID/:time', (req, res) => {
   }
 });
 
+let bookingIDCounter = 10001;
 const appointments = [];
 
-app.post('/book/hospital', (req, res) => {
+app.post('/book', (req, res) => {
+  let { userID, locationID, docID, datetime } = req.body;
+
+  locationID = parseInt(locationID);
+  docID = parseInt(docID);
+  datetime = parseInt(datetime);
+
+  const bookID = bookingIDCounter++;
+
   const appointment = {
-      bookID: counter.length + 1,
-      date: parseInt(req.body.date),
-      time: parseInt(req.body.time),
-      hospitalID: parseInt(req.body. hospitalID),
-      doctorID: parseInt(req.body.doctorID),
-  };
-  counter.push(1);
+    bookID,
+    userID,
+    locationID,
+    docID,
+    datetime,
+  }
+
   appointments.push(appointment);
-  res.send(appointment);
+
+  // Validate the presence of required fields
+  if ( !userID || !locationID || !docID || !datetime ) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  // Send a success response
+  res.json(appointment);
 });
 
 
 app.get('/appointment', (req, res) => {
   res.send(appointments);
+});
+
+app.get('/appointment/:userID', (req, res) => {
+  const { userID } = req.params;
+
+  // Find appointments for the given userID
+  const userAppointments = appointments.filter(appointment => appointment.userID === userID);
+
+  // Send the filtered list of appointments
+  res.json(userAppointments);
 });
 
 const port = process.env.PORT || 3000;

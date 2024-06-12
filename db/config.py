@@ -7,6 +7,7 @@ from flet_route import Params, Basket, params
 from flet_core.control_event import ControlEvent
 
 username = None
+userID = None
 
 firebaseConfig = {
     "apiKey": "AIzaSyDvZsBy92nHhTwkqOOQ4tEt9yocgYd77zM",
@@ -41,6 +42,8 @@ def register(email, password, name):
 
 def login(email, password):
     global username
+    global userID
+
     try:
         login = auth.sign_in_with_email_and_password(email, password)
         userID = auth.get_account_info(login['idToken'])['users'][0]['localId']
@@ -61,3 +64,6 @@ def login(email, password):
 
 def get_name():
     return username
+
+def get_userID():
+    return userID

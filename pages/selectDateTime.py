@@ -6,6 +6,7 @@ import datetime
 import calendar
 import requests
 import json
+from db.config import get_userID
 
 selected_container = None
 selected_date = None
@@ -213,7 +214,7 @@ class SelectDateTime:
             timeslot.controls.append(
                 GestureDetector(
                     on_tap=on_tap,
-                    data=time,
+                    data=timestamp,
                     mouse_cursor=MouseCursor.CLICK,
                     content=Container(
                         border_radius=10,
@@ -264,10 +265,25 @@ class SelectDateTime:
                 actions_alignment=MainAxisAlignment.CENTER,
                 on_dismiss=lambda e: print("Modal dialog dismissed!"),
             )
-            print(selected_date)
-            print(selected_time)
-            print(svr.get_hospital_name(hospital_id))
-            print(svr.get_doctor_name(doctor_id))
+
+            url = "http://localhost:3000/book"
+
+            userID = get_userID()
+
+            payload = f'userID={userID}&locationID={hospital_id}&docID={doctor_id}&datetime={selected_time}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            print(response.text)
+
+            # print(get_userID())
+            # print(selected_date)
+            # print(selected_time)
+            # print(hospital_id)
+            # print(doctor_id)
 
             page.dialog = dlg_modal
 
