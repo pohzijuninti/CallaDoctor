@@ -21,12 +21,19 @@ class SelectDoctor:
         svr.get_doctor_details(hospital_id),
 
         def go_select_hospital(e):
+            global selected_container
+            selected_container = None
+
             page.go("/selectHospital")
             page.update()
 
         def go_select_datetime(e):
-            page.go(f'/selectDateTime/{hospital_id}{doctor_id}')
-            page.update()
+            global selected_container
+            selected_container = None
+
+            if doctor_id is not None:
+                page.go(f'/selectDateTime/{hospital_id}{doctor_id}')
+                page.update()
 
         def on_tap(e):
             global selected_container

@@ -192,7 +192,6 @@ class SelectDateTime:
                 container.content.color = colors.RED
                 selected_container = container
                 selected_time = e.control.data
-                # print(f"Chosen Time: {selected_time}")
             else:
                 container.bgcolor = colors.WHITE
                 container.content.color = colors.GREY_800
@@ -259,11 +258,11 @@ class SelectDateTime:
                                 Text(value=f'{selected_time}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
+                                TextButton(text='Back To Home', width=100, on_click=close_dlg_modal),
                             ]
                         ))
                 ],
                 actions_alignment=MainAxisAlignment.CENTER,
-                on_dismiss=lambda e: print("Modal dialog dismissed!"),
             )
 
             url = "http://localhost:3000/book"
@@ -278,17 +277,19 @@ class SelectDateTime:
             response = requests.request("POST", url, headers=headers, data=payload)
 
             print(response.text)
-
-            # print(get_userID())
-            # print(selected_date)
-            # print(selected_time)
-            # print(hospital_id)
-            # print(doctor_id)
-
             page.dialog = dlg_modal
 
             if selected_time is not None:
                 dlg_modal.open = True
+
+        def close_dlg_modal(e):
+            global selected_container
+            global selected_date
+            global selected_time
+
+            selected_container = None
+            selected_date = None
+            selected_time = None
 
             page.go("/home")
             page.update()
