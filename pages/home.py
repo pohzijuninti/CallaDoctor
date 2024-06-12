@@ -7,12 +7,14 @@ import datetime
 import calendar
 import requests
 import json
-from db.config import get_name
+from db.config import get_name, get_userID
+import pages.server as svr
 
 
 class Home:
     def __init__(self):
         self.calendar_grid = None
+
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
@@ -121,6 +123,7 @@ class Home:
         def go_login(e):
             page.go("/")
             page.update()
+
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
@@ -128,6 +131,100 @@ class Home:
         def go_medical_record(e):
             page.go("/medicalRecord")
             page.update()
+
+        appointments = ListView(
+            expand=True,
+        )
+
+        svr.get_appointments(get_userID()),
+
+        for i in range(len(svr.appointments)):
+            appointments.controls.append(
+                Container(
+                    padding=5,
+                    content=Container(
+                        border_radius=10,
+                        bgcolor="amber",
+                        padding=padding.only(left=10, top=5, bottom=5),
+                        width=400,
+                        height=125,
+                        content=Row(
+                            expand=True,
+                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            controls=[
+                                Container(
+                                    expand=2,
+                                    content=Column(
+                                        expand=True,
+                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        controls=[
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
+                                                        Text(value=f'{svr.appointments[i]["datetime"]}', color="white")
+                                                    ]
+                                                ),
+                                            ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(name=icons.ACCESS_TIME_OUTLINED, color="white"),
+                                                        Text(value=f'{svr.appointments[i]["datetime"]}', color="white")
+                                                    ]
+                                                )
+                                            ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
+                                                        Text(value=f'{svr.get_hospital_name(svr.appointments[i]["hospitalID"])}',
+                                                            color="white")
+                                                    ]
+                                                )
+                                            ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(name=icons.PEOPLE_OUTLINED, color="white"),
+                                                        Text(value=f'{svr.get_doctor_name(svr.appointments[i]["doctorID"])}',
+                                                            color="white")
+                                                    ]
+                                                )
+                                            ),
+                                        ]
+
+                                    )
+                                ),
+                                Container(
+                                    expand=1,
+                                    content=Column(
+                                        alignment=MainAxisAlignment.SPACE_EVENLY,
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        controls=[
+                                            IconButton(icon=icons.DELETE_OUTLINED, icon_size=40, icon_color="white"),
+                                            TextButton(text="Delete", style=ButtonStyle(color=colors.WHITE))
+                                        ]
+                                    )
+                                )
+                            ]
+                        ),
+                    ),
+                ),
+            )
 
         return View(
             route="/home",
@@ -148,7 +245,6 @@ class Home:
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
-
                                                 Container(
                                                     padding=10,
                                                     content=Column(
@@ -158,7 +254,6 @@ class Home:
                                                                 style=ButtonStyle(color=colors.WHITE),
                                                                 icon=icons.PERSON,
                                                             ),
-
                                                             TextButton(
                                                                 text='Medical Record',
                                                                 style=ButtonStyle(color=colors.WHITE),
@@ -169,7 +264,6 @@ class Home:
                                                         ]
                                                     ),
                                                 ),
-
                                                 Container(
                                                     padding=10,
                                                     content=TextButton(
@@ -193,149 +287,99 @@ class Home:
                                     padding=padding.only(left=5),
                                     content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
-
-                                ListView(
-                                    expand=True,
-                                    controls=[
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                padding=padding.only(left=10, top=5, bottom=5),
-                                                width=400,
-                                                height=125,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                                    controls=[
-                                                        Container(
-                                                            expand=2,
-                                                            content=Column(
-                                                                expand=True,
-                                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                                                horizontal_alignment=CrossAxisAlignment.CENTER,
-                                                                controls=[
-                                                                    Container(
-                                                                        expand=True,
-                                                                        content=Row(
-                                                                            expand=True,
-                                                                            alignment=MainAxisAlignment.START,
-                                                                            controls=[
-                                                                                Icon(name=icons.DATE_RANGE_OUTLINED,
-                                                                                     color="white"),
-                                                                                Text(value="Date", color="white")
-                                                                            ]
-                                                                        ),
-                                                                    ),
-                                                                    Container(
-                                                                        expand=True,
-                                                                        content=Row(
-                                                                            expand=True,
-                                                                            alignment=MainAxisAlignment.START,
-                                                                            controls=[
-                                                                                Icon(name=icons.ACCESS_TIME_OUTLINED,
-                                                                                     color="white"),
-                                                                                Text(value="Time", color="white")
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    Container(
-                                                                        expand=True,
-                                                                        content=Row(
-                                                                            expand=True,
-                                                                            alignment=MainAxisAlignment.START,
-                                                                            controls=[
-                                                                                Icon(name=icons.LOCAL_HOSPITAL_OUTLINED,
-                                                                                     color="white"),
-                                                                                Text(value="Hospital", color="white")
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                    Container(
-                                                                        expand=True,
-                                                                        content=Row(
-                                                                            expand=True,
-                                                                            alignment=MainAxisAlignment.START,
-                                                                            controls=[
-                                                                                Icon(name=icons.PEOPLE_OUTLINED,
-                                                                                     color="white"),
-                                                                                Text(value="Doctor", color="white")
-                                                                            ]
-                                                                        )
-                                                                    ),
-                                                                ]
-                                                            )
-                                                        ),
-                                                        Container(
-                                                            expand=1,
-                                                            content=Column(
-                                                                alignment=MainAxisAlignment.SPACE_EVENLY,
-                                                                horizontal_alignment=CrossAxisAlignment.CENTER,
-                                                                controls=[
-                                                                    IconButton(icon=icons.DELETE_OUTLINED, icon_size=40,
-                                                                               icon_color="white"),
-                                                                    TextButton(text="Delete",
-                                                                               style=ButtonStyle(color=colors.WHITE))
-                                                                ]
-                                                            )
-                                                        )
-                                                    ]
-                                                ),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=125,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=125,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=125,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=100,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                        Container(
-                                            padding=5,
-                                            content=Container(
-                                                border_radius=10,
-                                                bgcolor="amber",
-                                                width=400,
-                                                height=125,
-                                                content=Text('Appointment'),
-                                            ),
-                                        ),
-                                    ]
-                                ),
+                                appointments
+                                # ListView(
+                                #     expand=True,
+                                #     controls=[
+                                #         Container(
+                                #             padding=5,
+                                #             content=Container(
+                                #                 border_radius=10,
+                                #                 bgcolor="amber",
+                                #                 padding=padding.only(left=10, top=5, bottom=5),
+                                #                 width=400,
+                                #                 height=125,
+                                #                 content=Row(
+                                #                     expand=True,
+                                #                     alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                #                     controls=[
+                                #                         Container(
+                                #                             expand=2,
+                                #                             content=Column(
+                                #                                 expand=True,
+                                #                                 alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                #                                 horizontal_alignment=CrossAxisAlignment.CENTER,
+                                #                                 controls=[
+                                #                                     Container(
+                                #                                         expand=True,
+                                #                                         content=Row(
+                                #                                             expand=True,
+                                #                                             alignment=MainAxisAlignment.START,
+                                #                                             controls=[
+                                #                                                 Icon(name=icons.DATE_RANGE_OUTLINED,
+                                #                                                      color="white"),
+                                #                                                 Text(value=f'{svr.appointments[0]["datetime"]}',color="white")
+                                #                                             ]
+                                #                                         ),
+                                #                                     ),
+                                #                                     Container(
+                                #                                         expand=True,
+                                #                                         content=Row(
+                                #                                             expand=True,
+                                #                                             alignment=MainAxisAlignment.START,
+                                #                                             controls=[
+                                #                                                 Icon(name=icons.ACCESS_TIME_OUTLINED,
+                                #                                                      color="white"),
+                                #                                                 Text(value=f'{svr.appointments[0]["datetime"]}', color="white")
+                                #                                             ]
+                                #                                         )
+                                #                                     ),
+                                #                                     Container(
+                                #                                         expand=True,
+                                #                                         content=Row(
+                                #                                             expand=True,
+                                #                                             alignment=MainAxisAlignment.START,
+                                #                                             controls=[
+                                #                                                 Icon(name=icons.LOCAL_HOSPITAL_OUTLINED,
+                                #                                                      color="white"),
+                                #                                                 Text(value=f'{svr.get_hospital_name(svr.appointments[0]["hospitalID"])}', color="white")
+                                #                                             ]
+                                #                                         )
+                                #                                     ),
+                                #                                     Container(
+                                #                                         expand=True,
+                                #                                         content=Row(
+                                #                                             expand=True,
+                                #                                             alignment=MainAxisAlignment.START,
+                                #                                             controls=[
+                                #                                                 Icon(name=icons.PEOPLE_OUTLINED,
+                                #                                                      color="white"),
+                                #                                                 Text(value=f'{svr.get_doctor_name(svr.appointments[0]["doctorID"])}', color="white")
+                                #                                             ]
+                                #                                         )
+                                #                                     ),
+                                #                                 ]
+                                #                             )
+                                #                         ),
+                                #                         Container(
+                                #                             expand=1,
+                                #                             content=Column(
+                                #                                 alignment=MainAxisAlignment.SPACE_EVENLY,
+                                #                                 horizontal_alignment=CrossAxisAlignment.CENTER,
+                                #                                 controls=[
+                                #                                     IconButton(icon=icons.DELETE_OUTLINED, icon_size=40,
+                                #                                                icon_color="white"),
+                                #                                     TextButton(text="Delete",
+                                #                                                style=ButtonStyle(color=colors.WHITE))
+                                #                                 ]
+                                #                             )
+                                #                         )
+                                #                     ]
+                                #                 ),
+                                #             ),
+                                #         ),
+                                #     ]
+                                # ),
                             ]
                         ),
 

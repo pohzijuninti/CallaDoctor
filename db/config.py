@@ -62,8 +62,10 @@ def login(email, password):
         print("Invalid email or password")
     return
 
+
 def get_name():
     return username
+
 
 def get_userID():
     return userID

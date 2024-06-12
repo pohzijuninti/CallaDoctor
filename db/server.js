@@ -347,10 +347,10 @@ let bookingIDCounter = 10001;
 const appointments = [];
 
 app.post('/book', (req, res) => {
-  let { userID, locationID, docID, datetime } = req.body;
+  let { userID, hospitalID, doctorID, datetime } = req.body;
 
-  locationID = parseInt(locationID);
-  docID = parseInt(docID);
+  hospitalID = parseInt(hospitalID);
+  doctorID = parseInt(doctorID);
   datetime = parseInt(datetime);
 
   const bookID = bookingIDCounter++;
@@ -358,15 +358,15 @@ app.post('/book', (req, res) => {
   const appointment = {
     bookID,
     userID,
-    locationID,
-    docID,
+    hospitalID,
+    doctorID,
     datetime,
   }
 
   appointments.push(appointment);
 
   // Validate the presence of required fields
-  if ( !userID || !locationID || !docID || !datetime ) {
+  if ( !userID || !hospitalID || !doctorID || !datetime ) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 

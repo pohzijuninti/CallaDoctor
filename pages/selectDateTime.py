@@ -228,6 +228,9 @@ class SelectDateTime:
             )
 
         def go_select_doctor(e):
+            global selected_container
+            selected_container = None
+
             page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
@@ -258,7 +261,7 @@ class SelectDateTime:
                                 Text(value=f'{selected_time}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
-                                TextButton(text='Back To Home', width=100, on_click=close_dlg_modal),
+                                TextButton(text='Back To Home', width=150, on_click=close_dlg_modal),
                             ]
                         ))
                 ],
@@ -267,9 +270,9 @@ class SelectDateTime:
 
             url = "http://localhost:3000/book"
 
-            userID = get_userID()
+            user_id = get_userID()
 
-            payload = f'userID={userID}&locationID={hospital_id}&docID={doctor_id}&datetime={selected_time}'
+            payload = f'userID={user_id}&hospitalID={hospital_id}&doctorID={doctor_id}&datetime={selected_time}'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -281,6 +284,7 @@ class SelectDateTime:
 
             if selected_time is not None:
                 dlg_modal.open = True
+                page.update()
 
         def close_dlg_modal(e):
             global selected_container
@@ -327,7 +331,6 @@ class SelectDateTime:
                                 )
                             ]
                         ),
-
                         Row(
                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                             controls=[

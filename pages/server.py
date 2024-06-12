@@ -1,10 +1,12 @@
 import requests
+from db.config import get_userID
 
 hospitalList = []
 doctorList = []
 specialityList = []
 doctorFilteredList = []
 descriptionList = []
+appointments = []
 
 # URL of the server.js endpoint
 url = 'http://localhost:3000/'
@@ -42,6 +44,18 @@ if description_response.status_code == 200:
     descriptionList = data
 else:
     print('Error:', description_response.status_code)
+
+
+def get_appointments(user_id):
+    global appointments
+    appointments = []
+
+    appointment_response = requests.get(url + f'appointment/:{user_id}')
+    if appointment_response.status_code == 200:
+        appointments = appointment_response.json()
+        print(appointments)
+    else:
+        print('Error:', appointment_response.status_code)
 
 
 def get_time_slot(hospital_id):
