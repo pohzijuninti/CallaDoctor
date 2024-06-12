@@ -201,8 +201,6 @@ class SelectDateTime:
         timeslot = GridView(
             runs_count=3,
             child_aspect_ratio=5/2,
-            # spacing=10,
-            # padding=10,
         )
 
         for i in range(len(self.timeslots_data)):
@@ -213,7 +211,7 @@ class SelectDateTime:
             timeslot.controls.append(
                 GestureDetector(
                     on_tap=on_tap,
-                    data=timestamp,
+                    data=time,
                     mouse_cursor=MouseCursor.CLICK,
                     content=Container(
                         border_radius=10,
@@ -280,6 +278,7 @@ class SelectDateTime:
             response = requests.request("POST", url, headers=headers, data=payload)
 
             print(response.text)
+
             page.dialog = dlg_modal
 
             if selected_time is not None:

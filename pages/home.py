@@ -14,7 +14,17 @@ import pages.server as svr
 class Home:
     def __init__(self):
         self.calendar_grid = None
+        self.url = "http://localhost:3000/appointment/"
+        self.payload = {}
+        self.headers = {}
+        self.response = None
+        self.appointments = None
 
+    def get_appointments(self):
+        # Perform the HTTP request to fetch appointments
+        self.response = requests.request("GET", self.url + str(get_userID()), headers=self.headers, data=self.payload)
+        # Store the response text data
+        self.appointments = json.loads(self.response.text)
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
@@ -118,6 +128,7 @@ class Home:
         page.window_min_width = 800
         page.window_min_height = 630
 
+        self.get_appointments()
         name = get_name()
 
         def go_login(e):
@@ -132,13 +143,15 @@ class Home:
             page.go("/medicalRecord")
             page.update()
 
+        def convert_time(timestamp):
+            dt_object = datetime.datetime.fromtimestamp(timestamp)
+            return dt_object.strftime("%I:%M %p")
+
         appointments = ListView(
             expand=True,
         )
 
-        svr.get_appointments(get_userID()),
-
-        for i in range(len(svr.appointments)):
+        for i in range(len(self.appointments)):
             appointments.controls.append(
                 Container(
                     padding=5,
@@ -166,7 +179,7 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.appointments[i]["datetime"]}', color="white")
+                                                        Text(value=f'{self.appointments[i]["datetime"]}', color="white")
                                                     ]
                                                 ),
                                             ),
@@ -177,7 +190,7 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.ACCESS_TIME_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.appointments[i]["datetime"]}', color="white")
+                                                        Text(value=f'{convert_time(self.appointments[i]["datetime"])}', color="white")
                                                     ]
                                                 )
                                             ),
@@ -188,8 +201,8 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_hospital_name(svr.appointments[i]["hospitalID"])}',
-                                                            color="white")
+                                                        Text(value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
+                                                             color="white")
                                                     ]
                                                 )
                                             ),
@@ -200,8 +213,8 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.PEOPLE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_doctor_name(svr.appointments[i]["doctorID"])}',
-                                                            color="white")
+                                                        Text(value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
+                                                             color="white")
                                                     ]
                                                 )
                                             ),
@@ -279,7 +292,6 @@ class Home:
                                 ]
                             ),
                         ),
-
                         Column(
                             expand=True,
                             controls=[

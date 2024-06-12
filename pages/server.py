@@ -6,56 +6,40 @@ doctorList = []
 specialityList = []
 doctorFilteredList = []
 descriptionList = []
-appointments = []
 
 # URL of the server.js endpoint
 url = 'http://localhost:3000/'
 
-# Send a GET request to the server.js endpoint
-hospital_response = requests.get(url + 'hospital')
-# Check if the request was successful (status code 200)
-if hospital_response.status_code == 200:
-    # Access the response data
-    data = hospital_response.json()  # Assuming the server.js endpoint returns JSON data
-    hospitalList = data
+payload = {}
+headers = {}
+
+# Hospital
+response = requests.request("GET", url + 'hospital', headers=headers, data=payload)
+if response.status_code == 200:
+    hospitalList = response.json()  # Assuming the server.js endpoint returns JSON data
 else:
-    print('Error:', hospital_response.status_code)
+    print('Error:', response.status_code)
 
-
-doctor_response = requests.get(url + 'doctor')
-if doctor_response.status_code == 200:
-    data = doctor_response.json()
-    doctorList = data
+# Doctor
+response = requests.request("GET", url + 'doctor', headers=headers, data=payload)
+if response.status_code == 200:
+    doctorList = response.json()  # Assuming the server.js endpoint returns JSON data
 else:
-    print('Error:', doctor_response.status_code)
+    print('Error:', response.status_code)
 
-
-speciality_response = requests.get(url + 'speciality')
-if speciality_response.status_code == 200:
-    data = speciality_response.json()
-    specialityList = data
+# Speciality
+response = requests.request("GET", url + 'speciality', headers=headers, data=payload)
+if response.status_code == 200:
+    specialityList = response.json()  # Assuming the server.js endpoint returns JSON data
 else:
-    print('Error:', speciality_response.status_code)
+    print('Error:', response.status_code)
 
-
-description_response = requests.get(url + 'description')
-if description_response.status_code == 200:
-    data = description_response.json()
-    descriptionList = data
+# Description
+response = requests.request("GET", url + 'description', headers=headers, data=payload)
+if response.status_code == 200:
+    descriptionList = response.json()  # Assuming the server.js endpoint returns JSON data
 else:
-    print('Error:', description_response.status_code)
-
-
-def get_appointments(user_id):
-    global appointments
-    appointments = []
-
-    appointment_response = requests.get(url + f'appointment/:{user_id}')
-    if appointment_response.status_code == 200:
-        appointments = appointment_response.json()
-        print(appointments)
-    else:
-        print('Error:', appointment_response.status_code)
+    print('Error:', response.status_code)
 
 
 def get_time_slot(hospital_id):
@@ -82,7 +66,7 @@ def get_doctor_details(hospital_id):
 
 
 def get_doctor_name(doctor_id):
-    for doctor in doctorFilteredList:
+    for doctor in doctorList:
         if doctor['doctorID'] == doctor_id:
             return doctor['name']
     return None
