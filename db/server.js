@@ -389,5 +389,24 @@ app.get('/appointment/:userID', (req, res) => {
   res.json(userAppointments);
 });
 
+// Delete an appointment by bookID using POST method
+app.post('/appointment/delete/:bookID', (req, res) => {
+  const { bookID } = req.params;
+  const bookIDInt = parseInt(bookID);
+
+  // Find the index of the appointment to be deleted
+  const index = appointments.findIndex(appointment => appointment.bookID === bookIDInt);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Appointment not found.' });
+  }
+
+  // Remove the appointment from the array
+  appointments.splice(index, 1);
+
+  // Send a success response
+  res.json({ message: 'Appointment deleted successfully.' });
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
