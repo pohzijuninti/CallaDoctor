@@ -25,6 +25,9 @@ class SelectHospital:
             page.update()
 
         def go_select_doctor(e):
+            global selected_container
+            selected_container = None
+
             if hospital_id is not None:
                 page.go(f'/selectDoctor/{hospital_id}')
                 page.update()

@@ -6,6 +6,7 @@ from db.config import register, login
 import requests
 from time import sleep
 
+
 class Login:
     def __init__(self):
         pass
@@ -16,7 +17,7 @@ class Login:
         page.window_min_height = 630
         page.window_resizable = True
         page.theme = Theme(
-            tabs_theme = TabsTheme(
+            tabs_theme=TabsTheme(
                 indicator_tab_size=True,
             )
         )
@@ -86,14 +87,15 @@ class Login:
             content=Text("It's quick and easy."),
             actions=[
                 Container(
-                    content=
-                Column(
-                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                    controls=[new_name,
-                              new_email,
-                              new_password,
-                              Container(padding=padding.only(top=20, bottom=10),content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
-                ))
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            new_name,
+                            new_email,
+                            new_password,
+                            Container(padding=padding.only(top=20, bottom=10),content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
+                    )
+                )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
             on_dismiss=lambda e: print("Modal dialog dismissed!"),
@@ -118,7 +120,6 @@ class Login:
         def go_clinic_form(e):
             page.go("/clinicForm")
             page.update()
-
 
         email.on_change = validate
         password.on_change = validate
@@ -151,11 +152,11 @@ class Login:
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
                                             # temp_button,
                                         ],
-                                horizontal_alignment=CrossAxisAlignment.CENTER,
-                                alignment=MainAxisAlignment.CENTER,
-                                spacing=20,
-                            ),
-                        ],
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        alignment=MainAxisAlignment.CENTER,
+                                        spacing=20,
+                                    ),
+                                ],
                         alignment=MainAxisAlignment.SPACE_EVENLY,
                         vertical_alignment=CrossAxisAlignment.CENTER,
                         spacing=50
