@@ -198,20 +198,22 @@ class SelectDateTime:
 
             container.update()
 
+        def convert_time(timestamp):
+            dt_object = datetime.datetime.fromtimestamp(timestamp)
+            return dt_object.strftime("%I:%M %p")
+
         timeslot = GridView(
             runs_count=3,
             child_aspect_ratio=5/2,
         )
 
         for i in range(len(self.timeslots_data)):
-            timestamp = self.timeslots_data[i]['slotDate']  # Unix timestamp
-            dt_object = datetime.datetime.fromtimestamp(timestamp)
-            time = dt_object.strftime("%I:%M %p")  # Convert to 12-hour clock format
+            time = convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format
 
             timeslot.controls.append(
                 GestureDetector(
                     on_tap=on_tap,
-                    data=time,
+                    data=self.timeslots_data[i]['slotDate'],
                     mouse_cursor=MouseCursor.CLICK,
                     content=Container(
                         border_radius=10,
@@ -256,7 +258,7 @@ class SelectDateTime:
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
                                 Text(value=f'{selected_date}'),
-                                Text(value=f'{selected_time}'),
+                                Text(value=f'{convert_time(selected_time)}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
                                 TextButton(text='Back To Home', width=150, on_click=close_dlg_modal),
@@ -268,15 +270,12 @@ class SelectDateTime:
 
             url = "http://localhost:3000/book"
 
-            user_id = get_userID()
-
-            payload = f'userID={user_id}&hospitalID={hospital_id}&doctorID={doctor_id}&datetime={selected_time}'
+            payload = f'userID={get_userID()}&hospitalID={hospital_id}&doctorID={doctor_id}&datetime={selected_time}'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
 
             response = requests.request("POST", url, headers=headers, data=payload)
-
             print(response.text)
 
             page.dialog = dlg_modal

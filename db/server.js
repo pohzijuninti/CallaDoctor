@@ -324,7 +324,7 @@ app.get('/timeslots/:doctorID/:date', (req, res) => {
   // Set the start time to either now or the start of the given date, whichever is later
   const startOfDay = new Date(Math.max(date.setHours(0, 0, 0, 0), now.setHours(now.getHours(), now.getMinutes(), 0, 0)));
   // Set the end time to 10:30 PM on the given date
-  const endOfDay = new Date(date.setHours(22, 30, 0, 0));
+  const endOfDay = new Date(date.setHours(23, 30, 0, 0));
   // Filter time slots for the specified doctorID within the time range
   const filteredTimeSlots = timeSlots.filter(slot => slot.doctorID === doctorID && slot.slotDate >= startOfDay.getTime() / 1000 && slot.slotDate <= endOfDay.getTime() / 1000);
   res.send(filteredTimeSlots);
@@ -344,7 +344,8 @@ app.post('/timeslots/:doctorID/:time', (req, res) => {
 });
 
 let bookingIDCounter = 10001;
-const appointments = [];
+const pendingAppointments = [];
+const approvedAppointments = [];
 
 app.post('/book', (req, res) => {
   let { userID, hospitalID, doctorID, datetime } = req.body;
@@ -361,9 +362,10 @@ app.post('/book', (req, res) => {
     hospitalID,
     doctorID,
     datetime,
+    status: "pending",
   }
 
-  appointments.push(appointment);
+  pendingAppointments.push(appointment);
 
   // Validate the presence of required fields
   if ( !userID || !hospitalID || !doctorID || !datetime ) {
@@ -374,39 +376,85 @@ app.post('/book', (req, res) => {
   res.json(appointment);
 });
 
+app.get('/appointment/:status', (req, res) => {
+  const { status } = req.params;
+  let appointments;
 
-app.get('/appointment', (req, res) => {
-  res.send(appointments);
+  if (status === "pending") {
+    appointments = pendingAppointments.filter(appointment => appointment.status === status);
+  } else if (status === "approved") {
+    appointments = approvedAppointments.filter(appointment => appointment.status === status);
+  }
+
+  res.json(appointments);
 });
 
-app.get('/appointment/:userID', (req, res) => {
+app.post('/approveAppointment/:bookID', (req, res) => {
+  const { bookID } = req.params;
+  const bookIDInt = parseInt(bookID);
+
+  // Find the appointment with the given bookID in pendingAppointments
+  const index = pendingAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
+
+  // If appointment with the given bookID is not found in pendingAppointments, return 404 Not Found
+  if (index === -1) {
+    return res.status(404).json({ error: 'Appointment not found in pending appointments.' });
+  }
+
+  // Move the appointment from pendingAppointments to approvedAppointments
+  const appointmentToApprove = pendingAppointments.splice(index, 1)[0];
+  appointmentToApprove.status = "approved";
+  approvedAppointments.push(appointmentToApprove);
+
+  res.json({ message: 'Appointment approved successfully.' });
+});
+
+app.get('/appointment/:status/:userID', (req, res) => {
+  const { status } = req.params;
   const { userID } = req.params;
 
-  // Find appointments for the given userID
-  const userAppointments = appointments.filter(appointment => appointment.userID === userID);
+  const userAppointments = approvedAppointments.filter(appointment => ( appointment.status === status && appointment.userID === userID ));
 
-  // Send the filtered list of appointments
+  // Check if the filtered list of appointments is not empty
   res.json(userAppointments);
 });
 
+
 // Delete an appointment by bookID using POST method
-app.post('/appointment/delete/:bookID', (req, res) => {
+app.post('/appointment/pending/delete/:bookID', (req, res) => {
   const { bookID } = req.params;
   const bookIDInt = parseInt(bookID);
 
   // Find the index of the appointment to be deleted
-  const index = appointments.findIndex(appointment => appointment.bookID === bookIDInt);
+  const index = pendingAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
 
   if (index === -1) {
-    return res.status(404).json({ error: 'Appointment not found.' });
+    return res.status(404).json({ error: 'Pending appointment not found.' });
   }
 
   // Remove the appointment from the array
-  appointments.splice(index, 1);
+  pendingAppointments.splice(index, 1);
 
   // Send a success response
+  res.json({ message: 'Pending Appointment deleted successfully.' });
+});
+
+app.post('/appointment/approved/delete/:bookID', (req, res) => {
+  const { bookID } = req.params;
+  const bookIDInt = parseInt(bookID);
+
+  const index = approvedAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Approved appointment not found.' });
+  }
+
+  // Remove the appointment from the array
+  approvedAppointments.splice(index, 1);
+
   res.json({ message: 'Appointment deleted successfully.' });
 });
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

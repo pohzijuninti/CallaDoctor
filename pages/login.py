@@ -3,8 +3,6 @@ from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
 from db.config import register, login
-import requests
-from time import sleep
 
 
 class Login:
@@ -22,8 +20,8 @@ class Login:
             )
         )
 
-        def temp_go_home(e):
-            page.go("/home")
+        def temp_go_admin(e):
+            page.go("/adminHome")
             page.update()
 
         # Setup fields
@@ -36,7 +34,7 @@ class Login:
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        temp_button: TextButton = TextButton(text='Temp Home', on_click=temp_go_home)
+        admin_button: TextButton = TextButton(text='Temp Admin', on_click=temp_go_admin)
         tabs: Tabs = Tabs(
                     height=100,
                     width=165,
@@ -150,7 +148,7 @@ class Login:
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
-                                            # temp_button,
+                                            admin_button,
                                         ],
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         alignment=MainAxisAlignment.CENTER,

@@ -22,9 +22,10 @@ class Home:
 
     def get_appointments(self):
         # Perform the HTTP request to fetch appointments
-        self.response = requests.request("GET", self.url + str(get_userID()), headers=self.headers, data=self.payload)
+        self.response = requests.request("GET", self.url + f'approved/{get_userID()}', headers=self.headers, data=self.payload)
         # Store the response text data
         self.appointments = json.loads(self.response.text)
+        print(self.appointments)
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
@@ -143,9 +144,49 @@ class Home:
             page.go("/medicalRecord")
             page.update()
 
+        def convert_date(timestamp):
+            dt_object = datetime.datetime.fromtimestamp(timestamp)
+            return dt_object.strftime("%d %B %Y")
+
         def convert_time(timestamp):
             dt_object = datetime.datetime.fromtimestamp(timestamp)
             return dt_object.strftime("%I:%M %p")
+
+        def open_dlg_modal(date, time, hospital, doctor, book_id):
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Delete Appointment"),
+                content=Text("Are you sure?"),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=f'{date}'),
+                                Text(value=f'{time}'),
+                                Text(value=f'{hospital}'),
+                                Text(value=f'{doctor}'),
+                                TextButton(text='Delete', width=150, on_click=lambda e: (delete_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+            )
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+        def delete_appointment(book_id):
+            url = "http://localhost:3000/appointment/approved/delete/"
+
+            payload = f'bookID={book_id}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url + str(book_id), headers=headers, data=payload)
+            print(response.text)
 
         appointments = ListView(
             expand=True,
@@ -179,7 +220,7 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
-                                                        Text(value=f'{self.appointments[i]["datetime"]}', color="white")
+                                                        Text(value=f'{convert_date(self.appointments[i]["datetime"])}', color="white")
                                                     ]
                                                 ),
                                             ),
@@ -228,8 +269,24 @@ class Home:
                                         alignment=MainAxisAlignment.SPACE_EVENLY,
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         controls=[
-                                            IconButton(icon=icons.DELETE_OUTLINED, icon_size=40, icon_color="white"),
-                                            TextButton(text="Delete", style=ButtonStyle(color=colors.WHITE))
+                                            IconButton(icon=icons.DELETE_OUTLINED, icon_size=40, icon_color="white",
+                                                       on_click=lambda e: open_dlg_modal(
+                                                           convert_date(self.appointments[i]["datetime"]),
+                                                           convert_time(self.appointments[i]["datetime"]),
+                                                           svr.get_hospital_name(self.appointments[i]["hospitalID"]),
+                                                           svr.get_doctor_name(self.appointments[i]["doctorID"]),
+                                                           self.appointments[i]["bookID"]
+                                                       )
+                                            ),
+                                            TextButton(text="Delete", style=ButtonStyle(color=colors.WHITE),
+                                                       on_click=lambda e: open_dlg_modal(
+                                                           convert_date(self.appointments[i]["datetime"]),
+                                                           convert_time(self.appointments[i]["datetime"]),
+                                                           svr.get_hospital_name(self.appointments[i]["hospitalID"]),
+                                                           svr.get_doctor_name(self.appointments[i]["doctorID"]),
+                                                           self.appointments[i]["bookID"]
+                                                       )
+                                            )
                                         ]
                                     )
                                 )
@@ -300,98 +357,6 @@ class Home:
                                     content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
                                 appointments
-                                # ListView(
-                                #     expand=True,
-                                #     controls=[
-                                #         Container(
-                                #             padding=5,
-                                #             content=Container(
-                                #                 border_radius=10,
-                                #                 bgcolor="amber",
-                                #                 padding=padding.only(left=10, top=5, bottom=5),
-                                #                 width=400,
-                                #                 height=125,
-                                #                 content=Row(
-                                #                     expand=True,
-                                #                     alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                #                     controls=[
-                                #                         Container(
-                                #                             expand=2,
-                                #                             content=Column(
-                                #                                 expand=True,
-                                #                                 alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                #                                 horizontal_alignment=CrossAxisAlignment.CENTER,
-                                #                                 controls=[
-                                #                                     Container(
-                                #                                         expand=True,
-                                #                                         content=Row(
-                                #                                             expand=True,
-                                #                                             alignment=MainAxisAlignment.START,
-                                #                                             controls=[
-                                #                                                 Icon(name=icons.DATE_RANGE_OUTLINED,
-                                #                                                      color="white"),
-                                #                                                 Text(value=f'{svr.appointments[0]["datetime"]}',color="white")
-                                #                                             ]
-                                #                                         ),
-                                #                                     ),
-                                #                                     Container(
-                                #                                         expand=True,
-                                #                                         content=Row(
-                                #                                             expand=True,
-                                #                                             alignment=MainAxisAlignment.START,
-                                #                                             controls=[
-                                #                                                 Icon(name=icons.ACCESS_TIME_OUTLINED,
-                                #                                                      color="white"),
-                                #                                                 Text(value=f'{svr.appointments[0]["datetime"]}', color="white")
-                                #                                             ]
-                                #                                         )
-                                #                                     ),
-                                #                                     Container(
-                                #                                         expand=True,
-                                #                                         content=Row(
-                                #                                             expand=True,
-                                #                                             alignment=MainAxisAlignment.START,
-                                #                                             controls=[
-                                #                                                 Icon(name=icons.LOCAL_HOSPITAL_OUTLINED,
-                                #                                                      color="white"),
-                                #                                                 Text(value=f'{svr.get_hospital_name(svr.appointments[0]["hospitalID"])}', color="white")
-                                #                                             ]
-                                #                                         )
-                                #                                     ),
-                                #                                     Container(
-                                #                                         expand=True,
-                                #                                         content=Row(
-                                #                                             expand=True,
-                                #                                             alignment=MainAxisAlignment.START,
-                                #                                             controls=[
-                                #                                                 Icon(name=icons.PEOPLE_OUTLINED,
-                                #                                                      color="white"),
-                                #                                                 Text(value=f'{svr.get_doctor_name(svr.appointments[0]["doctorID"])}', color="white")
-                                #                                             ]
-                                #                                         )
-                                #                                     ),
-                                #                                 ]
-                                #                             )
-                                #                         ),
-                                #                         Container(
-                                #                             expand=1,
-                                #                             content=Column(
-                                #                                 alignment=MainAxisAlignment.SPACE_EVENLY,
-                                #                                 horizontal_alignment=CrossAxisAlignment.CENTER,
-                                #                                 controls=[
-                                #                                     IconButton(icon=icons.DELETE_OUTLINED, icon_size=40,
-                                #                                                icon_color="white"),
-                                #                                     TextButton(text="Delete",
-                                #                                                style=ButtonStyle(color=colors.WHITE))
-                                #                                 ]
-                                #                             )
-                                #                         )
-                                #                     ]
-                                #                 ),
-                                #             ),
-                                #         ),
-                                #     ]
-                                # ),
                             ]
                         ),
 
