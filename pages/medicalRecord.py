@@ -56,8 +56,6 @@ class MedicalRecord:
         medical_record = GridView(
             runs_count=3,
             child_aspect_ratio=10 / 9,
-            # spacing=30,
-            # padding=30,
         )
 
         for i in range(9):
@@ -80,8 +78,9 @@ class MedicalRecord:
                                     ]
                                 ),
                                 Row(
-                                    alignment=MainAxisAlignment.END,
+                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
+                                        Text(value='Island Hospital, Dr Amelia', color=colors.BLACK, size=12),
                                         IconButton(icon=icons.SEND, icon_color=colors.BLUE),
                                     ]
                                 )

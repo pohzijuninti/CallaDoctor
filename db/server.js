@@ -168,41 +168,51 @@ const doctor = [
   },
 ];
 
-const description = [
+const medicalRecord = [
   {
-    "descriptionID": 201,
+    "recordID": 201,
     "datetime": 1717830000,
-    "caution": "High blood pressure",
-    "description": "Routine checkup for heart condition",
-    "userID": 101,
+    "title": "Broke His Left Leg",
+    "description": "Fall down from bicycle , Broke his left leg",
+    "hospitalID": 5,
+    "doctorID": 35,
+    "userID": '101',
   },
   {
-    "descriptionID": 202,
+    "recordID": 202,
     "datetime": 1717992000,
-    "caution": "Appendicitis",
-    "description": "Surgery scheduled for appendectomy",
-    "userID": 102,
+    "title": "Broke His Right Leg",
+    "description": "Fall down from bicycle , Broke his right leg",
+    "hospitalID": 5,
+    "doctorID": 35,
+    "userID": '101',
   },
   {
-    "descriptionID": 203,
+    "recordID": 203,
     "datetime": 1718445600,
-    "caution": "Vision blurry in right eye",
-    "description": "Consultation for possible cataracts",
-    "userID": 103,
+    "title": "Pulmonary Edema",
+    "description": "Difficult to breathe",
+    "hospitalID": 5,
+    "doctorID": 35,
+    "userID": '101',
   },
   {
-    "descriptionID": 204,
+    "recordID": 204,
     "datetime": 1718866800,
-    "caution": "Eczema flare-up",
-    "description": "Prescription refill for eczema cream",
-    "userID": 104,
+    "title": "Heart Disease",
+    "description": "High cholesterol , Lack of exercise",
+    "hospitalID": 5,
+    "doctorID": 35,
+    "userID": '101',
   },
   {
-    "descriptionID": 205,
+    "recordID": 205,
     "datetime": 1719104400,
-    "caution": "Toothache in lower left molar",
-    "description": "Extraction of infected tooth",
-    "userID": 105,
+    "title": "Extraction of infected tooth",
+    "description": "Toothache in lower left molar",
+    "hospitalID": 5,
+    "doctorID": 35,
+    "userID": '101',
   },
 ];
 
@@ -222,8 +232,10 @@ app.get('/doctor', (req, res) => {
   res.send(doctor);
 });
 
-app.get('/description', (req, res) => {
-  res.send(description);
+app.get('/medicalrecord/:userID', (req, res) => {
+  const userID = req.params.userID;
+  const userRecords = medicalRecord.filter(record => record.userID === userID);
+  res.json(userRecords);
 });
 
 let users = [];
@@ -344,8 +356,7 @@ app.post('/timeslots/:doctorID/:time', (req, res) => {
 });
 
 let bookingIDCounter = 10001;
-const pendingAppointments = [];
-const approvedAppointments = [];
+const appointments = [];
 
 app.post('/book', (req, res) => {
   let { userID, hospitalID, doctorID, datetime } = req.body;
@@ -362,10 +373,10 @@ app.post('/book', (req, res) => {
     hospitalID,
     doctorID,
     datetime,
-    status: "pending",
+    status: 0,
   }
 
-  pendingAppointments.push(appointment);
+  appointments.push(appointment);
 
   // Validate the presence of required fields
   if ( !userID || !hospitalID || !doctorID || !datetime ) {
@@ -375,6 +386,20 @@ app.post('/book', (req, res) => {
   // Send a success response
   res.json(appointment);
 });
+
+app.get('/appointment', (req, res) => {
+  res.send(appointments);
+});
+
+app.get('/appointment/:userID', (req, res) => {
+  const { userID } = req.params;
+  const userAppointments = appointments.filter(appointment => appointment.userID === userID);
+  res.json(userAppointments);
+});
+
+
+const pendingAppointments = [];
+const approvedAppointments = [];
 
 app.get('/appointment/:status', (req, res) => {
   const { status } = req.params;
