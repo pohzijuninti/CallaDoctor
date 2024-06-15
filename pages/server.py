@@ -1,5 +1,5 @@
 import requests
-from db.config import get_userID
+import datetime
 
 hospitalList = []
 doctorList = []
@@ -79,4 +79,11 @@ def get_speciality_name(specialty_id):
     return None
 
 
+def convert_date(timestamp):
+    dt_object = datetime.datetime.fromtimestamp(timestamp)
+    return dt_object.strftime("%d %B %Y")
 
+
+def convert_time(timestamp):
+    dt_object = datetime.datetime.fromtimestamp(timestamp)
+    return dt_object.strftime("%I:%M %p")

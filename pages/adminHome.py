@@ -1,8 +1,6 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
-import datetime
-import calendar
 import requests
 import json
 import pages.server as svr
@@ -10,89 +8,143 @@ import pages.server as svr
 
 class AdminHome:
     def __init__(self):
-        self.url = "http://localhost:3000/appointment/"
-        self.payload = {}
-        self.headers = {}
+        self.url = "http://localhost:3000/appointment/hospital"
+        self.payload = '='
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response = None
-        self.pending_appointments = None
-        self.approved_appointments = None
+        self.appointments = None
 
-    def get_pending_appointments(self):
-        # Perform the HTTP request to fetch appointments
-        self.response = requests.request("GET", self.url + 'pending', headers=self.headers, data=self.payload)
-        # Store the response text data
-        self.pending_appointments = json.loads(self.response.text)
-
-    def get_approved_appointments(self):
-        # Perform the HTTP request to fetch appointments
-        self.response = requests.request("GET", self.url + 'approved', headers=self.headers, data=self.payload)
-        # Store the response text data
-        self.approved_appointments = json.loads(self.response.text)
+    def get_appointments(self, hospital_id):
+        full_url = f"{self.url}/{hospital_id}"
+        print(full_url)
+        self.response = requests.get(full_url, headers=self.headers, data=self.payload)
+        self.appointments = json.loads(self.response.text)
+        print(self.appointments)
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Admin'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_min_width = 800
+        page.window_min_width = 900
         page.window_min_height = 630
 
-        self.get_pending_appointments()
-        self.get_approved_appointments()
+        hospital_id = int(params.hospital_id)
+        svr.get_doctor_details(hospital_id)
+        self.get_appointments(hospital_id)
 
         def go_login(e):
             page.go("/")
             page.update()
 
-        def convert_date(timestamp):
-            dt_object = datetime.datetime.fromtimestamp(timestamp)
-            return dt_object.strftime("%d %B %Y")
+        def approve_dlg_modal(e):
+            book_id = e.control.data
 
-        def convert_time(timestamp):
-            dt_object = datetime.datetime.fromtimestamp(timestamp)
-            return dt_object.strftime("%I:%M %p")
+            for i in range(len(self.appointments)):
+                if self.appointments[i]["bookID"] == book_id:
+                    date = svr.convert_date(self.appointments[i]["datetime"])
+                    time = svr.convert_time(self.appointments[i]["datetime"])
+                    hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
+                    doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Approve Appointment"),
+                content=Text("Are you sure?"),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=date),
+                                Text(value=time),
+                                Text(value=hospital),
+                                Text(value=doctor),
+                                TextButton(text='Approve', width=150, on_click=lambda e: (approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+            )
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+        def reject_dlg_modal(e):
+            book_id = e.control.data
+
+            for i in range(len(self.appointments)):
+                if self.appointments[i]["bookID"] == book_id:
+                    date = svr.convert_date(self.appointments[i]["datetime"])
+                    time = svr.convert_time(self.appointments[i]["datetime"])
+                    hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
+                    doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Reject Appointment"),
+                content=Text("Are you sure?"),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=date),
+                                Text(value=time),
+                                Text(value=hospital),
+                                Text(value=doctor),
+                                TextButton(text='Reject', width=150, on_click=lambda e: (reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+            )
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
 
         def approve_appointment(book_id):
-            url = "http://localhost:3000/approveAppointment/"
+            url = f"http://localhost:3000/appointment/approve/{book_id}"
+            payload = {}
+            headers = {}
 
-            payload = f'bookID={book_id}'
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-            response = requests.request("POST", url + str(book_id), headers=headers, data=payload)
             print(response.text)
 
-            page.go("/adminHome")
-            page.update()
+        def reject_appointment(book_id):
+            url = f"http://localhost:3000/appointment/reject/{book_id}"
+            payload = {}
+            headers = {}
 
-        def delete_appointment(book_id):
-            url = "http://localhost:3000/appointment/pending/delete/"
+            response = requests.request("POST", url, headers=headers, data=payload)
 
-            payload = f'bookID={book_id}'
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-
-            response = requests.request("POST", url + str(book_id), headers=headers, data=payload)
             print(response.text)
 
-            page.go("/adminHome")
-            page.update()
-
-        pending_appointments = ListView(
+        appointments = ListView(
             expand=True,
         )
 
-        approved_appointments = ListView(
-            expand=True,
-        )
+        for i in range(len(self.appointments)):
+            if self.appointments[i]["status"] == 0:
+                colour = 'grey'
+                status = 'PENDING'
+                disable = False
+            elif self.appointments[i]["status"] == 1:
+                colour = 'green'
+                status = 'APPROVED'
+                disable = True
+            else:
+                colour = 'red'
+                status = 'REJECTED'
+                disable = True
 
-        for i in range(len(self.pending_appointments)):
-            pending_appointments.controls.append(
+            appointments.controls.append(
                 Container(
                     padding=5,
                     content=Container(
                         border_radius=10,
-                        bgcolor="amber",
+                        bgcolor=colour,
                         padding=padding.only(left=10, top=5, bottom=5),
                         width=400,
                         height=125,
@@ -114,7 +166,7 @@ class AdminHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
-                                                        Text(value=f'{convert_date(self.pending_appointments[i]["datetime"])}', color="white")
+                                                        Text(value=f'{svr.convert_date(self.appointments[i]["datetime"])}', color="white")
                                                     ]
                                                 ),
                                             ),
@@ -125,7 +177,7 @@ class AdminHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.ACCESS_TIME_OUTLINED, color="white"),
-                                                        Text(value=f'{convert_time(self.pending_appointments[i]["datetime"])}', color="white")
+                                                        Text(value=f'{svr.convert_time(self.appointments[i]["datetime"])}', color="white")
                                                     ]
                                                 )
                                             ),
@@ -136,7 +188,7 @@ class AdminHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_hospital_name(self.pending_appointments[i]["hospitalID"])}',
+                                                        Text(value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
                                                              color="white")
                                                     ]
                                                 )
@@ -148,38 +200,63 @@ class AdminHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.PEOPLE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_doctor_name(self.pending_appointments[i]["doctorID"])}',
+                                                        Text(value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
                                                              color="white")
                                                     ]
                                                 )
                                             ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(icons.EDIT_DOCUMENT, color='white'),
+                                                        Text(status, color='white')
+                                                    ]
+                                                )
+                                            ),
                                         ]
-
                                     )
                                 ),
-                                Container(
+                                Row(
                                     expand=1,
-                                    content=Column(
-                                        alignment=MainAxisAlignment.SPACE_EVENLY,
-                                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                                        controls=[
-                                            Row(
-                                                alignment=MainAxisAlignment.START,
-                                                controls=[
-                                                    IconButton(icon=icons.CHECK_OUTLINED, icon_size=35,
-                                                               icon_color="white", on_click=lambda e: approve_appointment(self.pending_appointments[i]["bookID"])),
-                                                    TextButton(text="Approve", style=ButtonStyle(color=colors.WHITE), on_click=lambda e: approve_appointment(self.pending_appointments[i]["bookID"]))
-                                                ]
-                                            ),
-                                            Row(
-                                                controls=[
-                                                    IconButton(icon=icons.DO_NOT_DISTURB_OUTLINED, icon_size=35,
-                                                               icon_color="white", on_click=lambda e: delete_appointment(self.pending_appointments[i]["bookID"])),
-                                                    TextButton(text="Reject", style=ButtonStyle(color=colors.WHITE), on_click=lambda e: delete_appointment(self.pending_appointments[i]["bookID"]))
-                                                ]
-                                            ),
-                                        ]
-                                    )
+                                    alignment=MainAxisAlignment.SPACE_EVENLY,
+                                    controls=[
+                                        GestureDetector(
+                                            mouse_cursor=MouseCursor.CLICK,
+                                            data=int(self.appointments[i]["bookID"]),
+                                            on_tap=approve_dlg_modal if not disable else None,
+                                            content=Container(
+                                                expand=True,
+                                                content=Column(
+                                                    alignment=MainAxisAlignment.CENTER,
+                                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                    controls=[
+                                                        Icon(icons.CHECK_OUTLINED, size=35, color="white"),
+                                                        Text(value="Approve", color=colors.WHITE),
+                                                    ]
+                                                )
+                                            )
+                                        ),
+                                        GestureDetector(
+                                            mouse_cursor=MouseCursor.CLICK,
+                                            data=int(self.appointments[i]["bookID"]),
+                                            on_tap=reject_dlg_modal if not disable else None,
+                                            content=Container(
+                                                expand=True,
+                                                content=Column(
+                                                    alignment=MainAxisAlignment.CENTER,
+                                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                    controls=[
+                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35,
+                                                             color="white"),
+                                                        Text(value="Reject", color=colors.WHITE),
+                                                    ]
+                                                )
+                                            )
+                                        ),
+                                    ]
                                 )
                             ]
                         ),
@@ -187,85 +264,47 @@ class AdminHome:
                 ),
             )
 
-        for i in range(len(self.approved_appointments)):
-            approved_appointments.controls.append(
-                Container(
-                    padding=5,
+        doctors = GridView(
+            expand=True,
+        )
+
+        for i in range(len(svr.doctorFilteredList)):
+            doctors.controls.append(
+                GestureDetector(
+                    mouse_cursor=MouseCursor.CLICK,
+                    # on_tap=,
+                    data=int(svr.doctorFilteredList[i]["doctorID"]),
                     content=Container(
                         border_radius=10,
-                        bgcolor="amber",
-                        padding=padding.only(left=10, top=5, bottom=5),
-                        width=400,
-                        height=125,
-                        content=Row(
-                            expand=True,
-                            alignment=MainAxisAlignment.SPACE_BETWEEN,
-                            controls=[
-                                Container(
-                                    expand=True,
-                                    content=Column(
-                                        expand=True,
-                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
+                        bgcolor="white",
+                        content=Container(
+                            content=Column(
+                                alignment=MainAxisAlignment.CENTER,
+                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                controls=[
+                                    Container(
+                                        expand=3,
+                                        padding=padding.only(top=10),
+                                        content=Image(src=f'{svr.doctorFilteredList[i]["image"]}', fit=ImageFit.FIT_HEIGHT),
+                                    ),
+                                    Column(
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        expand=1,
                                         controls=[
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
-                                                        Text(value=f'{convert_date(self.approved_appointments[i]["datetime"])}', color="white")
-                                                    ]
-                                                ),
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(name=icons.ACCESS_TIME_OUTLINED, color="white"),
-                                                        Text(value=f'{convert_time(self.approved_appointments[i]["datetime"])}', color="white")
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_hospital_name(self.approved_appointments[i]["hospitalID"])}',
-                                                             color="white")
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(name=icons.PEOPLE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_doctor_name(self.approved_appointments[i]["doctorID"])}',
-                                                             color="white")
-                                                    ]
-                                                )
-                                            ),
+                                            Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
+                                            Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
+                                                 color='black', size=10),
                                         ]
-
                                     )
-                                ),
-                            ]
-                        ),
+                                ]
+                            )
+                        )
                     ),
-                ),
+                )
             )
 
         return View(
-            route="/adminHome",
+            route="/adminHome/:hospital_id",
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -288,21 +327,9 @@ class AdminHome:
                                                     content=Column(
                                                         controls=[
                                                             TextButton(
-                                                                text='Admin',
+                                                                text=f'{svr.get_hospital_name(hospital_id)}',
                                                                 style=ButtonStyle(color=colors.WHITE),
                                                                 icon=icons.PERSON,
-                                                            ),
-                                                            TextButton(
-                                                                text='Hospitals',
-                                                                style=ButtonStyle(color=colors.WHITE),
-                                                                icon=icons.LOCAL_HOSPITAL_OUTLINED,
-                                                                # on_click=
-                                                            ),
-                                                            TextButton(
-                                                                text='Doctors',
-                                                                style=ButtonStyle(color=colors.WHITE),
-                                                                icon=icons.PERSON_PIN_OUTLINED,
-                                                                # on_click=
                                                             ),
                                                         ]
                                                     ),
@@ -323,23 +350,21 @@ class AdminHome:
                             ),
                         ),
                         Column(
-                            expand=True,
+                            expand=2,
                             controls=[
                                 Container(
                                     padding=padding.only(left=5),
-                                    content=Text(value='Pending Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
+                                    content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
-                                pending_appointments
+                                appointments
                             ]
                         ),
                         Column(
-                            expand=True,
+                            expand=1,
+                            horizontal_alignment=CrossAxisAlignment.END,
                             controls=[
-                                Container(
-                                    padding=padding.only(left=5),
-                                    content=Text(value='Approved Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
-                                ),
-                                approved_appointments
+                                ElevatedButton(text='Add Doctor'),
+                                doctors
                             ]
                         ),
                     ]

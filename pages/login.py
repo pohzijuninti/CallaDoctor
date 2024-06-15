@@ -21,8 +21,14 @@ class Login:
             )
         )
 
-        def temp_go_admin(e):
-            page.go("/adminHome")
+        def temp_admin(e):
+            hospital_id = int(admin_field.value)
+            page.go(f'/adminHome/{hospital_id}')
+            page.update()
+
+        def temp_doctor(e):
+            doctor_id = int(doctor_field.value)
+            page.go(f'/doctorHome/{doctor_id}')
             page.update()
 
         # Setup fields
@@ -35,7 +41,13 @@ class Login:
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        admin_button: TextButton = TextButton(text='Temp Admin', on_click=temp_go_admin)
+
+        # Temporary
+        admin_field: TextField = TextField(label='Hospital ID', width=100, border=InputBorder.UNDERLINE, text_size=14)
+        admin_button: TextButton = TextButton(text='Temp Admin', on_click=temp_admin)
+        doctor_field: TextField = TextField(label='Doctor ID', width=100, border=InputBorder.UNDERLINE, text_size=14)
+        doctor_button: TextButton = TextButton(text='Temp Doctor', on_click=temp_doctor)
+
         tabs: Tabs = Tabs(
                     height=100,
                     width=165,
@@ -149,7 +161,20 @@ class Login:
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
-                                            admin_button,
+                                            Row(
+                                                alignment=MainAxisAlignment.CENTER,
+                                                controls=[
+                                                    admin_field,
+                                                    admin_button,
+                                                ]
+                                            ),
+                                            Row(
+                                                alignment=MainAxisAlignment.CENTER,
+                                                controls=[
+                                                    doctor_field,
+                                                    doctor_button,
+                                                ]
+                                            )
                                         ],
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         alignment=MainAxisAlignment.CENTER,

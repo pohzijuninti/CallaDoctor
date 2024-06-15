@@ -1,12 +1,29 @@
 import flet as ft
 from flet import *
 from flet_route import Params, Basket
+import datetime
+import requests
+import json
+from db.config import get_name, get_userID
 import pages.server as svr
 
 
 class MedicalRecord:
     def __init__(self):
-        pass
+        self.url = "http://localhost:3000/medicalRecord"
+        self.payload = '='
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        self.response = None
+        self.medical_record = None
+
+    def get_medical_records(self):
+        full_url = f"{self.url}/{get_userID()}"
+        print(full_url)
+        # Perform the HTTP request to fetch appointments
+        self.response = requests.get(full_url, headers=self.headers, data=self.payload)
+        # Store the response text data
+        self.medical_record = json.loads(self.response.text)
+        print(self.medical_record)
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Medical Record'
@@ -14,8 +31,13 @@ class MedicalRecord:
         page.window_min_width = 900
         page.window_min_height = 630
 
+        self.get_medical_records()
+
+        def go_home(e):
+            page.go("/home")
+            page.update()
+
         def name_card():
-            name = 'Poh Zi Jun'
             gender = 'Male'
             age = '24 years old'
             caution = 'Allergic to Panadol'
@@ -43,7 +65,7 @@ class MedicalRecord:
                                 Column(
                                     expand=2,
                                     controls=[
-                                        Text(value=f"{name}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
+                                        Text(value=f"{get_name()}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
                                         Text(value=f"**{caution}**", style=TextStyle(color=colors.RED)),
                                     ]
                                 ),
@@ -53,13 +75,20 @@ class MedicalRecord:
                 )
             )
 
-        medical_record = GridView(
+        def display_description(description):
+            if ',' in description:
+                description = description.replace(',', '\n*')
+            if not description.startswith('*'):
+                description = '* ' + description
+            return description
+
+        medical_records = GridView(
             runs_count=3,
             child_aspect_ratio=10 / 9,
         )
 
-        for i in range(9):
-            medical_record.controls.append(
+        for i in range(len(self.medical_record)):
+            medical_records.controls.append(
                 Container(
                     border_radius=10,
                     bgcolor='white',
@@ -70,17 +99,17 @@ class MedicalRecord:
                             controls=[
                                 Column(
                                     controls=[
-                                        Text(value='15 June 2024, 3:15 PM', color=colors.GREY),
-                                        Text(value='Broke His Leg', size=18, color=colors.BLACK,
+                                        Text(value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}', color=colors.GREY),
+                                        Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
                                              weight=FontWeight.BOLD),
                                         Text(value='Description', color=colors.BLACK),
-                                        Text(value='*Fall down from bike\n*Broke his left leg', color=colors.GREY),
+                                        Text(value=f'{display_description(self.medical_record[i]["description"])}', color=colors.GREY),
                                     ]
                                 ),
                                 Row(
                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
-                                        Text(value='Island Hospital, Dr Amelia', color=colors.BLACK, size=12),
+                                        Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
                                         IconButton(icon=icons.SEND, icon_color=colors.BLUE),
                                     ]
                                 )
@@ -90,10 +119,6 @@ class MedicalRecord:
                     )
                 )
             )
-
-        def go_home(e):
-            page.go("/home")
-            page.update()
 
         return View(
             route="/medicalRecord",
@@ -118,37 +143,8 @@ class MedicalRecord:
                         name_card(),
                         Container(
                             expand=True,
-                            content=medical_record,
+                            content=medical_records,
                         ),
-                        # Container(
-                        #     expand=2,
-                        #     width=300,
-                        #     border_radius=10,
-                        #     bgcolor="white",
-                        #     content=ListView(
-                        #         padding=10,
-                        #         spacing=20,
-                        #         controls=[
-                        #             Text(value=f'{svr.descriptionList[0]["datetime"]}', style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #             Text(value=f'{svr.descriptionList[0]["description"]}',
-                        #                  style=TextStyle(color=colors.BLACK)),
-                        #         ]
-                        #     )
-                        # )
                     ]
                 ),
             ]

@@ -176,7 +176,7 @@ const medicalRecord = [
     "description": "Fall down from bicycle , Broke his left leg",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": '101',
+    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
   },
   {
     "recordID": 202,
@@ -185,7 +185,7 @@ const medicalRecord = [
     "description": "Fall down from bicycle , Broke his right leg",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": '101',
+    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
   },
   {
     "recordID": 203,
@@ -194,7 +194,7 @@ const medicalRecord = [
     "description": "Difficult to breathe",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": '101',
+    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
   },
   {
     "recordID": 204,
@@ -203,7 +203,7 @@ const medicalRecord = [
     "description": "High cholesterol , Lack of exercise",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": '101',
+    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
   },
   {
     "recordID": 205,
@@ -212,7 +212,7 @@ const medicalRecord = [
     "description": "Toothache in lower left molar",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": '101',
+    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
   },
 ];
 
@@ -232,10 +232,16 @@ app.get('/doctor', (req, res) => {
   res.send(doctor);
 });
 
-app.get('/medicalrecord/:userID', (req, res) => {
+app.get('/medicalRecord/:userID', (req, res) => {
   const userID = req.params.userID;
   const userRecords = medicalRecord.filter(record => record.userID === userID);
   res.json(userRecords);
+});
+
+app.get('/medicalRecord/doctor/:doctorID', (req, res) => {
+  const doctorID = parseInt(req.params.doctorID);
+  const doctorRecords = medicalRecord.filter(record => record.doctorID === doctorID);
+  res.json(doctorRecords);
 });
 
 let users = [];
@@ -397,87 +403,47 @@ app.get('/appointment/:userID', (req, res) => {
   res.json(userAppointments);
 });
 
-
-const pendingAppointments = [];
-const approvedAppointments = [];
-
-app.get('/appointment/:status', (req, res) => {
-  const { status } = req.params;
-  let appointments;
-
-  if (status === "pending") {
-    appointments = pendingAppointments.filter(appointment => appointment.status === status);
-  } else if (status === "approved") {
-    appointments = approvedAppointments.filter(appointment => appointment.status === status);
-  }
-
-  res.json(appointments);
+app.get('/appointment/hospital/:hospitalID', (req, res) => {
+  const hospitalID = parseInt(req.params.hospitalID);
+  const hospitalAppointments = appointments.filter(appointment => appointment.hospitalID === hospitalID);
+  res.json(hospitalAppointments);
 });
 
-app.post('/approveAppointment/:bookID', (req, res) => {
+app.get('/appointment/doctor/:doctorID', (req, res) => {
+  const doctorID = parseInt(req.params.doctorID);
+  const doctorAppointments = appointments.filter(appointment => appointment.doctorID === doctorID);
+  res.json(doctorAppointments);
+});
+
+
+app.post('/appointment/approve/:bookID', (req, res) => {
   const { bookID } = req.params;
   const bookIDInt = parseInt(bookID);
 
-  // Find the appointment with the given bookID in pendingAppointments
-  const index = pendingAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
+  const index = appointments.findIndex(appointment => appointment.bookID === bookIDInt);
 
-  // If appointment with the given bookID is not found in pendingAppointments, return 404 Not Found
   if (index === -1) {
-    return res.status(404).json({ error: 'Appointment not found in pending appointments.' });
+    return res.status(404).json({ error: 'Appointment not found.' });
   }
 
-  // Move the appointment from pendingAppointments to approvedAppointments
-  const appointmentToApprove = pendingAppointments.splice(index, 1)[0];
-  appointmentToApprove.status = "approved";
-  approvedAppointments.push(appointmentToApprove);
+  appointments[index].status = 1;
 
   res.json({ message: 'Appointment approved successfully.' });
 });
 
-app.get('/appointment/:status/:userID', (req, res) => {
-  const { status } = req.params;
-  const { userID } = req.params;
-
-  const userAppointments = approvedAppointments.filter(appointment => ( appointment.status === status && appointment.userID === userID ));
-
-  // Check if the filtered list of appointments is not empty
-  res.json(userAppointments);
-});
-
-
-// Delete an appointment by bookID using POST method
-app.post('/appointment/pending/delete/:bookID', (req, res) => {
+app.post('/appointment/reject/:bookID', (req, res) => {
   const { bookID } = req.params;
   const bookIDInt = parseInt(bookID);
 
-  // Find the index of the appointment to be deleted
-  const index = pendingAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
+  const index = appointments.findIndex(appointment => appointment.bookID === bookIDInt);
 
   if (index === -1) {
-    return res.status(404).json({ error: 'Pending appointment not found.' });
+    return res.status(404).json({ error: 'Appointment not found.' });
   }
 
-  // Remove the appointment from the array
-  pendingAppointments.splice(index, 1);
+  appointments[index].status = -1;
 
-  // Send a success response
-  res.json({ message: 'Pending Appointment deleted successfully.' });
-});
-
-app.post('/appointment/approved/delete/:bookID', (req, res) => {
-  const { bookID } = req.params;
-  const bookIDInt = parseInt(bookID);
-
-  const index = approvedAppointments.findIndex(appointment => appointment.bookID === bookIDInt);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Approved appointment not found.' });
-  }
-
-  // Remove the appointment from the array
-  approvedAppointments.splice(index, 1);
-
-  res.json({ message: 'Appointment deleted successfully.' });
+  res.json({ message: 'Appointment rejected successfully.' });
 });
 
 

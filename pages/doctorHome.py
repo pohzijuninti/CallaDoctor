@@ -5,40 +5,33 @@ import datetime
 import calendar
 import requests
 import json
-from db.config import get_name, get_userID
 import pages.server as svr
 
 
-class Home:
+class DoctorHome:
     def __init__(self):
         self.calendar_grid = None
-        self.url = "http://localhost:3000/appointment"
+        self.appointment_url = "http://localhost:3000/appointment/doctor"
+        self.medical_record_url = "http://localhost:3000/medicalRecord/doctor"
         self.payload = '='
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response = None
         self.appointments = None
-        self.booking_histories = None
+        self.medical_record = None
 
-    def get_appointments(self):
-        full_url = f"{self.url}/{get_userID()}"
+    def get_appointments(self, doctor_id):
+        full_url = f"{self.appointment_url}/{doctor_id}"
         print(full_url)
-        # Perform the HTTP request to fetch appointments
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
-        # Store the response text data
         self.appointments = json.loads(self.response.text)
         print(self.appointments)
 
-    def get_booking_histories(self):
-        self.booking_histories = []
-
-        i = 0
-        while i < len(self.appointments):
-            if self.appointments[i]["datetime"] < datetime.datetime.now().timestamp():
-                self.booking_histories.append(self.appointments[i])
-                del self.appointments[i]
-            else:
-                i += 1
-        print(self.booking_histories)
+    def get_medical_records(self, doctor_id):
+        full_url = f"{self.medical_record_url}/{doctor_id}"
+        print(full_url)
+        self.response = requests.get(full_url, headers=self.headers, data=self.payload)
+        self.medical_record = json.loads(self.response.text)
+        print(self.medical_record)
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
@@ -137,28 +130,21 @@ class Home:
         )
 
     def view(self, page: Page, params: Params, basket: Basket):
-        page.title = 'Call a Doctor'
+        page.title = 'Call a Doctor - Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 900
         page.window_min_height = 630
 
-        self.get_appointments()
-        self.get_booking_histories()
-        name = get_name()
+        doctor_id = int(params.doctor_id)
+
+        self.get_appointments(doctor_id)
+        self.get_medical_records(doctor_id)
 
         def go_login(e):
             page.go("/")
             page.update()
 
-        def go_select_hospital(e):
-            page.go("/selectHospital")
-            page.update()
-
-        def go_medical_record(e):
-            page.go("/medicalRecord")
-            page.update()
-
-        def open_dlg_modal(e):
+        def approve_dlg_modal(e):
             book_id = e.control.data
 
             for i in range(len(self.appointments)):
@@ -170,7 +156,7 @@ class Home:
 
             dlg_modal = AlertDialog(
                 modal=False,
-                title=Text("Delete Appointment"),
+                title=Text("Approve Appointment"),
                 content=Text("Are you sure?"),
                 actions=[
                     Container(
@@ -181,7 +167,7 @@ class Home:
                                 Text(value=time),
                                 Text(value=hospital),
                                 Text(value=doctor),
-                                TextButton(text='Delete', width=150, on_click=lambda e: (delete_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                                TextButton(text='Approve', width=150, on_click=lambda e: (approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
                             ]
                         ))
                 ],
@@ -192,14 +178,64 @@ class Home:
             dlg_modal.open = True
             page.update()
 
-        def delete_appointment(book_id):
-            url = f"http://localhost:3000/appointment/delete/{book_id}"
+        def reject_dlg_modal(e):
+            book_id = e.control.data
+
+            for i in range(len(self.appointments)):
+                if self.appointments[i]["bookID"] == book_id:
+                    date = svr.convert_date(self.appointments[i]["datetime"])
+                    time = svr.convert_time(self.appointments[i]["datetime"])
+                    hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
+                    doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Reject Appointment"),
+                content=Text("Are you sure?"),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=date),
+                                Text(value=time),
+                                Text(value=hospital),
+                                Text(value=doctor),
+                                TextButton(text='Reject', width=150, on_click=lambda e: (reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+            )
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+        def approve_appointment(book_id):
+            url = f"http://localhost:3000/appointment/approve/{book_id}"
             payload = {}
             headers = {}
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
             print(response.text)
+
+        def reject_appointment(book_id):
+            url = f"http://localhost:3000/appointment/reject/{book_id}"
+            payload = {}
+            headers = {}
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            print(response.text)
+
+        def display_description(description):
+            if ',' in description:
+                description = description.replace(',', '\n*')
+            if not description.startswith('*'):
+                description = '* ' + description
+            return description
 
         appointments = ListView(
             expand=True,
@@ -299,134 +335,91 @@ class Home:
                                         ]
                                     )
                                 ),
-                                GestureDetector(
-                                    mouse_cursor=MouseCursor.CLICK,
-                                    data=int(self.appointments[i]["bookID"]),
-                                    on_tap=open_dlg_modal if not disable else None,
-                                    content=Container(
-                                        padding=20,
-                                        expand=1,
-                                        content=Column(
-                                            alignment=MainAxisAlignment.CENTER,
-                                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                                            controls=[
-                                                Icon(icons.DELETE_OUTLINED, size=35, color="white"),
-                                                Text(value="Delete", color=colors.WHITE),
-                                            ]
-                                        )
-                                    )
-                                ),
+                                Row(
+                                    expand=1,
+                                    alignment=MainAxisAlignment.SPACE_EVENLY,
+                                    controls=[
+                                        GestureDetector(
+                                            mouse_cursor=MouseCursor.CLICK,
+                                            data=int(self.appointments[i]["bookID"]),
+                                            on_tap=approve_dlg_modal if not disable else None,
+                                            content=Container(
+                                                expand=True,
+                                                content=Column(
+                                                    alignment=MainAxisAlignment.CENTER,
+                                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                    controls=[
+                                                        Icon(icons.CHECK_OUTLINED, size=35, color="white"),
+                                                        Text(value="Approve", color=colors.WHITE),
+                                                    ]
+                                                )
+                                            )
+                                        ),
+                                        GestureDetector(
+                                            mouse_cursor=MouseCursor.CLICK,
+                                            data=int(self.appointments[i]["bookID"]),
+                                            on_tap=reject_dlg_modal if not disable else None,
+                                            content=Container(
+                                                expand=True,
+                                                content=Column(
+                                                    alignment=MainAxisAlignment.CENTER,
+                                                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                                                    controls=[
+                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35,
+                                                             color="white"),
+                                                        Text(value="Reject", color=colors.WHITE),
+                                                    ]
+                                                )
+                                            )
+                                        ),
+                                    ]
+                                )
                             ]
                         ),
                     ),
                 ),
             )
 
-        booking_history = ListView(
+        medical_records = ListView(
             expand=True,
             padding=5,
             spacing=10,
         )
 
-        for i in range(len(self.booking_histories)):
-            booking_history.controls.append(
+        for i in range(len(self.medical_record)):
+            medical_records.controls.append(
                 Container(
-                    padding=5,
+                    border_radius=10,
+                    bgcolor="white",
                     content=Container(
-                        border_radius=10,
-                        bgcolor="white",
-                        padding=5,
-                        height=125,
-                        content=Row(
-                            expand=True,
+                        padding=10,
+                        content=Column(
                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                             controls=[
-                                Container(
-                                    expand=True,
-                                    content=Column(
-                                        expand=True,
-                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                                        controls=[
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.DATE_RANGE_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.convert_date(self.booking_histories[i]["datetime"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                ),
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.ACCESS_TIME_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.convert_time(self.booking_histories[i]["datetime"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.LOCAL_HOSPITAL_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.get_hospital_name(self.booking_histories[i]["hospitalID"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.PEOPLE_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.get_doctor_name(self.booking_histories[i]["doctorID"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                        ]
-                                    )
+                                Column(
+                                    controls=[
+                                        Text(value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}', color=colors.GREY),
+                                        Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
+                                             weight=FontWeight.BOLD),
+                                        Text(value='Description', color=colors.BLACK),
+                                        Text(value=f'{display_description(self.medical_record[i]["description"])}', color=colors.GREY),
+                                    ]
                                 ),
+                                Row(
+                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                    controls=[
+                                        Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
+                                        IconButton(icon=icons.EDIT_OUTLINED, icon_color=colors.BLUE),
+                                    ]
+                                )
                             ]
-                        ),
-                    ),
-                ),
+                        )
+                    )
+                )
             )
 
         return View(
-            route="/home",
+            route="/doctorHome/:doctor_id",
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -449,15 +442,9 @@ class Home:
                                                     content=Column(
                                                         controls=[
                                                             TextButton(
-                                                                text=name,
+                                                                text=f'{svr.get_doctor_name(doctor_id)}',
                                                                 style=ButtonStyle(color=colors.WHITE),
                                                                 icon=icons.PERSON,
-                                                            ),
-                                                            TextButton(
-                                                                text='Medical Record',
-                                                                style=ButtonStyle(color=colors.WHITE),
-                                                                icon=icons.FILE_COPY_OUTLINED,
-                                                                on_click=go_medical_record
                                                             ),
                                                         ]
                                                     ),
@@ -487,11 +474,9 @@ class Home:
                                 appointments
                             ]
                         ),
-
                         Column(
                             horizontal_alignment=CrossAxisAlignment.END,
                             controls=[
-                                ElevatedButton(text='Add Appointment', on_click=go_select_hospital),
                                 Container(
                                     expand=True,
                                     padding=padding.only(left=5, top=5),
@@ -502,6 +487,7 @@ class Home:
                                             Container(
                                                 content=Container(
                                                     border_radius=10,
+                                                    bgcolor="red",
                                                     width=300,
                                                     height=300,
                                                     content=self.generate_calendar(page),
@@ -513,18 +499,12 @@ class Home:
                                                     Column(
                                                         controls=[
                                                             Container(
-                                                                padding=padding.only(left=5),
-                                                                content=Text(value='Booking History',
-                                                                             style=TextStyle(size=18,
-                                                                                             weight=FontWeight.BOLD)),
-                                                            ),
-                                                            Container(
                                                                 expand=True,
                                                                 border_radius=10,
                                                                 bgcolor=colors.GREY_800,
                                                                 width=300,
                                                                 height=100,
-                                                                content=booking_history
+                                                                content=medical_records
                                                             ),
                                                         ]
                                                     ),

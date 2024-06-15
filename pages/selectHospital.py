@@ -37,9 +37,7 @@ class SelectHospital:
             hospital_id = e.control.data
             go_select_doctor(e)
 
-
         search_bar: SearchBar = SearchBar(
-
             width=300,
             bar_hint_text='Search...',
             bar_leading=Container(
@@ -54,7 +52,6 @@ class SelectHospital:
                 for i in range(len(svr.hospitalList))
             ]
         )
-
 
         def on_tap(e):
             global selected_container

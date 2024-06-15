@@ -17,16 +17,17 @@ class SelectDateTime:
     def __init__(self):
         self.calendar_grid = None
         self.chosen_date = None
-        today = datetime.date.today()
-        self.url = "http://localhost:3000/timeslots/21/" + today.isoformat()
+        self.url = "http://localhost:3000/timeslots"
         self.payload = {}
         self.headers = {}
         self.response = None
         self.timeslots_data = None
 
-    def get_timeslots(self):
+    def get_timeslots(self, doctor_id):
+        full_url = f"{self.url}/{doctor_id}/{datetime.date.today().isoformat()}"
+        print(full_url)
         # Perform the HTTP request to fetch time slots
-        self.response = requests.request("GET", self.url, headers=self.headers, data=self.payload)
+        self.response = requests.request("GET", full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
 
@@ -171,10 +172,9 @@ class SelectDateTime:
         page.window_min_width = 800
         page.window_min_height = 630
 
-        self.get_timeslots()
-
         hospital_id = int(params.hospital_id)
         doctor_id = int(params.doctor_id)
+        self.get_timeslots(doctor_id)
 
         def on_tap(e):
             global selected_container
@@ -198,17 +198,13 @@ class SelectDateTime:
 
             container.update()
 
-        def convert_time(timestamp):
-            dt_object = datetime.datetime.fromtimestamp(timestamp)
-            return dt_object.strftime("%I:%M %p")
-
         timeslot = GridView(
             runs_count=3,
             child_aspect_ratio=5/2,
         )
 
         for i in range(len(self.timeslots_data)):
-            time = convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format
+            time = svr.convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format
 
             timeslot.controls.append(
                 GestureDetector(
@@ -219,10 +215,11 @@ class SelectDateTime:
                         border_radius=10,
                         alignment=alignment.center,
                         bgcolor=colors.WHITE,
-                        content=Text(value=time,
-                                     color=colors.GREY_800,
-                                     size=12,
-                                     ),
+                        content=Text(
+                            value=time,
+                            color=colors.GREY_800,
+                            size=12,
+                        ),
                     )
                 )
             )
@@ -240,13 +237,12 @@ class SelectDateTime:
 
             current_date = datetime.date.today()
             current_month = current_date.month
-            current_year = current_date.year
             month_name = calendar.month_name[current_month]
 
             if self.chosen_date is None:
-                selected_date = f'{current_date.day} {month_name} {current_year}'
+                selected_date = f'{current_date.day} {month_name} {current_date.year}'
             else:
-                selected_date = f'{self.chosen_date} {month_name} {current_year}'
+                selected_date = f'{self.chosen_date} {month_name} {current_date.year}'
 
             dlg_modal = AlertDialog(
                 modal=False,
@@ -258,7 +254,7 @@ class SelectDateTime:
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
                                 Text(value=f'{selected_date}'),
-                                Text(value=f'{convert_time(selected_time)}'),
+                                Text(value=f'{svr.convert_time(selected_time)}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
                                 TextButton(text='Back To Home', width=150, on_click=close_dlg_modal),

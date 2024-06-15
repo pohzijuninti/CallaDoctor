@@ -11,6 +11,7 @@ from pages.selectHospital import SelectHospital
 from pages.selectDoctor import SelectDoctor
 from pages.selectDateTime import SelectDateTime
 from pages.adminHome import AdminHome
+from pages.doctorHome import DoctorHome
 
 
 def main(page: Page):
@@ -25,8 +26,8 @@ def main(page: Page):
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
         path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),
         path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
-        path(url='/adminHome', clear=False, view=AdminHome().view),
-
+        path(url='/adminHome/:hospital_id', clear=False, view=AdminHome().view),
+        path(url='/doctorHome/:doctor_id', clear=False, view=DoctorHome().view),
     ]
     Routing(page=page, app_routes=app_routes)
     page.go(page.route)
