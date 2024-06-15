@@ -32,7 +32,16 @@ class SelectHospital:
                 page.go(f'/selectDoctor/{hospital_id}')
                 page.update()
 
-        # def search_hospital(e):
+        def go_search_hospital(e):
+            page.go("/searchHospital")
+            page.update()
+
+        search_bar: SearchBar = SearchBar(
+            bar_hint_text='Search...',
+            controls=[
+                ListTile()
+            ]
+        )
 
         def on_tap(e):
             global selected_container
@@ -124,6 +133,7 @@ class SelectHospital:
 
                                     ]
                                 ),
+                                search_bar,
                                 Column(
                                     expand=1,
                                     horizontal_alignment=CrossAxisAlignment.END,
@@ -132,7 +142,7 @@ class SelectHospital:
                                             icon=icons.SEARCH_OUTLINED,
                                             icon_color=colors.WHITE,
                                             hover_color=colors.BLUE_100,
-                                            # on_click=search_hospital,
+                                            # on_click=go_search_hospital,
                                         ),
                                     ]
                                 )

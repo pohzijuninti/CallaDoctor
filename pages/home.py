@@ -198,7 +198,7 @@ class Home:
                     padding=5,
                     content=Container(
                         border_radius=10,
-                        bgcolor="amber",
+                        bgcolor=colors.GREY_800,
                         padding=padding.only(left=10, top=5, bottom=5),
                         width=400,
                         height=125,
