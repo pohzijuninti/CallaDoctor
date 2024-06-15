@@ -278,7 +278,7 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(icons.EDIT_DOCUMENT, color='white'),
-                                                        Text(status)
+                                                        Text(status, color='white')
                                                     ]
                                                 )
                                             ),
