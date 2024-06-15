@@ -3,7 +3,10 @@ from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
 from db.config import register, login
+import requests
+import json
 
+selected_index = None
 
 class Login:
     def __init__(self):
@@ -21,8 +24,20 @@ class Login:
             )
         )
 
-        def temp_admin(e):
-            hospital_id = int(admin_field.value)
+        def admin_login():
+            url = "http://localhost:3000/login/admin"
+
+            payload = f'email={email.value}&password={password.value}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            hospital_id = json.loads(response.text)['hospitalID']
+
+            print(hospital_id)
+
             page.go(f'/adminHome/{hospital_id}')
             page.update()
 
@@ -37,14 +52,11 @@ class Login:
         password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', width=250, border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         login_button: ElevatedButton = ElevatedButton(text='Login', width=250, disabled=True)
+
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-
-        # Temporary
-        admin_field: TextField = TextField(label='Hospital ID', width=100, border=InputBorder.UNDERLINE, text_size=14)
-        admin_button: TextButton = TextButton(text='Temp Admin', on_click=temp_admin)
         doctor_field: TextField = TextField(label='Doctor ID', width=100, border=InputBorder.UNDERLINE, text_size=14)
         doctor_button: TextButton = TextButton(text='Temp Doctor', on_click=temp_doctor)
 
@@ -124,17 +136,33 @@ class Login:
                 login_button.disabled = True
             page.update()
 
-        def loginToHome(e: ControlEvent):
-            if login(email.value, password.value):
-                page.go('/home')
+        def all_login(e: ControlEvent):
+            global selected_index
+            if selected_index == 0 or selected_index is None:
+                if login(email.value, password.value):
+                    page.go('/home')
+            elif selected_index == 1:
+                print('doc')
+            else:
+                admin_login()
+
+
+        def on_change(e: ControlEvent):
+            global selected_index
+            if int(e.data) == 0:
+                selected_index = 0
+            elif int(e.data) == 1:
+                selected_index = 1
+            else:
+                selected_index = 2
 
         def go_clinic_form(e):
             page.go("/clinicForm")
             page.update()
-
         email.on_change = validate
         password.on_change = validate
-        login_button.on_click = loginToHome
+        login_button.on_click = all_login
+        tabs.on_change = on_change
 
         return View(
             route="/",
@@ -161,13 +189,6 @@ class Login:
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
-                                            Row(
-                                                alignment=MainAxisAlignment.CENTER,
-                                                controls=[
-                                                    admin_field,
-                                                    admin_button,
-                                                ]
-                                            ),
                                             Row(
                                                 alignment=MainAxisAlignment.CENTER,
                                                 controls=[

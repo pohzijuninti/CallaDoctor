@@ -3,36 +3,56 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const app = express();
+const bcrypt = require('bcryptjs')
 app.use(express.json());
 
 // add body-parser middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const generateFixedHash = async () => {
+  const password = 'adventist123'; // Replace this with the password you want to hash
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  console.log('Hashed password:', hashedPassword);
+};
+
+generateFixedHash();
 
 const hospital = [
   {
     "hospitalID": 1,
     "name": "Pantai Hospital Penang",
     "image": "pantai.png",
+    "email": "pantai@gmail.com",
+    "password": "$2a$10$grRJEbGhuED/Rz.9T0.SCOdPxESFm4CTBKs1d67s3W3wk8.uSDGsq"
   },
   {
     "hospitalID": 2,
     "name": "Island Hospital Penang",
     "image": "island.jpeg",
+    "email": "island@gmail.com",
+    "password": "$2a$10$ZVb20qG6EasQgkDZNT31yuIRAaR7MMcstvoYQyZK7v03PU1q9XyMO"
   },
   {
     "hospitalID": 3,
     "name": "Gleneagles Hospital Penang",
     "image": "gleneagles.jpeg",
+    "email": "gmc@gmail.com",
+    "password": "$2a$10$pbpLhUoBd0A/QQ2KvHYG9e7NVnlD6IVjDpyggctfeU23sxlxdlvrK"
   },
   {
     "hospitalID": 4,
     "name": "Sunway Medical Centre Penang",
     "image": "sunway.jpeg",
+    "email": "sunway@gmail.com",
+    "password": "$2a$10$IgdR5tTZmmzH00kYZ8BgVe88CXfpWcXIDg5CTuE/l7cGYBfpcYS92"
   },
   {
     "hospitalID": 5,
     "name": "Penang Adventist Hospital",
     "image": "adventist.jpeg",
+    "email": "adventist@gmail.com",
+    "password": "$2a$10$VQgehZMx9m9Q2X3OaNUCneupSP6SVhSkSKRFRX3l0OBlhcDvYket."
   },
 ];
 
@@ -116,6 +136,8 @@ const doctor = [
     "image": "dramelia.jpeg",
     "specialityID": 13,
     "hospitalID": 3,
+    "email": "amelia@gmail.com",
+    "password": "test"
   },
   {
     "doctorID": 29,
@@ -220,6 +242,8 @@ app.get('/', (req, res) => {
     res.send('CallaDoctor API');
 });
 
+
+
 app.get('/hospital', (req, res) => {
   res.send(hospital);
 });
@@ -231,6 +255,8 @@ app.get('/speciality', (req, res) => {
 app.get('/doctor', (req, res) => {
   res.send(doctor);
 });
+
+
 
 app.get('/medicalRecord/:userID', (req, res) => {
   const userID = req.params.userID;
@@ -283,6 +309,7 @@ app.post('/user', (req, res) => {
     });
 });
 
+
 app.get('/username/:userID', (req, res) => {
   const userID = req.params.userID;
   const user = users.find(u => u.userID == userID);
@@ -293,6 +320,29 @@ app.get('/username/:userID', (req, res) => {
     res.status(404).send({ error: 'User not found' });
   }
 });
+
+
+// Login route
+app.post('/login/admin', async (req, res) => {
+  const { email, password } = req.body;
+
+  // Find the hospital admin by email
+  const hospitalAdmin = hospital.find(h => h.email === email);
+  if (!hospitalAdmin) {
+    return res.status(401).send('Invalid email or password');
+  }
+
+  // Compare the hashed password with the one in the request
+  const match = await bcrypt.compare(password, hospitalAdmin.password);
+  if (!match) {
+    return res.status(401).send('Invalid email or password');
+  }
+
+  res.json({
+    hospitalID: hospitalAdmin.hospitalID
+  });
+});
+
 
 let timeSlots = [];
 

@@ -17,6 +17,9 @@ sudo npm i -g nodemon
 # Install body-parser
 npm install body-parser
 
+# Hash the password
+npm i bcryptjs
+
 # For CSV file
 npm install csv-writer
 
