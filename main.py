@@ -8,7 +8,6 @@ from pages.home import Home
 from pages.medicalRecord import MedicalRecord
 from pages.clinicForm import ClinicForm
 from pages.selectHospital import SelectHospital
-from pages.searchHospital import SearchHospital
 from pages.selectDoctor import SelectDoctor
 from pages.selectDateTime import SelectDateTime
 from pages.adminHome import AdminHome
@@ -24,7 +23,6 @@ def main(page: Page):
         path(url='/medicalRecord', clear=False, view=MedicalRecord().view),
         path(url='/clinicForm', clear=False, view=ClinicForm().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
-        path(url='/searchHospital', clear=False, view=SearchHospital().view),
         path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),
         path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
         path(url='/adminHome', clear=False, view=AdminHome().view),

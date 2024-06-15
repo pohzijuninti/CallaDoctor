@@ -11,8 +11,9 @@ class Login:
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Login'
-        page.window_min_width = 800
+        page.window_min_width = 900
         page.window_min_height = 630
+        page.window_width = 900
         page.window_resizable = True
         page.theme = Theme(
             tabs_theme=TabsTheme(

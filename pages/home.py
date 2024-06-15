@@ -14,15 +14,17 @@ import pages.server as svr
 class Home:
     def __init__(self):
         self.calendar_grid = None
-        self.url = "http://localhost:3000/appointment/"
-        self.payload = {}
-        self.headers = {}
+        self.url = "http://localhost:3000/appointment"
+        self.payload = '='
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response = None
         self.appointments = None
 
     def get_appointments(self):
+        full_url = f"{self.url}/{get_userID()}"
+        print(full_url)
         # Perform the HTTP request to fetch appointments
-        self.response = requests.request("GET", self.url + f'approved/{get_userID()}', headers=self.headers, data=self.payload)
+        self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.appointments = json.loads(self.response.text)
         print(self.appointments)
@@ -126,7 +128,7 @@ class Home:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_min_width = 800
+        page.window_min_width = 900
         page.window_min_height = 630
 
         self.get_appointments()
@@ -193,12 +195,22 @@ class Home:
         )
 
         for i in range(len(self.appointments)):
+            if self.appointments[i]["status"] == 0:
+                colour = 'grey'
+                status = 'PENDING'
+            elif self.appointments[i]["status"] == 1:
+                colour = 'green'
+                status = 'APPROVED'
+            else:
+                colour = 'red'
+                status = 'REJECTED'
+
             appointments.controls.append(
                 Container(
                     padding=5,
                     content=Container(
                         border_radius=10,
-                        bgcolor=colors.GREY_800,
+                        bgcolor=colour,
                         padding=padding.only(left=10, top=5, bottom=5),
                         width=400,
                         height=125,
@@ -259,37 +271,43 @@ class Home:
                                                     ]
                                                 )
                                             ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(icons.EDIT_DOCUMENT, color='white'),
+                                                        Text(status)
+                                                    ]
+                                                )
+                                            ),
                                         ]
 
                                     )
                                 ),
-                                Container(
-                                    expand=1,
-                                    content=Column(
-                                        alignment=MainAxisAlignment.SPACE_EVENLY,
-                                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                                        controls=[
-                                            IconButton(icon=icons.DELETE_OUTLINED, icon_size=40, icon_color="white",
-                                                       on_click=lambda e: open_dlg_modal(
+                                GestureDetector(
+                                    mouse_cursor=MouseCursor.CLICK,
+                                    on_tap=lambda e: open_dlg_modal(
                                                            convert_date(self.appointments[i]["datetime"]),
                                                            convert_time(self.appointments[i]["datetime"]),
                                                            svr.get_hospital_name(self.appointments[i]["hospitalID"]),
                                                            svr.get_doctor_name(self.appointments[i]["doctorID"]),
                                                            self.appointments[i]["bookID"]
-                                                       )
-                                            ),
-                                            TextButton(text="Delete", style=ButtonStyle(color=colors.WHITE),
-                                                       on_click=lambda e: open_dlg_modal(
-                                                           convert_date(self.appointments[i]["datetime"]),
-                                                           convert_time(self.appointments[i]["datetime"]),
-                                                           svr.get_hospital_name(self.appointments[i]["hospitalID"]),
-                                                           svr.get_doctor_name(self.appointments[i]["doctorID"]),
-                                                           self.appointments[i]["bookID"]
-                                                       )
-                                            )
-                                        ]
+                                                       ),
+                                    content=Container(
+                                        padding=20,
+                                        expand=1,
+                                        content=Column(
+                                            alignment=MainAxisAlignment.CENTER,
+                                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                                            controls=[
+                                                Icon(icons.DELETE_OUTLINED, size=35, color="white"),
+                                                Text(value="Delete",color=colors.WHITE),
+                                            ]
+                                        )
                                     )
-                                )
+                                ),
                             ]
                         ),
                     ),
@@ -388,8 +406,8 @@ class Home:
                                                             Container(
                                                                 expand=True,
                                                                 border_radius=10,
-                                                                bgcolor="green",
-                                                                width=145,
+                                                                bgcolor=colors.GREY_800,
+                                                                width=300,
                                                                 height=100,
                                                                 content=ListView(
                                                                     expand=True,
@@ -400,7 +418,6 @@ class Home:
                                                                                 border_radius=10,
                                                                                 bgcolor="amber",
                                                                                 padding=5,
-                                                                                width=400,
                                                                                 height=125,
                                                                                 content=Row(
                                                                                     expand=True,
@@ -487,7 +504,7 @@ class Home:
                                                                             padding=5,
                                                                             content=Container(
                                                                                 border_radius=10,
-                                                                                bgcolor="amber",
+                                                                                bgcolor="pink",
                                                                                 width=400,
                                                                                 height=125,
                                                                                 content=Text('Booking History'),
@@ -498,19 +515,6 @@ class Home:
                                                             ),
                                                         ]
                                                     ),
-                                                    Column(
-                                                        controls=[
-                                                            Container(
-                                                                expand=True,
-                                                                border_radius=10,
-                                                                bgcolor="blue",
-                                                                width=145,
-                                                                height=100,
-                                                                content=Text('Graph'),
-                                                            ),
-                                                        ]
-                                                    ),
-
                                                 ]
                                             )
                                         ]

@@ -32,16 +32,29 @@ class SelectHospital:
                 page.go(f'/selectDoctor/{hospital_id}')
                 page.update()
 
-        def go_search_hospital(e):
-            page.go("/searchHospital")
-            page.update()
+        def on_click(e):
+            global hospital_id
+            hospital_id = e.control.data
+            go_select_doctor(e)
+
 
         search_bar: SearchBar = SearchBar(
+
+            width=300,
             bar_hint_text='Search...',
+            bar_leading=Container(
+                padding=10,
+                content=Icon(icons.SEARCH_OUTLINED,
+                             color=colors.WHITE),
+            ),
             controls=[
-                ListTile()
+                ListTile(title=Text(f'{svr.hospitalList[i]["name"]}'),
+                         on_click=on_click,
+                         data=int(svr.hospitalList[i]["hospitalID"]),)
+                for i in range(len(svr.hospitalList))
             ]
         )
+
 
         def on_tap(e):
             global selected_container
@@ -134,19 +147,6 @@ class SelectHospital:
                                     ]
                                 ),
                                 search_bar,
-                                Column(
-                                    expand=1,
-                                    horizontal_alignment=CrossAxisAlignment.END,
-                                    controls=[
-                                        IconButton(
-                                            icon=icons.SEARCH_OUTLINED,
-                                            icon_color=colors.WHITE,
-                                            hover_color=colors.BLUE_100,
-                                            # on_click=go_search_hospital,
-                                        ),
-                                    ]
-                                )
-
                             ]
                         ),
                         Container(
