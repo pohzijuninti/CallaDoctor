@@ -25,26 +25,42 @@ class Login:
         )
 
         def admin_login():
-            url = "http://localhost:3000/login/admin"
+            try:
+                url = "http://localhost:3000/login/admin"
 
-            payload = f'email={email.value}&password={password.value}'
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+                payload = f'email={email.value}&password={password.value}'
+                headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
 
-            response = requests.request("POST", url, headers=headers, data=payload)
+                response = requests.request("POST", url, headers=headers, data=payload)
 
-            hospital_id = json.loads(response.text)['hospitalID']
+                hospital_id = json.loads(response.text)['hospitalID']
 
-            print(hospital_id)
+                page.go(f'/adminHome/{hospital_id}')
+                page.update()
+            except:
+                print("Invalid email or password")
 
-            page.go(f'/adminHome/{hospital_id}')
-            page.update()
+        def doctor_login():
+            try:
+                url = "http://localhost:3000/login/doctor"
 
-        def temp_doctor(e):
-            doctor_id = int(doctor_field.value)
-            page.go(f'/doctorHome/{doctor_id}')
-            page.update()
+                payload = f'email={email.value}&password={password.value}'
+                headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                print(json.loads(response.text))
+
+                doctor_id = json.loads(response.text)['doctorID']
+
+                page.go(f'/doctorHome/{doctor_id}')
+                page.update()
+            except:
+                print("Invalid email or password")
 
         # Setup fields
         img: Image = Image(src=f'login.png', width=350, height=350) # 90CFF9
@@ -57,8 +73,7 @@ class Login:
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        doctor_field: TextField = TextField(label='Doctor ID', width=100, border=InputBorder.UNDERLINE, text_size=14)
-        doctor_button: TextButton = TextButton(text='Temp Doctor', on_click=temp_doctor)
+        new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
 
         tabs: Tabs = Tabs(
                     height=100,
@@ -114,6 +129,7 @@ class Login:
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[
                             new_name,
+                            new_ic,
                             new_email,
                             new_password,
                             Container(padding=padding.only(top=20, bottom=10),content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
@@ -121,7 +137,7 @@ class Login:
                 )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
-            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
 
         def open_dlg_modal(e):
@@ -142,7 +158,7 @@ class Login:
                 if login(email.value, password.value):
                     page.go('/home')
             elif selected_index == 1:
-                print('doc')
+                doctor_login()
             else:
                 admin_login()
 
@@ -189,13 +205,6 @@ class Login:
                                             login_button,
                                             TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
-                                            Row(
-                                                alignment=MainAxisAlignment.CENTER,
-                                                controls=[
-                                                    doctor_field,
-                                                    doctor_button,
-                                                ]
-                                            )
                                         ],
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         alignment=MainAxisAlignment.CENTER,

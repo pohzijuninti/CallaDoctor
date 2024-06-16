@@ -38,7 +38,7 @@ class Home:
                 del self.appointments[i]
             else:
                 i += 1
-        print(self.booking_histories)
+        # print(self.booking_histories)
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
