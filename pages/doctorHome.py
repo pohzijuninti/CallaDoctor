@@ -7,7 +7,6 @@ import requests
 import json
 import pages.server as svr
 
-
 class DoctorHome:
     def __init__(self):
         self.calendar_grid = None

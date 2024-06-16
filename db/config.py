@@ -22,7 +22,7 @@ firebaseConfig = {
 firebase=pyrebase.initialize_app(firebaseConfig)
 auth=firebase.auth()
 
-def register(email, password, name):
+def register(email, password, name, ic):
     try:
         user = auth.create_user_with_email_and_password(email, password)
 
@@ -30,7 +30,7 @@ def register(email, password, name):
 
         userID = user['localId']
 
-        payload = f'userID={userID}&name={name}'
+        payload = f'userID={userID}&name={name}&ic={ic}'
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }

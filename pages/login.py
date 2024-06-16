@@ -78,7 +78,7 @@ class Login:
         tabs: Tabs = Tabs(
                     height=100,
                     width=165,
-                    selected_index=0,
+                    selected_index=selected_index,
                     animation_duration=400,
                     tabs=[
                         Tab(
@@ -112,7 +112,7 @@ class Login:
 
         def signup(e):
             dlg_modal.open = False
-            register(new_email.value, new_password.value, new_name.value)
+            register(new_email.value, new_password.value, new_name.value, new_ic.value)
 
             new_email.value = ''
             new_password.value = ''
@@ -154,7 +154,7 @@ class Login:
 
         def all_login(e: ControlEvent):
             global selected_index
-            if selected_index == 0 or selected_index is None:
+            if selected_index is None or selected_index == 0:
                 if login(email.value, password.value):
                     page.go('/home')
             elif selected_index == 1:
