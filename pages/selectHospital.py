@@ -104,13 +104,13 @@ class SelectHospital:
                     data=int(svr.hospitalList[i]["hospitalID"]),
                     content=Container(
                         border_radius=10,
-                        bgcolor="white",
+                        bgcolor=colors.WHITE,
                         content=Column(
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
                                 Image(src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),
-                                Text(value=f'{svr.hospitalList[i]["name"]}', color='black', size=12),
+                                Text(value=f'{svr.hospitalList[i]["name"]}', color=colors.BLACK, size=12),
                             ]
                         ),
                     ),

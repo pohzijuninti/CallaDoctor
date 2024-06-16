@@ -565,7 +565,6 @@ app.get('/appointment/doctor/:doctorID', (req, res) => {
   res.json(doctorAppointments);
 });
 
-
 app.post('/appointment/approve/:bookID', (req, res) => {
   const { bookID } = req.params;
   const bookIDInt = parseInt(bookID);
@@ -596,35 +595,34 @@ app.post('/appointment/reject/:bookID', (req, res) => {
   res.json({ message: 'Appointment rejected successfully.' });
 });
 
-let pontentialCustomerIDCounter = 200;
-const pontentialCustomers = [];
+let potentialCustomerIDCounter = 200;
+const potentialCustomers = [];
 
 app.post('/clinic/form', (req, res) => {
   let { hospitalName, address, phone, email } = req.body;
 
-  const pontentialCustomerID = pontentialCustomerIDCounter++;
+  const potentialCustomerID = potentialCustomerIDCounter++;
 
-  const pontentialCustomer = {
-    pontentialCustomerID,
+  const potentialCustomer = {
+    potentialCustomerID,
     hospitalName,
     address,
     phone,
     email
   }
 
-  pontentialCustomers.push(pontentialCustomer);
+  potentialCustomers.push(potentialCustomer);
 
   if ( !hospitalName || !address || !phone || !email ) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
-  res.json(pontentialCustomer);
+  res.json(potentialCustomer);
 });
 
 app.get('/potential/customer', (req, res) => {
-  res.send(pontentialCustomers);
+  res.send(potentialCustomers);
 });
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

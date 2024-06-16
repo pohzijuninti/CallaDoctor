@@ -23,7 +23,6 @@ class SelectDoctor:
         self.doctor_response = requests.get(full_url, headers=self.doctor_headers, data=self.doctor_payload)
         self.doctors = json.loads(self.doctor_response.text)['doctors']
 
-
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -104,7 +103,7 @@ class SelectDoctor:
                     data=int(self.doctors[i]["doctorID"]),
                     content=Container(
                         border_radius=10,
-                        bgcolor="white",
+                        bgcolor=colors.WHITE,
                         content=Container(
                             content=Column(
                                 alignment=MainAxisAlignment.CENTER,
@@ -119,10 +118,10 @@ class SelectDoctor:
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         expand=1,
                                         controls=[
-                                            Text(value=f'{self.doctors[i]["name"]}', color='black', size=12),
+                                            Text(value=f'{self.doctors[i]["name"]}', color=colors.BLACK, size=12),
                                             Text(
                                                 value=f'{svr.get_speciality_name(self.doctors[i]["specialityID"])}',
-                                                color='black', size=10
+                                                color=colors.BLACK, size=10
                                             ),
                                         ]
                                     )

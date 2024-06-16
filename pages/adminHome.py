@@ -105,44 +105,33 @@ class AdminHome:
             new_email.value = ""
             page.update()
 
-        def update_doctors_view():
-            doctors.controls.clear()  # Clear existing controls
-            for i in range(len(self.doctors)):
-                speciality = svr.get_speciality_name(self.doctors[i]["specialityID"])
-                doctors.controls.append(
-                    GestureDetector(
-                        mouse_cursor=MouseCursor.CLICK,
-                        # on_tap=,
-                        data=int(self.doctors[i]['doctorID']),
-                        content=Container(
-                            border_radius=10,
-                            bgcolor="white",
-                            content=Container(
-                                content=Column(
-                                    alignment=MainAxisAlignment.CENTER,
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    controls=[
-                                        Container(
-                                            expand=3,
-                                            padding=padding.only(top=10),
-                                            content=display_doc_image(self.doctors[i]["image"]),
-                                        ),
-                                        Column(
-                                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                                            expand=1,
-                                            controls=[
-                                                Text(value=f'{self.doctors[i]["name"]}', color='black', size=12),
-                                                Text(value=f'{speciality}',
-                                                     color='black', size=10),
-                                            ]
-                                        )
-                                    ]
-                                )
-                            )
-                        ),
+        dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Add Doctor"),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            new_name,
+                            new_email,
+                            anchor,
+                            Container(padding=padding.only(top=20, bottom=10),
+                                      content=ElevatedButton(text="Done", on_click=done, width=250))]
                     )
                 )
-            page.update()
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        )
+
+        appointments = ListView(
+            expand=True,
+        )
+
+        doctors = GridView(
+            expand=True,
+        )
 
         def update_appointments_view():
             appointments.controls.clear()  # Clear existing controls
@@ -195,10 +184,10 @@ class AdminHome:
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
                                                         controls=[
-                                                            Icon(name=icons.DATE_RANGE_OUTLINED, color="white"),
+                                                            Icon(name=icons.DATE_RANGE_OUTLINED, color=colors.WHITE),
                                                             Text(
                                                                 value=f'{svr.convert_date(self.appointments[i]["datetime"])}',
-                                                                color="white")
+                                                                color=colors.WHITE)
                                                         ]
                                                     ),
                                                 ),
@@ -208,10 +197,10 @@ class AdminHome:
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
                                                         controls=[
-                                                            Icon(name=icons.ACCESS_TIME_OUTLINED, color="white"),
+                                                            Icon(name=icons.ACCESS_TIME_OUTLINED, color=colors.WHITE),
                                                             Text(
                                                                 value=f'{svr.convert_time(self.appointments[i]["datetime"])}',
-                                                                color="white")
+                                                                color=colors.WHITE)
                                                         ]
                                                     )
                                                 ),
@@ -221,8 +210,8 @@ class AdminHome:
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
                                                         controls=[
-                                                            Icon(name=icons.PERSON, color="white"),
-                                                            Text(value=f'{name}', color="white")
+                                                            Icon(name=icons.PERSON, color=colors.WHITE),
+                                                            Text(value=f'{name}', color=colors.WHITE)
                                                         ]
                                                     )
                                                 ),
@@ -232,10 +221,10 @@ class AdminHome:
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
                                                         controls=[
-                                                            Icon(name=icons.HEALTH_AND_SAFETY, color="white"),
+                                                            Icon(name=icons.HEALTH_AND_SAFETY, color=colors.WHITE),
                                                             Text(
                                                                 value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
-                                                                color="white")
+                                                                color=colors.WHITE)
                                                         ]
                                                     )
                                                 ),
@@ -245,8 +234,8 @@ class AdminHome:
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
                                                         controls=[
-                                                            Icon(icons.EDIT_DOCUMENT, color='white'),
-                                                            Text(status, color='white')
+                                                            Icon(icons.EDIT_DOCUMENT, color=colors.WHITE),
+                                                            Text(status, color=colors.WHITE)
                                                         ]
                                                     )
                                                 ),
@@ -267,7 +256,7 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.CHECK_OUTLINED, size=35, color="white"),
+                                                            Icon(icons.CHECK_OUTLINED, size=35, color=colors.WHITE),
                                                             Text(value="Approve", color=colors.WHITE),
                                                         ]
                                                     )
@@ -283,7 +272,7 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color="white"),
+                                                            Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colors.WHITE),
                                                             Text(value="Reject", color=colors.WHITE),
                                                         ]
                                                     )
@@ -298,25 +287,44 @@ class AdminHome:
                 )
             page.update()
 
-        dlg_modal = AlertDialog(
-            modal=False,
-            title=Text("Add Doctor"),
-            actions=[
-                Container(
-                    content=Column(
-                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            new_name,
-                            new_email,
-                            anchor,
-                            Container(padding=padding.only(top=20, bottom=10),
-                                      content=ElevatedButton(text="Done", on_click=done, width=250))]
-                    )
+        def update_doctors_view():
+            doctors.controls.clear()  # Clear existing controls
+            for i in range(len(self.doctors)):
+                speciality = svr.get_speciality_name(self.doctors[i]["specialityID"])
+                doctors.controls.append(
+                    Container(
+                        border_radius=10,
+                        bgcolor=colors.WHITE,
+                        content=Container(
+                            content=Column(
+                                alignment=MainAxisAlignment.CENTER,
+                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                controls=[
+                                    Container(
+                                        alignment=alignment.top_right,
+                                        content=IconButton(
+                                            icon=icons.DELETE_OUTLINED,
+                                            style=ButtonStyle(color=colors.BLACK)
+                                        )
+                                    ),
+                                    Container(
+                                        expand=2,
+                                        content=display_doc_image(self.doctors[i]["image"]),
+                                    ),
+                                    Column(
+                                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                                        expand=1,
+                                        controls=[
+                                            Text(value=f'{self.doctors[i]["name"]}', color=colors.BLACK, size=12),
+                                            Text(value=f'{speciality}', color=colors.BLACK, size=10),
+                                        ]
+                                    )
+                                ]
+                            )
+                        )
+                    ),
                 )
-            ],
-            actions_alignment=MainAxisAlignment.CENTER,
-            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
-        )
+            page.update()
 
         def approve_dlg_modal(e):
             book_id = e.control.data
@@ -394,7 +402,6 @@ class AdminHome:
             headers = {}
 
             response = requests.request("POST", url, headers=headers, data=payload)
-
             print(response.text)
 
             # Refresh appointments data and update the view
@@ -414,17 +421,9 @@ class AdminHome:
             self.get_appointments(hospital_id)
             update_appointments_view()
 
-        appointments = ListView(
-            expand=True,
-        )
-
-        doctors = GridView(
-            expand=True,
-        )
-
         def display_doc_image(img):
             if img == "":
-                return Icon(icons.PERSON, color='black', size=140)
+                return Icon(icons.PERSON, color=colors.BLACK, size=140)
             else:
                 return Image(src=f'{img}', fit=ImageFit.FIT_HEIGHT)
 

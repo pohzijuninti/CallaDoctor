@@ -4,9 +4,26 @@ from flet_route import Params, Basket
 import requests
 import json
 
+
 class ClinicForm:
     def __init__(self):
-        pass
+        self.potentialCustomersURL = "http://localhost:3000/potential/customer"
+        self.payload = '='
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        self.response = None
+        self.potentialCustomers = None
+
+    def get_potentialCustomers(self):
+        self.response = requests.get(self.potentialCustomersURL, headers=self.headers, data=self.payload)
+        self.potentialCustomers = json.loads(self.response.text)
+
+        max_id = -1
+
+        for i in range(len(self.potentialCustomers)):
+            if self.potentialCustomers[i]["potentialCustomerID"] > max_id:
+                max_id = self.potentialCustomers[i]["potentialCustomerID"]
+
+        return max_id
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Clinic Form'
@@ -23,48 +40,52 @@ class ClinicForm:
         phone_number: TextField = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.WHITE)
         email: TextField = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.WHITE)
 
+        def open_dlg_modal(e):
+            if name.value and address.value and phone_number.value and email.value:
+                url = "http://localhost:3000/clinic/form"
+
+                payload = f'hospitalName={name.value}&address={address.value}&phone={phone_number.value}&email={email.value}'
+                headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+
+                response = requests.request("POST", url, headers=headers, data=payload)
+                form = json.loads(response.text)
+                print(form)
+
+                id = self.get_potentialCustomers()
+
+                dlg_modal.actions = [
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(f'Your code is #{id}'),
+                                Text(f'{name.value}'),
+                                Text(f'{address.value}'),
+                                Text(f'{phone_number.value}'),
+                                Text(f'{email.value}'),
+                                Container(
+                                    padding=padding.only(top=20, bottom=10),
+                                    content=ElevatedButton(text="Back to Login", width=250, on_click=go_login)
+                                )
+                            ]
+                        )
+                    )
+                ]
+
+                page.dialog = dlg_modal
+                dlg_modal.open = True
+                page.update()
+            else:
+                print("Please fill in all fields.")
+
         dlg_modal = AlertDialog(
             modal=False,
             title=Text("Thank You", text_align=TextAlign.CENTER),
             content=Text("We have received your application and will get back to you soon."),
-            actions=[
-                Container(
-                    content=Column(
-                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                        controls=[
-                            Text('Your code is #200'),
-                            Text(f'Hospital Name: '),
-                            Text(f'Hospital Address: '),
-                            Text(f'Phone Number: '),
-                            Text(f'Email: '),
-                            Container(padding=padding.only(top=20, bottom=10),
-                                      content=ElevatedButton(text="Back to Login", width=250, on_click=go_login))
-                        ]
-                    )
-                )
-            ],
             actions_alignment=MainAxisAlignment.CENTER,
         )
-
-        def open_dlg_modal(e):
-
-            url = "http://localhost:3000/clinic/form"
-
-            payload = f'hospitalName={name.value}&address={address.value}&phone={phone_number.value}&email={email.value}'
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-
-            response = requests.request("POST", url, headers=headers, data=payload)
-
-            form = json.loads(response.text)
-
-            print(form)
-
-
-            page.dialog = dlg_modal
-            dlg_modal.open = True
-            page.update()
 
         def display_button():
             return Row(
