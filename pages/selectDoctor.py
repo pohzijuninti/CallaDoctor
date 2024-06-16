@@ -68,9 +68,11 @@ class SelectDoctor:
                         expand=True,
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
-                            TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
-                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
-                                       on_click=go_select_datetime)
+                            TextButton(
+                                text="Next", style=ButtonStyle(color=colors.WHITE),
+                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
+                                on_click=go_select_datetime
+                            )
                         ]
                     ),
                 ],
@@ -100,8 +102,10 @@ class SelectDoctor:
                                         expand=1,
                                         controls=[
                                             Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
-                                            Text(value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
-                                                 color='black', size=10),
+                                            Text(
+                                                value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
+                                                color='black', size=10
+                                            ),
                                         ]
                                     )
                                 ]

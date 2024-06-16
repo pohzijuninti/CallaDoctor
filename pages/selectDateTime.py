@@ -299,10 +299,11 @@ class SelectDateTime:
                 Column(
                     expand=True,
                     controls=[
-                        TextButton(text=f'{svr.get_hospital_name(hospital_id)}, {svr.get_doctor_name(doctor_id)}',
-                                   style=ButtonStyle(color=colors.WHITE),
-                                   icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white",
-                                   on_click=go_select_doctor),
+                        TextButton(
+                            text=f'{svr.get_hospital_name(hospital_id)}, {svr.get_doctor_name(doctor_id)}',
+                            style=ButtonStyle(color=colors.WHITE),
+                            icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white", on_click=go_select_doctor
+                        ),
                         Row(
                             expand=True,
                             controls=[

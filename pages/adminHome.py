@@ -249,8 +249,7 @@ class AdminHome:
                                                     alignment=MainAxisAlignment.CENTER,
                                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                                     controls=[
-                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35,
-                                                             color="white"),
+                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color="white"),
                                                         Text(value="Reject", color=colors.WHITE),
                                                     ]
                                                 )

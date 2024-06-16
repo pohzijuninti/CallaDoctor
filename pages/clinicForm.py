@@ -32,9 +32,9 @@ class ClinicForm:
                         expand=True,
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
-                            TextButton(text="Submit", style=ButtonStyle(color=colors.WHITE),
-                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
-                                       #on_click=
+                            TextButton(
+                                text="Submit", style=ButtonStyle(color=colors.WHITE),
+                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
                             )
                         ]
                     ),

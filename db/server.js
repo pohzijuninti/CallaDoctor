@@ -27,7 +27,7 @@ const hospital = [
   {
     "hospitalID": 3,
     "name": "Gleneagles Hospital Penang",
-    "image": "gleneagles.jpeg",
+    "image": "gmc.jpeg",
     "email": "gmc@gmail.com",
     "password": "$2a$10$pbpLhUoBd0A/QQ2KvHYG9e7NVnlD6IVjDpyggctfeU23sxlxdlvrK"
   },
@@ -74,7 +74,7 @@ const doctors = [
   {
     "doctorID": 21,
     "name": "Dr. Lim Guan Choon",
-    "image": "drlim.png",
+    "image": "gclim.png",
     "specialityID": 11,
     "hospitalID": 1,
     "email": "gclim@gmail.com",
@@ -83,7 +83,7 @@ const doctors = [
   {
     "doctorID": 22,
     "name": "Dr. Wong Choy Hoong",
-    "image": "drwong.jpeg",
+    "image": "chwong.jpeg",
     "specialityID": 13,
     "hospitalID": 1,
     "email": "chwong@gmail.com",
@@ -92,7 +92,7 @@ const doctors = [
   {
     "doctorID": 23,
     "name": "Dr. Lai Huey Yoke",
-    "image": "drlai.jpeg",
+    "image": "hylai.jpeg",
     "specialityID": 15,
     "hospitalID": 1,
     "email": "hylai@gmail.com",
@@ -101,7 +101,7 @@ const doctors = [
   {
     "doctorID": 24,
     "name": "Dr. Goh Tiong Meng",
-    "image": "drgoh.png",
+    "image": "tmgoh.png",
     "specialityID": 12,
     "hospitalID": 2,
     "email": "tmgoh@gmail.com",
@@ -110,7 +110,7 @@ const doctors = [
   {
     "doctorID": 25,
     "name": "Dr. Andrew Lim Keat Eu",
-    "image": "drandrew.png",
+    "image": "andrew.png",
     "specialityID": 13,
     "hospitalID": 2,
     "email": "andrew@gmail.com",
@@ -119,16 +119,16 @@ const doctors = [
 {
     "doctorID": 26,
     "name": "Dr. Khor Yek Huan",
-    "image": "drkhor.png",
+    "image": "yhkhor.png",
     "specialityID": 14,
     "hospitalID": 2,
-    "email": "hykhor@gmail.com",
+    "email": "yhkhor@gmail.com",
     "password": "$2a$10$NVzoRyx1Z4E.1f1mpbw15OLpDqYf3u/na2QIAKALluNzFf.dLuOji"
   },
   {
     "doctorID": 27,
     "name": "Dr. Jasjit Singh",
-    "image": "drjasjit.jpeg",
+    "image": "jasjit.jpeg",
     "specialityID": 12,
     "hospitalID": 3,
     "email": "jasjit@gmail.com",
@@ -137,7 +137,7 @@ const doctors = [
   {
     "doctorID": 28,
     "name": "Dr. Amelia Lim Lay Suan",
-    "image": "dramelia.jpeg",
+    "image": "amelia.jpeg",
     "specialityID": 13,
     "hospitalID": 3,
     "email": "amelia@gmail.com",
@@ -146,7 +146,7 @@ const doctors = [
   {
     "doctorID": 29,
     "name": "Dr. Chong Yew Thong",
-    "image": "drchong.jpeg",
+    "image": "ytchong.jpeg",
     "specialityID": 14,
     "hospitalID": 3,
     "email": "ytchong@gmail.com",
@@ -155,7 +155,7 @@ const doctors = [
   {
     "doctorID": 30,
     "name": "Dr. Khaw Chee Sin",
-    "image": "drkhaw.png",
+    "image": "cskhaw.png",
     "specialityID": 11,
     "hospitalID": 4,
     "email": "cskhaw@gmail.com",
@@ -164,7 +164,7 @@ const doctors = [
   {
     "doctorID": 31,
     "name": "Dr. Lee Kuo Ting",
-    "image": "drlee.png",
+    "image": "ktlee.png",
     "specialityID": 11,
     "hospitalID": 4,
     "email": "ktlee@gmail.com",
@@ -173,7 +173,7 @@ const doctors = [
   {
     "doctorID": 32,
     "name": "Dr. Heah Hsin Tak",
-    "image": "drheah.png",
+    "image": "htheah.png",
     "specialityID": 12,
     "hospitalID": 4,
     "email": "htheah@gmail.com",
@@ -182,7 +182,7 @@ const doctors = [
   {
     "doctorID": 33,
     "name": "Dr. Tu Poh Koon",
-    "image": "drtu.jpeg",
+    "image": "pktu.jpeg",
     "specialityID": 14,
     "hospitalID": 5,
     "email": "pktu@gmail.com",
@@ -191,7 +191,7 @@ const doctors = [
   {
     "doctorID": 34,
     "name": "Dr. Khoo Heng Hoon",
-    "image": "drkhoo.png",
+    "image": "hhkhoo.png",
     "specialityID": 15,
     "hospitalID": 5,
     "email": "hhkhoo@gmail.com",
@@ -200,7 +200,7 @@ const doctors = [
   {
     "doctorID": 35,
     "name": "Dr. Shirlynn Francis",
-    "image": "drshirlynn.png",
+    "image": "shirlynn.png",
     "specialityID": 15,
     "hospitalID": 5,
     "email": "shirlynn@gmail.com",

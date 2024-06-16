@@ -268,8 +268,10 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
-                                                             color="white")
+                                                        Text(
+                                                            value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
+                                                            color="white"
+                                                        )
                                                     ]
                                                 )
                                             ),
@@ -280,8 +282,10 @@ class Home:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.PEOPLE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
-                                                             color="white")
+                                                        Text(
+                                                            value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
+                                                            color="white"
+                                                        )
                                                     ]
                                                 )
                                             ),
@@ -514,9 +518,11 @@ class Home:
                                                         controls=[
                                                             Container(
                                                                 padding=padding.only(left=5),
-                                                                content=Text(value='Booking History',
-                                                                             style=TextStyle(size=18,
-                                                                                             weight=FontWeight.BOLD)),
+                                                                content=Text(
+                                                                    value='Booking History',
+                                                                    style=TextStyle(size=18,
+                                                                    weight=FontWeight.BOLD)
+                                                                ),
                                                             ),
                                                             Container(
                                                                 expand=True,

@@ -303,8 +303,9 @@ class DoctorHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.LOCAL_HOSPITAL_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
-                                                             color="white")
+                                                        Text(
+                                                            value=f'{svr.get_hospital_name(self.appointments[i]["hospitalID"])}',
+                                                            color="white")
                                                     ]
                                                 )
                                             ),
@@ -315,8 +316,9 @@ class DoctorHome:
                                                     alignment=MainAxisAlignment.START,
                                                     controls=[
                                                         Icon(name=icons.PEOPLE_OUTLINED, color="white"),
-                                                        Text(value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
-                                                             color="white")
+                                                        Text(
+                                                            value=f'{svr.get_doctor_name(self.appointments[i]["doctorID"])}',
+                                                            color="white")
                                                     ]
                                                 )
                                             ),
@@ -364,8 +366,7 @@ class DoctorHome:
                                                     alignment=MainAxisAlignment.CENTER,
                                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                                     controls=[
-                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35,
-                                                             color="white"),
+                                                        Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color="white"),
                                                         Text(value="Reject", color=colors.WHITE),
                                                     ]
                                                 )
@@ -397,17 +398,26 @@ class DoctorHome:
                             controls=[
                                 Column(
                                     controls=[
-                                        Text(value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}', color=colors.GREY),
-                                        Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
-                                             weight=FontWeight.BOLD),
+                                        Text(
+                                            value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}',
+                                            color=colors.GREY
+                                        ),
+                                        Text(
+                                            value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
+                                            weight=FontWeight.BOLD),
                                         Text(value='Description', color=colors.BLACK),
-                                        Text(value=f'{display_description(self.medical_record[i]["description"])}', color=colors.GREY),
+                                        Text(
+                                            value=f'{display_description(self.medical_record[i]["description"])}',
+                                            color=colors.GREY
+                                        ),
                                     ]
                                 ),
                                 Row(
                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
-                                        Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
+                                        Text(
+                                            value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}',
+                                            color=colors.BLACK, size=12),
                                         IconButton(icon=icons.EDIT_OUTLINED, icon_color=colors.BLUE),
                                     ]
                                 )

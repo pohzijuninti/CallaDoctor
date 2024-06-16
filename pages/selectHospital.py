@@ -42,13 +42,13 @@ class SelectHospital:
             bar_hint_text='Search...',
             bar_leading=Container(
                 padding=10,
-                content=Icon(icons.SEARCH_OUTLINED,
-                             color=colors.WHITE),
+                content=Icon(icons.SEARCH_OUTLINED, color=colors.WHITE),
             ),
             controls=[
-                ListTile(title=Text(f'{svr.hospitalList[i]["name"]}'),
-                         on_click=on_click,
-                         data=int(svr.hospitalList[i]["hospitalID"]),)
+                ListTile(
+                    title=Text(f'{svr.hospitalList[i]["name"]}'), on_click=on_click,
+                    data=int(svr.hospitalList[i]["hospitalID"])
+                )
                 for i in range(len(svr.hospitalList))
             ]
         )
@@ -86,9 +86,11 @@ class SelectHospital:
                         expand=True,
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
-                            TextButton(text="Next", style=ButtonStyle(color=colors.WHITE),
-                                       icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
-                                       on_click=go_select_doctor)
+                            TextButton(
+                                text="Next", style=ButtonStyle(color=colors.WHITE),
+                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
+                                on_click=go_select_doctor
+                            )
                         ]
                     ),
                 ],
@@ -110,7 +112,7 @@ class SelectHospital:
                                 Image(src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),
                                 Text(value=f'{svr.hospitalList[i]["name"]}', color='black', size=12),
                             ]
-                         ),
+                        ),
                     ),
                 ),
             )
@@ -136,8 +138,10 @@ class SelectHospital:
                                                     icon_color=colors.WHITE,
                                                     on_click=go_home,
                                                 ),
-                                                Text(value='Select Hospital',
-                                                     style=TextStyle(size=24, weight=FontWeight.BOLD)),
+                                                Text(
+                                                    value='Select Hospital',
+                                                    style=TextStyle(size=24, weight=FontWeight.BOLD)
+                                                ),
                                             ]
                                         ),
 

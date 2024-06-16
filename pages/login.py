@@ -8,6 +8,7 @@ import json
 
 selected_index = None
 
+
 class Login:
     def __init__(self):
         pass
@@ -71,7 +72,7 @@ class Login:
 
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
-                                        password=True, can_reveal_password=True)
+                                            password=True, can_reveal_password=True)
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
         new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
 
@@ -84,8 +85,7 @@ class Login:
                         Tab(
                             tab_content=Icon(icons.PERSON),
                             content=Container(
-                                content=Text(value='User', size=14,
-                                             text_align=TextAlign.CENTER),
+                                content=Text(value='User', size=14, text_align=TextAlign.CENTER),
                             )
                         ),
                         Tab(
@@ -162,7 +162,6 @@ class Login:
             else:
                 admin_login()
 
-
         def on_change(e: ControlEvent):
             global selected_index
             if int(e.data) == 0:
@@ -198,8 +197,7 @@ class Login:
                                         expand=True,
                                         controls=[
                                             tabs,
-                                            Text(value='Welcome to Call A Doctor! ',
-                                                 style=TextStyle(size=18)),
+                                            Text(value='Welcome to Call A Doctor! ', style=TextStyle(size=18)),
                                             email,
                                             password,
                                             login_button,
