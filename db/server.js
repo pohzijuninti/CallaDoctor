@@ -9,15 +9,6 @@ app.use(express.json());
 // add body-parser middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const generateFixedHash = async () => {
-  const password = 'adventist123'; // Replace this with the password you want to hash
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  console.log('Hashed password:', hashedPassword);
-};
-
-generateFixedHash();
-
 const hospital = [
   {
     "hospitalID": 1,
@@ -79,14 +70,15 @@ const speciality = [
   },
 ];
 
-
-const doctor = [
+const doctors = [
   {
     "doctorID": 21,
     "name": "Dr. Lim Guan Choon",
     "image": "drlim.png",
     "specialityID": 11,
     "hospitalID": 1,
+    "email": "gclim@gmail.com",
+    "password": "$2a$10$RefkciYGazZHYv.59jza5.y4GGvIc2DsMN5g6Fbw62PpQLMwJZP3O"
   },
   {
     "doctorID": 22,
@@ -94,6 +86,8 @@ const doctor = [
     "image": "drwong.jpeg",
     "specialityID": 13,
     "hospitalID": 1,
+    "email": "chwong@gmail.com",
+    "password": "$2a$10$BgXqQQcbstysnmYzhuZ59uoSWEFK9PcujdtqS/hQffndzZQvj7bZm"
   },
   {
     "doctorID": 23,
@@ -101,6 +95,8 @@ const doctor = [
     "image": "drlai.jpeg",
     "specialityID": 15,
     "hospitalID": 1,
+    "email": "hylai@gmail.com",
+    "password": "$2a$10$XAiqRRipwJN9cXqnYRzEKewXU2FkLfWeajbfRYJzh/4OiE0kCZt7u"
   },
   {
     "doctorID": 24,
@@ -108,6 +104,8 @@ const doctor = [
     "image": "drgoh.png",
     "specialityID": 12,
     "hospitalID": 2,
+    "email": "tmgoh@gmail.com",
+    "password": "$2a$10$tz47aED4GEK0keHWXChK1.pvmbVNvCVdiQyy0SU2utEOaOPBnTMny"
   },
   {
     "doctorID": 25,
@@ -115,6 +113,8 @@ const doctor = [
     "image": "drandrew.png",
     "specialityID": 13,
     "hospitalID": 2,
+    "email": "andrew@gmail.com",
+    "password": "$2a$10$/dqF9WfM2olg..2K8f7AVeqW5B9B2lIwD3QnbpSvbD86gRyeahokK"
   },
 {
     "doctorID": 26,
@@ -122,6 +122,8 @@ const doctor = [
     "image": "drkhor.png",
     "specialityID": 14,
     "hospitalID": 2,
+    "email": "hykhor@gmail.com",
+    "password": "$2a$10$NVzoRyx1Z4E.1f1mpbw15OLpDqYf3u/na2QIAKALluNzFf.dLuOji"
   },
   {
     "doctorID": 27,
@@ -129,6 +131,8 @@ const doctor = [
     "image": "drjasjit.jpeg",
     "specialityID": 12,
     "hospitalID": 3,
+    "email": "jasjit@gmail.com",
+    "password": "$2a$10$1dTAdoxwQDzSr.arTM1dMeh5OQ8NQ4dOwEvMvSucIm//s3dx4I8zq"
   },
   {
     "doctorID": 28,
@@ -137,7 +141,7 @@ const doctor = [
     "specialityID": 13,
     "hospitalID": 3,
     "email": "amelia@gmail.com",
-    "password": "test"
+    "password": "$2a$10$cKkzlRk.9CkaQ61eTiVItOxYylHZjrDFLWjSt7iz5J4QweIZOdEYa"
   },
   {
     "doctorID": 29,
@@ -145,6 +149,8 @@ const doctor = [
     "image": "drchong.jpeg",
     "specialityID": 14,
     "hospitalID": 3,
+    "email": "ytchong@gmail.com",
+    "password": "$2a$10$AiIJMQYi341v62mKJy0.pO09uxL8jJqXxPAGyRC0D5xT3R9JoCZ6y"
   },
   {
     "doctorID": 30,
@@ -152,6 +158,8 @@ const doctor = [
     "image": "drkhaw.png",
     "specialityID": 11,
     "hospitalID": 4,
+    "email": "cskhaw@gmail.com",
+    "password": "$2a$10$Z3KqOm4ZvYT25wqDstSGKOAhsrxhccmiAXZPj.p4cWo2lmcsPCVem"
   },
   {
     "doctorID": 31,
@@ -159,6 +167,8 @@ const doctor = [
     "image": "drlee.png",
     "specialityID": 11,
     "hospitalID": 4,
+    "email": "ktlee@gmail.com",
+    "password": "$2a$10$XbmeqfL7vQomrf5ewYz5ye8ofLaqWn/8w9ff9NOpehhtQLG7hTqom"
   },
   {
     "doctorID": 32,
@@ -166,6 +176,8 @@ const doctor = [
     "image": "drheah.png",
     "specialityID": 12,
     "hospitalID": 4,
+    "email": "htheah@gmail.com",
+    "password": "$2a$10$y8Wj1lnchnGbl1DW/Y7GE.5nmgVWTJwM4tlQaRLbXxDw3she8V95a"
   },
   {
     "doctorID": 33,
@@ -173,6 +185,8 @@ const doctor = [
     "image": "drtu.jpeg",
     "specialityID": 14,
     "hospitalID": 5,
+    "email": "pktu@gmail.com",
+    "password": "$2a$10$Q9pwUikoBAQEl1aWcDlFC.YaJCnY92UZRrEyfYjvTJA3qVetE/2IW"
   },
   {
     "doctorID": 34,
@@ -180,6 +194,8 @@ const doctor = [
     "image": "drkhoo.png",
     "specialityID": 15,
     "hospitalID": 5,
+    "email": "hhkhoo@gmail.com",
+    "password": "$2a$10$BRWniSwXwFoBy3ZPkfRkcuxUAASuUgM8nNOU75hzv/jTR8lyWGbX6"
   },
   {
     "doctorID": 35,
@@ -187,6 +203,8 @@ const doctor = [
     "image": "drshirlynn.png",
     "specialityID": 15,
     "hospitalID": 5,
+    "email": "shirlynn@gmail.com",
+    "password": "$2a$10$PkyXpkCsTOIFCHr.WgQ3g.klPRn9uRU5rGEPMCER3I0IWrvGivCPW"
   },
 ];
 
@@ -242,8 +260,6 @@ app.get('/', (req, res) => {
     res.send('CallaDoctor API');
 });
 
-
-
 app.get('/hospital', (req, res) => {
   res.send(hospital);
 });
@@ -253,10 +269,8 @@ app.get('/speciality', (req, res) => {
 });
 
 app.get('/doctor', (req, res) => {
-  res.send(doctor);
+  res.send(doctors);
 });
-
-
 
 app.get('/medicalRecord/:userID', (req, res) => {
   const userID = req.params.userID;
@@ -276,28 +290,36 @@ const csvWriter = createCsvWriter({
   path: 'user.csv',
   header: [
     { id: 'userID', title: 'userID' },
-    { id: 'name', title: 'name' }
+    { id: 'name', title: 'name' },
+    { id: 'ic', title: 'IC' } // Added IC to the header
   ],
   append: true // Append mode to avoid overwriting existing data
 });
 
+// Read existing users from CSV if it exists
 if (fs.existsSync('user.csv')) {
   const csv = fs.readFileSync('user.csv', 'utf8');
   const lines = csv.split('\n').slice(1); // Remove header
   lines.forEach(line => {
-    if (line) {
-      const [userID, name] = line.split(',');
-      users.push({ userID, name });
+    if (line.trim()) {
+      const [userID, name, ic] = line.split(','); // Added IC in parsing
+      users.push({ userID, name, ic });
     }
   });
 }
 
+// POST route to add a new user
 app.post('/user', (req, res) => {
   const user = {
-      userID: req.body.userID,
-      name: req.body.name,
+    userID: req.body.userID,
+    name: req.body.name,
+    ic: req.body.ic // Fixed case to match body input
   };
+
+  // Add the new user to the users array
   users.push(user);
+
+  // Write the new user to the CSV file
   csvWriter.writeRecords([user])
     .then(() => {
       console.log('User added to CSV file');
@@ -315,7 +337,7 @@ app.get('/username/:userID', (req, res) => {
   const user = users.find(u => u.userID == userID);
 
   if (user) {
-    res.send({ name: user.name });
+    res.send({ name: user.name, ic: user.ic });
   } else {
     res.status(404).send({ error: 'User not found' });
   }
@@ -343,6 +365,28 @@ app.post('/login/admin', async (req, res) => {
   });
 });
 
+// Login route for doctors
+app.post('/login/doctor', async (req, res) => {
+  const { email, password } = req.body;
+
+  // Find the doctor by email
+  const doctor = doctors.find(d => d.email === email);
+  if (!doctor) {
+    return res.status(401).send('Invalid email or password');
+  }
+
+  // Compare the hashed password with the one in the request
+  const match = await bcrypt.compare(password, doctor.password);
+  if (!match) {
+    return res.status(401).send('Invalid email or password');
+  }
+
+  // Passwords match, login successful
+  // Send the doctorID in the response
+  res.json({
+    doctorID: doctor.doctorID
+  });
+});
 
 let timeSlots = [];
 
