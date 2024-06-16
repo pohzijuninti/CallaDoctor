@@ -272,6 +272,62 @@ app.get('/doctor', (req, res) => {
   res.send(doctors);
 });
 
+let doctorIDCounter = 36;
+
+app.post('/doctor/add', async (req, res) => {
+  try {
+    const { name, specialityID, hospitalID, email } = req.body;
+
+    if (!name || !specialityID || !hospitalID || !email) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const passwordPlainText = `${name}123`;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(passwordPlainText, saltRounds);
+
+    const doctorID = doctorIDCounter++;
+
+    const newDoctor = {
+      doctorID: doctorID,
+      name,
+      image: '',
+      specialityID: parseInt(specialityID),
+      hospitalID: parseInt(hospitalID),
+      email,
+      password: hashedPassword
+    };
+
+    doctors.push(newDoctor);
+
+    res.status(201).json({ doctor: newDoctor });
+    createTimeSlots(doctorID)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/doctor/:hospitalID', (req, res) => {
+  const { hospitalID } = req.params;
+
+  // Convert hospitalID to an integer for comparison
+  const hospitalIDInt = parseInt(hospitalID, 10);
+
+  if (isNaN(hospitalIDInt)) {
+    return res.status(400).json({ error: 'Invalid hospitalID' });
+  }
+
+  // Filter doctors based on hospitalID
+  const doctorsInHospital = doctors.filter(doctor => doctor.hospitalID === hospitalIDInt);
+
+  if (doctorsInHospital.length === 0) {
+    return res.status(404).json({ message: 'No doctors found for the specified hospitalID' });
+  }
+
+  res.json({ doctors: doctorsInHospital });
+});
+
 app.get('/medicalRecord/:userID', (req, res) => {
   const userID = req.params.userID;
   const userRecords = medicalRecord.filter(record => record.userID === userID);
@@ -538,6 +594,35 @@ app.post('/appointment/reject/:bookID', (req, res) => {
   appointments[index].status = -1;
 
   res.json({ message: 'Appointment rejected successfully.' });
+});
+
+let pontentialCustomerIDCounter = 200;
+const pontentialCustomers = [];
+
+app.post('/clinic/form', (req, res) => {
+  let { hospitalName, address, phone, email } = req.body;
+
+  const pontentialCustomerID = pontentialCustomerIDCounter++;
+
+  const pontentialCustomer = {
+    pontentialCustomerID,
+    hospitalName,
+    address,
+    phone,
+    email
+  }
+
+  pontentialCustomers.push(pontentialCustomer);
+
+  if ( !hospitalName || !address || !phone || !email ) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  res.json(pontentialCustomer);
+});
+
+app.get('/potential/customer', (req, res) => {
+  res.send(pontentialCustomers);
 });
 
 

@@ -240,6 +240,7 @@ class DoctorHome:
             expand=True,
         )
 
+
         for i in range(len(self.appointments)):
             if self.appointments[i]["status"] == 0:
                 colour = 'grey'
