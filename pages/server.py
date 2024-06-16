@@ -5,7 +5,6 @@ hospitalList = []
 doctorList = []
 specialityList = []
 doctorFilteredList = []
-descriptionList = []
 
 # URL of the server.js endpoint
 url = 'http://localhost:3000/'
@@ -31,13 +30,6 @@ else:
 response = requests.request("GET", url + 'speciality', headers=headers, data=payload)
 if response.status_code == 200:
     specialityList = response.json()  # Assuming the server.js endpoint returns JSON data
-else:
-    print('Error:', response.status_code)
-
-# Description
-response = requests.request("GET", url + 'description', headers=headers, data=payload)
-if response.status_code == 200:
-    descriptionList = response.json()  # Assuming the server.js endpoint returns JSON data
 else:
     print('Error:', response.status_code)
 

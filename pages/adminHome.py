@@ -50,8 +50,7 @@ class AdminHome:
             anchor.close_view(svr.specialityList[e.control.data - 11]["name"])
 
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE,
-                                         text_size=14)
+        new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         anchor = SearchBar(
             width=300,
             bar_hint_text='Select Speciality',
@@ -116,8 +115,11 @@ class AdminHome:
                             new_name,
                             new_email,
                             anchor,
-                            Container(padding=padding.only(top=20, bottom=10),
-                                      content=ElevatedButton(text="Done", on_click=done, width=250))]
+                            Container(
+                                padding=padding.only(top=20, bottom=10),
+                                content=ElevatedButton(text="Done", on_click=done, width=250)
+                            )
+                        ]
                     )
                 )
             ],
@@ -300,11 +302,14 @@ class AdminHome:
                                 alignment=MainAxisAlignment.CENTER,
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 controls=[
-                                    Container(
-                                        alignment=alignment.top_right,
-                                        content=IconButton(
-                                            icon=icons.DELETE_OUTLINED,
-                                            style=ButtonStyle(color=colors.BLACK)
+                                    GestureDetector(
+                                        mouse_cursor=MouseCursor.CLICK,
+                                        data=int(self.doctors[i]["doctorID"]),
+                                        # on_tap=on_tap,
+                                        content=Container(
+                                            padding=padding.only(top=5, right=5),
+                                            alignment=alignment.top_right,
+                                            content=Icon(icons.DELETE_OUTLINED, color=colors.BLACK),
                                         )
                                     ),
                                     Container(
