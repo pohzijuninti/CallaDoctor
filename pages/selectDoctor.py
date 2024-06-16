@@ -2,6 +2,9 @@ import flet as ft
 from flet import *
 from flet_route import Params, Basket
 import pages.server as svr
+import requests
+import json
+
 
 selected_container = None
 doctor_id = None
@@ -9,7 +12,17 @@ doctor_id = None
 
 class SelectDoctor:
     def __init__(self):
-        pass
+        self.doctorsURL = "http://localhost:3000/doctor"
+        self.doctor_payload = {}
+        self.doctor_headers = {}
+        self.doctor_response = None
+        self.doctors = None
+
+    def get_doctors(self, hospital_id):
+        full_url = f"{self.doctorsURL}/{hospital_id}"
+        self.doctor_response = requests.get(full_url, headers=self.doctor_headers, data=self.doctor_payload)
+        self.doctors = json.loads(self.doctor_response.text)['doctors']
+
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Doctor'
@@ -19,6 +32,8 @@ class SelectDoctor:
 
         hospital_id = int(params.hospital_id)
         svr.get_doctor_details(hospital_id),
+
+        self.get_doctors(hospital_id)
 
         def go_select_hospital(e):
             global selected_container
@@ -78,12 +93,15 @@ class SelectDoctor:
                 ],
             )
 
-        for i in range(len(svr.doctorFilteredList)):
+        for i in range(len(self.doctors)):
+            image_src = self.doctors[i]["image"]
+            doctor_image = Image(src=image_src, fit=ImageFit.FIT_HEIGHT) if image_src else Icon(icons.PERSON, color='black', size=140)
+
             doctor.controls.append(
                 GestureDetector(
                     mouse_cursor=MouseCursor.CLICK,
                     on_tap=on_tap,
-                    data=int(svr.doctorFilteredList[i]["doctorID"]),
+                    data=int(self.doctors[i]["doctorID"]),
                     content=Container(
                         border_radius=10,
                         bgcolor="white",
@@ -95,15 +113,15 @@ class SelectDoctor:
                                     Container(
                                         expand=3,
                                         padding=padding.only(top=10),
-                                        content=Image(src=f'{svr.doctorFilteredList[i]["image"]}', fit=ImageFit.FIT_HEIGHT),
+                                        content=doctor_image,
                                     ),
                                     Column(
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                         expand=1,
                                         controls=[
-                                            Text(value=f'{svr.doctorFilteredList[i]["name"]}', color='black', size=12),
+                                            Text(value=f'{self.doctors[i]["name"]}', color='black', size=12),
                                             Text(
-                                                value=f'{svr.get_speciality_name(svr.doctorFilteredList[i]["specialityID"])}',
+                                                value=f'{svr.get_speciality_name(self.doctors[i]["specialityID"])}',
                                                 color='black', size=10
                                             ),
                                         ]
