@@ -487,29 +487,48 @@ app.get('/timeslots/:doctorID/:date', (req, res) => {
   const doctorID = parseInt(req.params.doctorID);
   const dateParam = req.params.date;
   const date = new Date(dateParam);
+
   // Get current date and time
   const now = new Date();
+
   // Set the start time to either now or the start of the given date, whichever is later
-  const startOfDay = new Date(Math.max(date.setHours(0, 0, 0, 0), now.setHours(now.getHours(), now.getMinutes(), 0, 0)));
+  const startOfDay = new Date(Math.max(date.setHours(0, 0, 0, 0), now.getTime()));
+
   // Set the end time to 10:30 PM on the given date
   const endOfDay = new Date(date.setHours(23, 30, 0, 0));
-  // Filter time slots for the specified doctorID within the time range
-  const filteredTimeSlots = timeSlots.filter(slot => slot.doctorID === doctorID && slot.slotDate >= startOfDay.getTime() / 1000 && slot.slotDate <= endOfDay.getTime() / 1000);
+
+  // Filter time slots for the specified doctorID within the time range and with blockDate of 0
+  const filteredTimeSlots = timeSlots.filter(slot =>
+    slot.doctorID === doctorID &&
+    slot.slotDate >= startOfDay.getTime() / 1000 &&
+    slot.slotDate <= endOfDay.getTime() / 1000 &&
+    slot.blockDate === 0
+  );
+
   res.send(filteredTimeSlots);
 });
 
 // Endpoint to update blockDate for a specific doctor and time
-app.post('/timeslots/:doctorID/:time', (req, res) => {
+app.post('/timeslots/update/:doctorID/:time', (req, res) => {
   const doctorID = parseInt(req.params.doctorID);
   const time = parseInt(req.params.time);
+  const blockDate = parseInt(req.body.blockDate); // Retrieve blockDate from request body
+
+  // Validate blockDate value
+  if (blockDate !== 0 && blockDate !== 1) {
+    return res.status(400).send("Invalid blockDate value. It must be 0 or 1.");
+  }
+
   const index = timeSlots.findIndex(slot => slot.doctorID === doctorID && slot.slotDate === time);
+
   if (index !== -1) {
-    timeSlots[index].blockDate = 1;
+    timeSlots[index].blockDate = blockDate; // Update blockDate based on request body
     res.send(timeSlots[index]);
   } else {
     res.status(404).send("Time slot not found.");
   }
 });
+
 
 let bookingIDCounter = 10001;
 const appointments = [];
@@ -547,6 +566,25 @@ app.get('/appointment', (req, res) => {
   res.send(appointments);
 });
 
+app.post('/appointment/delete/:bookID', (req, res) => {
+  const bookID = parseInt(req.params.bookID);
+
+  // Find the index of the appointment with the given bookID
+  const index = appointments.findIndex(appointment => appointment.bookID === bookID);
+
+  // If the appointment is not found, send an error response
+  if (index === -1) {
+    return res.status(404).json({ error: 'Appointment not found.' });
+  }
+
+  // Remove the appointment from the array
+  const deletedAppointment = appointments.splice(index, 1);
+
+  // Send a success response with the deleted appointment
+  res.json(deletedAppointment[0]);
+});
+
+
 app.get('/appointment/:userID', (req, res) => {
   const { userID } = req.params;
   const userAppointments = appointments.filter(appointment => appointment.userID === userID);
@@ -564,6 +602,7 @@ app.get('/appointment/doctor/:doctorID', (req, res) => {
   const doctorAppointments = appointments.filter(appointment => appointment.doctorID === doctorID);
   res.json(doctorAppointments);
 });
+
 
 app.post('/appointment/approve/:bookID', (req, res) => {
   const { bookID } = req.params;
@@ -623,6 +662,7 @@ app.post('/clinic/form', (req, res) => {
 app.get('/potential/customer', (req, res) => {
   res.send(potentialCustomers);
 });
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
