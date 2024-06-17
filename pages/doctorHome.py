@@ -160,6 +160,7 @@ class DoctorHome:
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
+                    colour1 = 'white'
                     colour2 = 'white'
                     icon1 = 'done'
                     text1 = 'Approve'
@@ -169,15 +170,17 @@ class DoctorHome:
                     disable = False
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
-                    colour2 = 'green'
+                    colour1 = 'green'
+                    colour2 = 'white'
                     icon1 = 'done'
                     text1 = 'Approve'
-                    icon2 = 'do_not_disturb'
-                    text2 = 'Reject'
+                    icon2 = 'edit_document'
+                    text2 = 'Record'
                     status = 'APPROVED'
                     disable = True
                 else:
                     colour = 'red'
+                    colour1 = 'red'
                     colour2 = 'red'
                     icon1 = 'done'
                     text1 = 'Approve'
@@ -293,8 +296,8 @@ class DoctorHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(name=icon1, size=35, color=colour2),
-                                                            Text(value=text1, color=colour2),
+                                                            Icon(name=icon1, size=35, color=colour1),
+                                                            Text(value=text1, color=colour1),
                                                         ]
                                                     )
                                                 )
