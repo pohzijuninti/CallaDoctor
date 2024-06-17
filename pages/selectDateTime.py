@@ -25,7 +25,6 @@ class SelectDateTime:
 
     def get_timeslots(self, doctor_id):
         full_url = f"{self.url}/{doctor_id}/{datetime.date.today().isoformat()}"
-        print(full_url)
         # Perform the HTTP request to fetch time slots
         self.response = requests.request("GET", full_url, headers=self.headers, data=self.payload)
         # Store the response text data
@@ -244,6 +243,17 @@ class SelectDateTime:
             else:
                 selected_date = f'{self.chosen_date} {month_name} {current_date.year}'
 
+            url = f"http://localhost:3000/timeslots/update/{doctor_id}/{selected_time}"
+
+            payload = 'blockDate=1'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            # print(response.text)
+
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Successful"),
@@ -272,7 +282,7 @@ class SelectDateTime:
             }
 
             response = requests.request("POST", url, headers=headers, data=payload)
-            print(response.text)
+            # print(response.text)
 
             page.dialog = dlg_modal
 

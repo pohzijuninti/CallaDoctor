@@ -160,14 +160,29 @@ class DoctorHome:
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
+                    colour2 = 'white'
+                    icon1 = 'done'
+                    text1 = 'Approve'
+                    icon2 = 'do_not_disturb'
+                    text2 = 'Reject'
                     status = 'PENDING'
                     disable = False
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
+                    colour2 = 'green'
+                    icon1 = 'done'
+                    text1 = 'Approve'
+                    icon2 = 'do_not_disturb'
+                    text2 = 'Reject'
                     status = 'APPROVED'
                     disable = True
                 else:
                     colour = 'red'
+                    colour2 = 'red'
+                    icon1 = 'done'
+                    text1 = 'Approve'
+                    icon2 = 'do_not_disturb'
+                    text2 = 'Reject'
                     status = 'REJECTED'
                     disable = True
 
@@ -278,8 +293,8 @@ class DoctorHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.CHECK_OUTLINED, size=35, color=colors.WHITE),
-                                                            Text(value="Approve", color=colors.WHITE),
+                                                            Icon(name=icon1, size=35, color=colour2),
+                                                            Text(value=text1, color=colour2),
                                                         ]
                                                     )
                                                 )
@@ -294,8 +309,8 @@ class DoctorHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colors.WHITE),
-                                                            Text(value="Reject", color=colors.WHITE),
+                                                            Icon(name=icon2, size=35, color=colour2),
+                                                            Text(value=text2, color=colour2),
                                                         ]
                                                     )
                                                 )

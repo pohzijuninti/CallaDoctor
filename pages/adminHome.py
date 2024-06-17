@@ -258,7 +258,7 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.CHECK_OUTLINED, size=35, color=colors.WHITE),
+                                                            Icon(name='done', size=35, color=colors.WHITE),
                                                             Text(value="Approve", color=colors.WHITE),
                                                         ]
                                                     )
@@ -274,7 +274,7 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colors.WHITE),
+                                                            Icon(name=icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colors.WHITE),
                                                             Text(value="Reject", color=colors.WHITE),
                                                         ]
                                                     )

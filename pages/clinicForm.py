@@ -14,16 +14,27 @@ class ClinicForm:
         self.potentialCustomers = None
 
     def get_potentialCustomers(self):
-        self.response = requests.get(self.potentialCustomersURL, headers=self.headers, data=self.payload)
-        self.potentialCustomers = json.loads(self.response.text)
+        try:
+            self.response = requests.get(self.potentialCustomersURL, headers=self.headers, data=self.payload)
+            self.response.raise_for_status()  # Raise an exception for HTTP errors
+            self.potentialCustomers = self.response.json()  # Use .json() method to directly get JSON data
 
-        max_id = -1
+            max_id = -1
 
-        for i in range(len(self.potentialCustomers)):
-            if self.potentialCustomers[i]["potentialCustomerID"] > max_id:
-                max_id = self.potentialCustomers[i]["potentialCustomerID"]
+            for customer in self.potentialCustomers:
+                if "potentialCustomerID" in customer:
+                    if customer["potentialCustomerID"] > max_id:
+                        max_id = customer["potentialCustomerID"]
+                else:
+                    print(f"Missing 'potentialCustomerID' in: {customer}")
 
-        return max_id
+            return max_id
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {e}")
+            return -1
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {e}")
+            return -1
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Clinic Form'
@@ -35,10 +46,10 @@ class ClinicForm:
             page.go("/")
             page.update()
 
-        name: TextField = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        address: TextField = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        phone_number: TextField = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        email: TextField = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.WHITE)
+        name = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.WHITE)
+        address = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.WHITE)
+        phone_number = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.WHITE)
+        email = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.WHITE)
 
         def open_dlg_modal(e):
             if name.value and address.value and phone_number.value and email.value:
@@ -49,34 +60,43 @@ class ClinicForm:
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
 
-                response = requests.request("POST", url, headers=headers, data=payload)
-                form = json.loads(response.text)
-                print(form)
+                try:
+                    response = requests.post(url, headers=headers, data=payload)
+                    response.raise_for_status()  # Raise an exception for HTTP errors
+                    form = response.json()
+                    print(form)
 
-                id = self.get_potentialCustomers()
+                    id = self.get_potentialCustomers()
+                    if id == -1:
+                        print("Failed to get potential customers.")
+                        return
 
-                dlg_modal.actions = [
-                    Container(
-                        content=Column(
-                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                            controls=[
-                                Text(f'Your code is #{id}'),
-                                Text(f'{name.value}'),
-                                Text(f'{address.value}'),
-                                Text(f'{phone_number.value}'),
-                                Text(f'{email.value}'),
-                                Container(
-                                    padding=padding.only(top=20, bottom=10),
-                                    content=ElevatedButton(text="Back to Login", width=250, on_click=go_login)
-                                )
-                            ]
+                    dlg_modal.actions = [
+                        Container(
+                            content=Column(
+                                horizontal_alignment=CrossAxisAlignment.CENTER,
+                                controls=[
+                                    Text(f'Your code is #{id}'),
+                                    Text(f'{name.value}'),
+                                    Text(f'{address.value}'),
+                                    Text(f'{phone_number.value}'),
+                                    Text(f'{email.value}'),
+                                    Container(
+                                        padding=padding.only(top=20, bottom=10),
+                                        content=ElevatedButton(text="Back to Login", width=250, on_click=go_login)
+                                    )
+                                ]
+                            )
                         )
-                    )
-                ]
+                    ]
 
-                page.dialog = dlg_modal
-                dlg_modal.open = True
-                page.update()
+                    page.dialog = dlg_modal
+                    dlg_modal.open = True
+                    page.update()
+                except requests.exceptions.RequestException as e:
+                    print(f"Request error: {e}")
+                except json.JSONDecodeError as e:
+                    print(f"JSON decode error: {e}")
             else:
                 print("Please fill in all fields.")
 

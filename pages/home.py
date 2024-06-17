@@ -21,12 +21,12 @@ class Home:
 
     def get_appointments(self):
         full_url = f"{self.url}/{get_userID()}"
-        print(full_url)
+        # print(full_url)
         # Perform the HTTP request to fetch appointments
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.appointments = json.loads(self.response.text)
-        print(self.appointments)
+        # print(self.appointments)
 
     def get_booking_histories(self):
         self.booking_histories = []
@@ -168,6 +168,7 @@ class Home:
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
 
+
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Delete Appointment"),
@@ -199,7 +200,19 @@ class Home:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            print(response.text)
+            temp = json.loads(response.text)
+
+
+            url2 = f"http://localhost:3000/timeslots/update/{temp['doctorID']}/{temp['datetime']}"
+
+            payload2 = 'blockDate=0'
+            headers2 = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response2 = requests.request("POST", url2, headers=headers2, data=payload2)
+
+            # print(response2.text)
 
         appointments = ListView(
             expand=True,
