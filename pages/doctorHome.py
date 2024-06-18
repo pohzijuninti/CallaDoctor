@@ -7,7 +7,6 @@ import requests
 import json
 import pages.server as svr
 
-
 class DoctorHome:
     def __init__(self):
         self.calendar_grid = None
@@ -145,6 +144,10 @@ class DoctorHome:
             page.go("/")
             page.update()
 
+        def go_doctor_medical_record(user_id):
+            page.go(f"/doctor/medicalRecord/{user_id}")
+            page.update()
+
         appointments = ListView(
             expand=True,
         )
@@ -158,6 +161,8 @@ class DoctorHome:
         def update_appointments_view():
             appointments.controls.clear()
             for i in range(len(self.appointments)):
+                userID = self.appointments[i]['userID']
+
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
                     colour1 = 'white'
@@ -167,7 +172,8 @@ class DoctorHome:
                     icon2 = 'do_not_disturb'
                     text2 = 'Reject'
                     status = 'PENDING'
-                    disable = False
+                    action1 = approve_dlg_modal
+                    action2 = reject_dlg_modal
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
                     colour1 = 'green'
@@ -177,7 +183,9 @@ class DoctorHome:
                     icon2 = 'edit_document'
                     text2 = 'Record'
                     status = 'APPROVED'
-                    disable = True
+                    action1 = None
+                    # action2 = go_doctor_medical_record
+                    action2 = lambda e, user_id=userID: go_doctor_medical_record(user_id)
                 else:
                     colour = 'red'
                     colour1 = 'red'
@@ -187,9 +195,10 @@ class DoctorHome:
                     icon2 = 'do_not_disturb'
                     text2 = 'Reject'
                     status = 'REJECTED'
-                    disable = True
+                    action1 = None
+                    action2 = None
 
-                userID = self.appointments[i]['userID']
+
                 url = f"http://localhost:3000/username/{userID}"
 
                 payload = {}
@@ -289,7 +298,7 @@ class DoctorHome:
                                             GestureDetector(
                                                 mouse_cursor=MouseCursor.CLICK,
                                                 data=int(self.appointments[i]["bookID"]),
-                                                on_tap=approve_dlg_modal if not disable else None,
+                                                on_tap=action1,
                                                 content=Container(
                                                     expand=True,
                                                     content=Column(
@@ -305,7 +314,7 @@ class DoctorHome:
                                             GestureDetector(
                                                 mouse_cursor=MouseCursor.CLICK,
                                                 data=int(self.appointments[i]["bookID"]),
-                                                on_tap=reject_dlg_modal if not disable else None,
+                                                on_tap=action2,
                                                 content=Container(
                                                     expand=True,
                                                     content=Column(

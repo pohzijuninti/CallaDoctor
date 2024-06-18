@@ -12,7 +12,7 @@ from pages.selectDoctor import SelectDoctor
 from pages.selectDateTime import SelectDateTime
 from pages.adminHome import AdminHome
 from pages.doctorHome import DoctorHome
-
+from pages.doctorMedicalRecord import DoctorMedicalRecord
 
 def main(page: Page):
     page.theme_mode = ft.ThemeMode.DARK
@@ -28,6 +28,7 @@ def main(page: Page):
         path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
         path(url='/adminHome/:hospital_id', clear=False, view=AdminHome().view),
         path(url='/doctorHome/:doctor_id', clear=False, view=DoctorHome().view),
+        path(url='/doctor/medicalRecord/:user_id', clear=False, view=DoctorMedicalRecord().view),
     ]
     Routing(page=page, app_routes=app_routes)
     page.go(page.route)
