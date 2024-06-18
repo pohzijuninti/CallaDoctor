@@ -70,7 +70,7 @@ const speciality = [
   },
 ];
 
-const doctors = [
+let doctors = [
   {
     "doctorID": 21,
     "name": "Dr. Lim Guan Choon",
@@ -208,7 +208,7 @@ const doctors = [
   },
 ];
 
-const medicalRecord = [
+let medicalRecord = [
   {
     "recordID": 201,
     "datetime": 1717830000,
@@ -216,7 +216,7 @@ const medicalRecord = [
     "description": "Fall down from bicycle , Broke his left leg",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
+    "userID": 'MywJLVPqIiX7PGELcQAXuXSIL4C3',
   },
   {
     "recordID": 202,
@@ -225,7 +225,7 @@ const medicalRecord = [
     "description": "Fall down from bicycle , Broke his right leg",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
+    "userID": 'MywJLVPqIiX7PGELcQAXuXSIL4C3',
   },
   {
     "recordID": 203,
@@ -234,7 +234,7 @@ const medicalRecord = [
     "description": "Difficult to breathe",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
+    "userID": 'MywJLVPqIiX7PGELcQAXuXSIL4C3',
   },
   {
     "recordID": 204,
@@ -243,7 +243,7 @@ const medicalRecord = [
     "description": "High cholesterol , Lack of exercise",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
+    "userID": 'MywJLVPqIiX7PGELcQAXuXSIL4C3',
   },
   {
     "recordID": 205,
@@ -252,7 +252,7 @@ const medicalRecord = [
     "description": "Toothache in lower left molar",
     "hospitalID": 5,
     "doctorID": 35,
-    "userID": 'x3qNoXgCl1cS40dj1TAJ0UwqRCW2',
+    "userID": 'MywJLVPqIiX7PGELcQAXuXSIL4C3',
   },
 ];
 
@@ -338,6 +338,35 @@ app.get('/medicalRecord/doctor/:doctorID', (req, res) => {
   const doctorID = parseInt(req.params.doctorID);
   const doctorRecords = medicalRecord.filter(record => record.doctorID === doctorID);
   res.json(doctorRecords);
+});
+
+let medicalRecordCounter = 206;
+
+app.post('/medicalRecord/add', async (req, res) => {
+  const { datetime, title, description, hospitalID, doctorID, userID } = req.body;
+
+  // Validate the required fields
+  if (!datetime || !title || !description || !hospitalID || !doctorID || !userID) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+
+  const medicalRecordID = medicalRecordCounter++;
+
+  const newRecord = {
+    recordID: medicalRecordID,
+    datetime: parseInt(datetime),
+    title,
+    description,
+    hospitalID: parseInt(hospitalID),
+    doctorID: parseInt(doctorID),
+    userID,
+  };
+
+  // Add the new record to the array
+  medicalRecord.push(newRecord);
+
+  // Send back the new record as a response
+  res.status(201).json(newRecord);
 });
 
 let users = [];
