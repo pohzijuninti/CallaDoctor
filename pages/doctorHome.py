@@ -106,6 +106,7 @@ class DoctorHome:
                         day_container.border_radius = 14
                         day_container.bgcolor = colors.RED
                         day_container.content.color = colors.WHITE
+                        day_container.content.color = colors.WHITE
 
                     if day < current_date.day:
                         if day_container.content:
@@ -184,7 +185,6 @@ class DoctorHome:
                     text2 = 'Record'
                     status = 'APPROVED'
                     action1 = None
-                    # action2 = go_doctor_medical_record
                     action2 = lambda e, user_id=userID: go_doctor_medical_record(user_id)
                 else:
                     colour = 'red'
@@ -481,7 +481,7 @@ class DoctorHome:
         update_medicalRecords_view()
 
         return View(
-            route="/doctorHome/:doctor_id",
+            route="/doctorHome",
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,

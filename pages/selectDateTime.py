@@ -256,8 +256,8 @@ class SelectDateTime:
 
             dlg_modal = AlertDialog(
                 modal=False,
-                title=Text("Successful"),
-                content=Text("Thanks for choosing us."),
+                title=Text("Successful", text_align=TextAlign.CENTER),
+                content=Text("Thanks for choosing us.", text_align=TextAlign.CENTER),
                 actions=[
                     Container(
                         content=Column(
