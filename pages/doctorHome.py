@@ -7,7 +7,6 @@ import requests
 import json
 import pages.server as svr
 
-doctor_id = None
 
 class DoctorHome:
     def __init__(self):
@@ -147,9 +146,8 @@ class DoctorHome:
             page.go("/")
             page.update()
 
-        def go_doctor_medical_record(user_id):
-            page.go(f"/doctor/medicalRecord/{doctor_id}{user_id}")
-            print(doctor_id)
+        def go_doctor_medical_record(hospital_id, user_id):
+            page.go(f"/doctorMedicalRecord/{hospital_id}/{doctor_id}/{user_id}")
             page.update()
 
         appointments = ListView(
@@ -166,6 +164,7 @@ class DoctorHome:
             appointments.controls.clear()
             for i in range(len(self.appointments)):
                 userID = self.appointments[i]['userID']
+                hospitalID = self.appointments[i]['hospitalID']
 
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
@@ -188,7 +187,7 @@ class DoctorHome:
                     text2 = 'Record'
                     status = 'APPROVED'
                     action1 = None
-                    action2 = lambda e, user_id=userID: go_doctor_medical_record(user_id)
+                    action2 = lambda e: go_doctor_medical_record(hospitalID, userID)
                 else:
                     colour = 'red'
                     colour1 = 'red'
@@ -200,7 +199,6 @@ class DoctorHome:
                     status = 'REJECTED'
                     action1 = None
                     action2 = None
-
 
                 url = f"http://localhost:3000/username/{userID}"
 
@@ -354,15 +352,15 @@ class DoctorHome:
                                     Column(
                                         controls=[
                                             Text(
-                                                value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}',
+                                                value=f'{svr.convert_date(self.medicalRecord[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}',
                                                 color=colors.GREY
                                             ),
                                             Text(
-                                                value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
+                                                value=f'{self.medicalRecord[i]["title"]}', size=18, color=colors.BLACK,
                                                 weight=FontWeight.BOLD),
                                             Text(value='Description', color=colors.BLACK),
                                             Text(
-                                                value=f'{display_description(self.medical_record[i]["description"])}',
+                                                value=f'{display_description(self.medicalRecord[i]["description"])}',
                                                 color=colors.GREY
                                             ),
                                         ]
@@ -371,7 +369,7 @@ class DoctorHome:
                                         alignment=MainAxisAlignment.SPACE_BETWEEN,
                                         controls=[
                                             Text(
-                                                value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}',
+                                                value=f'{svr.get_hospital_name(self.medicalRecord[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}',
                                                 color=colors.BLACK, size=12),
                                             IconButton(icon=icons.EDIT_OUTLINED, icon_color=colors.BLUE),
                                         ]
@@ -484,7 +482,7 @@ class DoctorHome:
         update_medicalRecords_view()
 
         return View(
-            route="/doctorHome",
+            route="/doctorHome/:doctor_id",
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,

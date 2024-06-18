@@ -7,7 +7,6 @@ import time
 import datetime
 import pages.server as svr
 
-from pages.doctorHome import doctor_id
 
 class DoctorMedicalRecord:
 
@@ -21,7 +20,6 @@ class DoctorMedicalRecord:
         self.name_card = None
         self.medical_record = None
 
-
     def get_name_card(self, user_id):
         full_url = f'{self.name_card_url}/{user_id}'
         self.response1 = requests.get(full_url, headers=self.headers, data=self.payload)
@@ -32,7 +30,6 @@ class DoctorMedicalRecord:
         self.response2 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.medical_record = json.loads(self.response2.text)
 
-
     def view(self, page: Page, params: Params, basket: Basket):
         patientName = None
         page.title = f'{patientName} - Medical Record'
@@ -40,10 +37,9 @@ class DoctorMedicalRecord:
         page.window_min_width = 900
         page.window_min_height = 630
 
-        user_id = params.user_id
+        hospital_id = int(params.hospital_id)
         doctor_id = int(params.doctor_id)
-        #
-        print(doctor_id)
+        user_id = params.user_id
 
         self.get_name_card(user_id)
         self.get_medical_records(user_id)
@@ -120,8 +116,6 @@ class DoctorMedicalRecord:
 
             age = str(current_year - birth_year) + ' years old'
             caution = 'Allergic to Panadol'
-
-
 
             return Container(
                 width=300,
@@ -202,7 +196,7 @@ class DoctorMedicalRecord:
             )
 
         return View(
-            route="/doctor/medicalRecord/:doctor_id:user_id",
+            route='/doctorMedicalRecord/:hospital_id/:doctor_id/:user_id',
             padding=50,
             spacing=50,
             controls=[

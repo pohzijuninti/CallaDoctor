@@ -24,7 +24,6 @@ class MedicalRecord:
         self.response1 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.name_card = json.loads(self.response1.text)
 
-
     def get_medical_records(self):
         full_url = f"{self.medical_record_url}/{get_userID()}"
         self.response2 = requests.get(full_url, headers=self.headers, data=self.payload)
