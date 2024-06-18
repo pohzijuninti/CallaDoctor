@@ -303,6 +303,7 @@ class SelectDateTime:
             page.update()
 
         return View(
+            route="/selectDateTime/:hospital_id/:doctor_id",
             padding=50,
             spacing=50,
             controls=[

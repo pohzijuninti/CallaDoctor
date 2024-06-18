@@ -308,6 +308,20 @@ app.post('/doctor/add', async (req, res) => {
   }
 });
 
+app.post('/doctor/delete/:doctorID', (req, res) => {
+  const doctorID = parseInt(req.params.doctorID);
+
+  const index = doctors.findIndex(doctor => doctor.doctorID === doctorID);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Doctor not found.' });
+  }
+
+  const deletedDoctor = doctors.splice(index, 1);
+
+  res.json(deletedDoctor[0]);
+});
+
 app.get('/doctor/:hospitalID', (req, res) => {
   const { hospitalID } = req.params;
 

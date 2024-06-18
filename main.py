@@ -25,7 +25,7 @@ def main(page: Page):
         path(url='/clinicForm', clear=False, view=ClinicForm().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
         path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),
-        path(url='/selectDateTime/:hospital_id:doctor_id', clear=False, view=SelectDateTime().view),
+        path(url='/selectDateTime/:hospital_id/:doctor_id', clear=False, view=SelectDateTime().view),
         path(url='/adminHome/:hospital_id', clear=False, view=AdminHome().view),
         path(url='/doctorHome/:doctor_id', clear=False, view=DoctorHome().view),
         path(url='/doctorMedicalRecord/:hospital_id/:doctor_id/:user_id', clear=False, view=DoctorMedicalRecord().view),

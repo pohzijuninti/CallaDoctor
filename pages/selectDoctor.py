@@ -46,7 +46,7 @@ class SelectDoctor:
             selected_container = None
 
             if doctor_id is not None:
-                page.go(f'/selectDateTime/{hospital_id}{doctor_id}')
+                page.go(f'/selectDateTime/{hospital_id}/{doctor_id}')
                 page.update()
 
         def on_tap(e):

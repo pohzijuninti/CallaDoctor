@@ -389,7 +389,15 @@ class DoctorHome:
                     date = svr.convert_date(self.appointments[i]["datetime"])
                     time = svr.convert_time(self.appointments[i]["datetime"])
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
-                    doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+                    userID = self.appointments[i]["userID"]
+
+            url = f"http://localhost:3000/username/{userID}"
+
+            payload = {}
+            headers = {}
+
+            response = requests.request("GET", url, headers=headers, data=payload)
+            name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
                 modal=False,
@@ -403,7 +411,7 @@ class DoctorHome:
                                 Text(value=date),
                                 Text(value=time),
                                 Text(value=hospital),
-                                Text(value=doctor),
+                                Text(value=name),
                                 TextButton(text='Approve', width=150, on_click=lambda e: (approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
                             ]
                         ))
@@ -423,7 +431,15 @@ class DoctorHome:
                     date = svr.convert_date(self.appointments[i]["datetime"])
                     time = svr.convert_time(self.appointments[i]["datetime"])
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
-                    doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+                    userID = self.appointments[i]["userID"]
+
+            url = f"http://localhost:3000/username/{userID}"
+
+            payload = {}
+            headers = {}
+
+            response = requests.request("GET", url, headers=headers, data=payload)
+            name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
                 modal=False,
@@ -437,7 +453,7 @@ class DoctorHome:
                                 Text(value=date),
                                 Text(value=time),
                                 Text(value=hospital),
-                                Text(value=doctor),
+                                Text(value=name),
                                 TextButton(text='Reject', width=150, on_click=lambda e: (reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
                             ]
                         ))

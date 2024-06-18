@@ -90,7 +90,6 @@ class AdminHome:
 
                 # Update doctors GridView
                 update_doctors_view()
-
                 page.update()
             except Exception as e:
                 print('Add doctor failed', e)
@@ -124,7 +123,6 @@ class AdminHome:
                 )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
-            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
 
         appointments = ListView(
@@ -305,7 +303,7 @@ class AdminHome:
                                     GestureDetector(
                                         mouse_cursor=MouseCursor.CLICK,
                                         data=int(self.doctors[i]["doctorID"]),
-                                        # on_tap=on_tap,
+                                        on_tap=delete_dlg_modal,
                                         content=Container(
                                             padding=padding.only(top=5, right=5),
                                             alignment=alignment.top_right,
@@ -338,8 +336,16 @@ class AdminHome:
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
                     time = svr.convert_time(self.appointments[i]["datetime"])
-                    hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
+                    userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+
+            url = f"http://localhost:3000/username/{userID}"
+
+            payload = {}
+            headers = {}
+
+            response = requests.request("GET", url, headers=headers, data=payload)
+            name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
                 modal=False,
@@ -352,7 +358,7 @@ class AdminHome:
                             controls=[
                                 Text(value=date),
                                 Text(value=time),
-                                Text(value=hospital),
+                                Text(value=name),
                                 Text(value=doctor),
                                 TextButton(text='Approve', width=150, on_click=lambda e: (
                                 approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
@@ -373,8 +379,16 @@ class AdminHome:
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
                     time = svr.convert_time(self.appointments[i]["datetime"])
-                    hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
+                    userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
+
+            url = f"http://localhost:3000/username/{userID}"
+
+            payload = {}
+            headers = {}
+
+            response = requests.request("GET", url, headers=headers, data=payload)
+            name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
                 modal=False,
@@ -387,7 +401,7 @@ class AdminHome:
                             controls=[
                                 Text(value=date),
                                 Text(value=time),
-                                Text(value=hospital),
+                                Text(value=name),
                                 Text(value=doctor),
                                 TextButton(text='Reject', width=150, on_click=lambda e: (
                                 reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
@@ -425,6 +439,49 @@ class AdminHome:
             # Refresh appointments data and update the view
             self.get_appointments(hospital_id)
             update_appointments_view()
+
+        def delete_dlg_modal(e):
+            doctor_id = e.control.data
+
+            for i in range(len(self.doctors)):
+                if self.doctors[i]["doctorID"] == doctor_id:
+                    name = self.doctors[i]["name"]
+                    speciality = svr.get_speciality_name(self.doctors[i]["specialityID"])
+                    hospital = svr.get_hospital_name(self.doctors[i]["hospitalID"])
+
+            dlg_modal = AlertDialog(
+                modal=False,
+                title=Text("Delete Doctor"),
+                content=Text("Are you sure?"),
+                actions=[
+                    Container(
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Text(value=name),
+                                Text(value=speciality),
+                                Text(value=hospital),
+                                TextButton(text='Delete', width=150, on_click=lambda e: (delete_doctor(doctor_id), setattr(dlg_modal, 'open', False), page.update())),
+                            ]
+                        ))
+                ],
+                actions_alignment=MainAxisAlignment.CENTER,
+            )
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+        def delete_doctor(doctor_id):
+            url = f"http://localhost:3000/doctor/delete/{doctor_id}"
+            payload = {}
+            headers = {}
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+            print(response.text)
+
+            self.get_doctors(hospital_id)
+            update_doctors_view()
 
         def display_doc_image(img):
             if img == "":
