@@ -7,6 +7,8 @@ import requests
 import json
 import pages.server as svr
 
+doctor_id = None
+
 class DoctorHome:
     def __init__(self):
         self.calendar_grid = None
@@ -146,7 +148,8 @@ class DoctorHome:
             page.update()
 
         def go_doctor_medical_record(user_id):
-            page.go(f"/doctor/medicalRecord/{user_id}")
+            page.go(f"/doctor/medicalRecord/{doctor_id}{user_id}")
+            print(doctor_id)
             page.update()
 
         appointments = ListView(

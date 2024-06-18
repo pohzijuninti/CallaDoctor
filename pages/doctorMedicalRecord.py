@@ -3,8 +3,11 @@ from flet import *
 from flet_route import Params, Basket
 import requests
 import json
+import time
 import datetime
 import pages.server as svr
+
+from pages.doctorHome import doctor_id
 
 class DoctorMedicalRecord:
 
@@ -28,8 +31,7 @@ class DoctorMedicalRecord:
         full_url = f"{self.medical_record_url}/{user_id}"
         self.response2 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.medical_record = json.loads(self.response2.text)
-        print(full_url)
-        print(self.medical_record)
+
 
     def view(self, page: Page, params: Params, basket: Basket):
         patientName = None
@@ -39,9 +41,9 @@ class DoctorMedicalRecord:
         page.window_min_height = 630
 
         user_id = params.user_id
-        # doctor_id = params.doctor_id
-
-        print(user_id)
+        doctor_id = int(params.doctor_id)
+        #
+        print(doctor_id)
 
         self.get_name_card(user_id)
         self.get_medical_records(user_id)
@@ -49,6 +51,55 @@ class DoctorMedicalRecord:
         # def go_doctor_home():
         #     page.go(f'/doctorHome/{doctor_id}')
         #     page.update()
+
+        title: TextField = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
+        description: TextField = TextField(label='Description', width=250, border=InputBorder.UNDERLINE, text_size=14,
+                                           multiline=True, min_lines=3, max_lines=3)
+
+        def open_dlg_modal(e):
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+        def close_dlg(e):
+            current_unix_time = int(time.time())
+            url = "http://localhost:3000/medicalRecord/add"
+
+            payload = f'datetime={current_unix_time}&title={title.value}&description={description.value}&hospitalID={5}&doctorID={35}&userID={user_id}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            print(response.text)
+
+            dlg_modal.open = False
+            title.value = ''
+            description.value = ''
+            page.update()
+
+        dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Medical Record"),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            title,
+                            description,
+                            Container(padding=padding.only(top=20, bottom=10),
+                                      content=ElevatedButton(text="Done",
+                                                             on_click=close_dlg,
+                                                             width=250))]
+                    )
+                )
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        )
+
         def name_card():
             is_odd = int(self.name_card['ic'][-1]) % 2 != 0
             if is_odd:
@@ -141,7 +192,6 @@ class DoctorMedicalRecord:
                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
                                         Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
-                                        IconButton(icon=icons.SEND, icon_color=colors.BLUE),
                                     ]
                                 )
 
@@ -152,7 +202,7 @@ class DoctorMedicalRecord:
             )
 
         return View(
-            route="/doctor/medicalRecord/:user_id",
+            route="/doctor/medicalRecord/:doctor_id:user_id",
             padding=50,
             spacing=50,
             controls=[
@@ -171,10 +221,16 @@ class DoctorMedicalRecord:
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]
                         ),
-                        name_card(),
-                        Container(
-                            bgcolor='white',
-                            content=Text('test')
+                        Row(
+                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            vertical_alignment=CrossAxisAlignment.START,
+                            controls=[
+                                name_card(),
+                                ElevatedButton(
+                                    on_click=open_dlg_modal,
+                                    content=Text('Add Medical Record')
+                                ),
+                            ]
                         ),
                         Container(
                             expand=True,
