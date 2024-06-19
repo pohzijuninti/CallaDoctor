@@ -23,14 +23,14 @@ class SelectDateTime:
         self.response = None
         self.timeslots_data = None
 
-    def get_timeslots(self, doctor_id):
-        full_url = f"{self.url}/{doctor_id}/{datetime.date.today().isoformat()}"
+    def get_timeslots(self, doctor_id, date):
+        full_url = f"{self.url}/{doctor_id}/{date}"
         # Perform the HTTP request to fetch time slots
         self.response = requests.request("GET", full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
 
-    def generate_calendar(self, page):
+    def generate_calendar(self, page, doctor_id):
         current_date = datetime.date.today()
         current_year = current_date.year
         current_month = current_date.month
@@ -95,7 +95,7 @@ class SelectDateTime:
                             height=28,
                             border=None,
                             alignment=alignment.center,
-                            on_click=lambda control, date=day: self.date_clicked(date),
+                            on_click=lambda control, date=day: self.date_clicked(doctor_id, date),
                             content=Text(str(day), size=12, color=colors.BLACK, weight=FontWeight.W_500),
                             margin=margin.only(right=10, bottom=-10),
                         )
@@ -135,14 +135,13 @@ class SelectDateTime:
             )
         )
 
-    def date_clicked(self, date):
+    def date_clicked(self, doctor_id, date):
         if date:
             # Reset the previously chosen date
             if self.chosen_date:
                 self.reset_date_color(self.chosen_date)
 
             self.chosen_date = date
-            print(f"Chosen Date: {self.chosen_date}")
 
             # Update the color for the newly chosen date
             for month_grid in self.calendar_grid.controls:
@@ -153,6 +152,13 @@ class SelectDateTime:
                             day_container.bgcolor = colors.GREY_200
                             day_container.content.color = colors.RED
                             day_container.update()
+
+            chosen_day = int(self.chosen_date)
+            current_date = datetime.date.today()
+            timeslot_date = datetime.date(current_date.year, current_date.month, chosen_day).isoformat()
+
+            self.get_timeslots(doctor_id, timeslot_date)
+            # update_timeslots()
 
     def reset_date_color(self, date):
         # Reset the properties for a specific date
@@ -173,7 +179,7 @@ class SelectDateTime:
 
         hospital_id = int(params.hospital_id)
         doctor_id = int(params.doctor_id)
-        self.get_timeslots(doctor_id)
+        self.get_timeslots(doctor_id, datetime.date.today().isoformat())
 
         def on_tap(e):
             global selected_container
@@ -202,26 +208,30 @@ class SelectDateTime:
             child_aspect_ratio=5/2,
         )
 
-        for i in range(len(self.timeslots_data)):
-            time = svr.convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format
+        def update_timeslots():
+            timeslot.controls.clear()
 
-            timeslot.controls.append(
-                GestureDetector(
-                    on_tap=on_tap,
-                    data=self.timeslots_data[i]['slotDate'],
-                    mouse_cursor=MouseCursor.CLICK,
-                    content=Container(
-                        border_radius=10,
-                        alignment=alignment.center,
-                        bgcolor=colors.WHITE,
-                        content=Text(
-                            value=time,
-                            color=colors.GREY_800,
-                            size=12,
-                        ),
+            for i in range(len(self.timeslots_data)):
+                time = svr.convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format.
+
+                timeslot.controls.append(
+                    GestureDetector(
+                        on_tap=on_tap,
+                        data=self.timeslots_data[i]['slotDate'],
+                        mouse_cursor=MouseCursor.CLICK,
+                        content=Container(
+                            border_radius=10,
+                            alignment=alignment.center,
+                            bgcolor=colors.WHITE,
+                            content=Text(
+                                value=time,
+                                color=colors.GREY_800,
+                                size=12,
+                            ),
+                        )
                     )
                 )
-            )
+            page.update()
 
         def go_select_doctor(e):
             global selected_container
@@ -302,6 +312,8 @@ class SelectDateTime:
             page.go("/home")
             page.update()
 
+        update_timeslots()
+
         return View(
             route="/selectDateTime/:hospital_id/:doctor_id",
             padding=50,
@@ -312,8 +324,8 @@ class SelectDateTime:
                     controls=[
                         TextButton(
                             text=f'{svr.get_hospital_name(hospital_id)}, {svr.get_doctor_name(doctor_id)}',
-                            style=ButtonStyle(color=colors.WHITE),
-                            icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color="white", on_click=go_select_doctor
+                            style=ButtonStyle(color=colors.GREY_800),
+                            icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color=colors.GREY_800, on_click=go_select_doctor
                         ),
                         Row(
                             expand=True,
@@ -322,7 +334,7 @@ class SelectDateTime:
                                     expand=1,
                                     alignment=MainAxisAlignment.CENTER,
                                     controls=[
-                                        self.generate_calendar(page),
+                                        self.generate_calendar(page, doctor_id),
                                     ]
                                 ),
                                 Column(

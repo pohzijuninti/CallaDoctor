@@ -44,9 +44,9 @@ class DoctorMedicalRecord:
         self.get_name_card(user_id)
         self.get_medical_records(user_id)
 
-        # def go_doctor_home():
-        #     page.go(f'/doctorHome/{doctor_id}')
-        #     page.update()
+        def go_doctor_home():
+            page.go(f'/doctorHome/{doctor_id}')
+            page.update()
 
         title: TextField = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
         description: TextField = TextField(label='Description', width=250, border=InputBorder.UNDERLINE, text_size=14,
@@ -210,7 +210,7 @@ class DoctorMedicalRecord:
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
                                     icon_color=colors.WHITE,
-                                    # on_click=go_doctor_home,
+                                    on_click=go_doctor_home,
                                 ),
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]

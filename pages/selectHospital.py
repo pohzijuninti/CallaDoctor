@@ -87,8 +87,8 @@ class SelectHospital:
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
                             TextButton(
-                                text="Next", style=ButtonStyle(color=colors.WHITE),
-                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
+                                text="Next", style=ButtonStyle(color=colors.GREY_800),
+                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.GREY_800,
                                 on_click=go_select_doctor
                             )
                         ]
@@ -135,7 +135,7 @@ class SelectHospital:
                                             controls=[
                                                 IconButton(
                                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
-                                                    icon_color=colors.WHITE,
+                                                    icon_color=colors.GREY_800,
                                                     on_click=go_home,
                                                 ),
                                                 Text(

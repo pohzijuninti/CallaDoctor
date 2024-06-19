@@ -135,17 +135,23 @@ class AdminHome:
 
         def update_appointments_view():
             appointments.controls.clear()  # Clear existing controls
+
+            self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
+                    # colour1 = 'white'
                     status = 'PENDING'
                     disable = False
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
+                    # colour1 = 'green'
                     status = 'APPROVED'
                     disable = True
                 else:
                     colour = 'red'
+                    # colour1 = 'red'
                     status = 'REJECTED'
                     disable = True
 
@@ -293,6 +299,7 @@ class AdminHome:
                 speciality = svr.get_speciality_name(self.doctors[i]["specialityID"])
                 doctors.controls.append(
                     Container(
+                        border=border.all(5, colors.GREY_800),
                         border_radius=10,
                         bgcolor=colors.WHITE,
                         content=Container(

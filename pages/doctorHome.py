@@ -121,6 +121,7 @@ class DoctorHome:
             self.calendar_grid.controls.append(month_grid)
 
         return Container(
+            border=border.all(5, colors.GREY_800),
             border_radius=10,
             bgcolor=colors.WHITE,
             padding=padding.only(left=5, right=5, top=15, bottom=15),
@@ -162,6 +163,9 @@ class DoctorHome:
 
         def update_appointments_view():
             appointments.controls.clear()
+
+            self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+
             for i in range(len(self.appointments)):
                 userID = self.appointments[i]['userID']
                 hospitalID = self.appointments[i]['hospitalID']
@@ -577,6 +581,13 @@ class DoctorHome:
                                                 controls=[
                                                     Column(
                                                         controls=[
+                                                            Container(
+                                                                padding=padding.only(left=5),
+                                                                content=Text(
+                                                                    value='Booking History',
+                                                                    style=TextStyle(size=18, weight=FontWeight.BOLD)
+                                                                ),
+                                                            ),
                                                             Container(
                                                                 expand=True,
                                                                 border_radius=10,

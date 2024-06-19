@@ -22,6 +22,7 @@ firebaseConfig = {
 firebase=pyrebase.initialize_app(firebaseConfig)
 auth=firebase.auth()
 
+
 def register(email, password, name, ic):
     try:
         user = auth.create_user_with_email_and_password(email, password)
@@ -39,6 +40,7 @@ def register(email, password, name, ic):
     except:
         print("Email already exists")
     return
+
 
 def login(email, password):
     global username

@@ -25,7 +25,6 @@ class Home:
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.appointments = json.loads(self.response.text)
-        # print(self.appointments)
 
     def get_booking_histories(self):
         self.booking_histories = []
@@ -124,6 +123,7 @@ class Home:
             self.calendar_grid.controls.append(month_grid)
 
         return Container(
+            border=border.all(5, colors.GREY_800),
             border_radius=10,
             bgcolor=colors.WHITE,
             padding=padding.only(left=5, right=5, top=15, bottom=15),
@@ -168,6 +168,9 @@ class Home:
 
         def update_appointments_view():
             appointments.controls.clear()
+
+            self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
@@ -294,6 +297,110 @@ class Home:
                 )
             page.update()
 
+        def update_bookingHistories_view():
+            booking_history.controls.clear()
+
+            self.booking_histories = sorted(self.booking_histories, key=lambda appt: appt["datetime"], reverse=True)[
+                                     :10]
+
+            for i in range(len(self.booking_histories)):
+                booking_history.controls.append(
+                    Container(
+                        padding=5,
+                        content=Container(
+                            border_radius=10,
+                            bgcolor="white",
+                            padding=5,
+                            height=125,
+                            content=Row(
+                                expand=True,
+                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                controls=[
+                                    Container(
+                                        expand=True,
+                                        content=Column(
+                                            expand=True,
+                                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                                            controls=[
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.DATE_RANGE_OUTLINED,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{svr.convert_date(self.booking_histories[i]["datetime"])}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    ),
+                                                ),
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.ACCESS_TIME_OUTLINED,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{svr.convert_time(self.booking_histories[i]["datetime"])}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    )
+                                                ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(
+                                                            name=icons.LOCAL_HOSPITAL_OUTLINED,
+                                                            color=colors.GREY,
+                                                            size=20),
+                                                        Text(
+                                                            value=f'{svr.get_hospital_name(self.booking_histories[i]["hospitalID"])}',
+                                                            color=colors.GREY_700,
+                                                            size=10)
+                                                    ]
+                                                )
+                                            ),
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.PEOPLE_OUTLINED,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{svr.get_doctor_name(self.booking_histories[i]["doctorID"])}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    )
+                                                ),
+                                            ]
+                                        )
+                                    ),
+                                ]
+                            ),
+                        ),
+                    ),
+                )
+            page.update()
+
         def open_dlg_modal(e):
             book_id = e.control.data
 
@@ -346,106 +453,12 @@ class Home:
             # print(response2.text)
 
             self.get_appointments()
+            self.get_booking_histories()
             update_appointments_view()
-
-        for i in range(len(self.booking_histories)):
-            booking_history.controls.append(
-                Container(
-                    padding=5,
-                    content=Container(
-                        border_radius=10,
-                        bgcolor="white",
-                        padding=5,
-                        height=125,
-                        content=Row(
-                            expand=True,
-                            alignment=MainAxisAlignment.SPACE_BETWEEN,
-                            controls=[
-                                Container(
-                                    expand=True,
-                                    content=Column(
-                                        expand=True,
-                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                        horizontal_alignment=CrossAxisAlignment.CENTER,
-                                        controls=[
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.DATE_RANGE_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.convert_date(self.booking_histories[i]["datetime"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                ),
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.ACCESS_TIME_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.convert_time(self.booking_histories[i]["datetime"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.LOCAL_HOSPITAL_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.get_hospital_name(self.booking_histories[i]["hospitalID"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                            Container(
-                                                expand=True,
-                                                content=Row(
-                                                    expand=True,
-                                                    alignment=MainAxisAlignment.START,
-                                                    controls=[
-                                                        Icon(
-                                                            name=icons.PEOPLE_OUTLINED,
-                                                            color=colors.GREY,
-                                                            size=20),
-                                                        Text(
-                                                            value=f'{svr.get_doctor_name(self.booking_histories[i]["doctorID"])}',
-                                                            color=colors.GREY_700,
-                                                            size=10)
-                                                    ]
-                                                )
-                                            ),
-                                        ]
-                                    )
-                                ),
-                            ]
-                        ),
-                    ),
-                ),
-            )
+            update_bookingHistories_view()
 
         update_appointments_view()
+        update_bookingHistories_view()
 
         return View(
             route="/home",

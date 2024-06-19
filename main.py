@@ -14,8 +14,9 @@ from pages.adminHome import AdminHome
 from pages.doctorHome import DoctorHome
 from pages.doctorMedicalRecord import DoctorMedicalRecord
 
+
 def main(page: Page):
-    page.theme_mode = ft.ThemeMode.DARK
+    page.theme_mode = ft.ThemeMode.LIGHT
 
     app_routes = [
         # Interfaces' path

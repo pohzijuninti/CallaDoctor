@@ -9,6 +9,7 @@ import datetime
 
 selected_index = None
 
+
 class Login:
     def __init__(self):
         pass
@@ -70,56 +71,56 @@ class Login:
                                         password=True, can_reveal_password=True)
         login_button: ElevatedButton = ElevatedButton(text='Login', width=250, disabled=True)
 
+        new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
+        new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
                                             password=True, can_reveal_password=True)
-        new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
+        confirm_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Confirm Password', border=InputBorder.UNDERLINE,
+                                            text_size=14,
+                                            password=True, can_reveal_password=True)
 
         tabs: Tabs = Tabs(
-                    height=100,
-                    width=165,
-                    selected_index=selected_index,
-                    animation_duration=400,
-                    tabs=[
-                        Tab(
-                            tab_content=Icon(icons.PERSON),
-                            content=Container(
-                                content=Text(value='User', size=14, text_align=TextAlign.CENTER),
-                            )
-                        ),
-                        Tab(
-                            tab_content=Icon(icons.HEALTH_AND_SAFETY),
-                            content=Container(
-                                content=Text(value='Doctor', size=14, text_align=TextAlign.CENTER),
-                            )
-                        ),
-                        Tab(
-                            tab_content=Icon(icons.ADMIN_PANEL_SETTINGS_OUTLINED),
-                            content=Container(
-                                content=Text(value='Admin', size=14, text_align=TextAlign.CENTER),
-                            )
-                        ),
-                                                ]
-                                            )
-
-        def close_dlg(e):
-            dlg_modal.open = False
-            new_email.value = ''
-            new_password.value = ''
-            new_name.value = ''
-            page.update()
+            height=100,
+            width=165,
+            selected_index=selected_index,
+            animation_duration=400,
+            tabs=[
+                Tab(
+                    tab_content=Icon(icons.PERSON),
+                    content=Container(
+                        content=Text(value='User', size=14, text_align=TextAlign.CENTER),
+                    )
+                ),
+                Tab(
+                    tab_content=Icon(icons.HEALTH_AND_SAFETY),
+                    content=Container(
+                        content=Text(value='Doctor', size=14, text_align=TextAlign.CENTER),
+                    )
+                ),
+                Tab(
+                    tab_content=Icon(icons.ADMIN_PANEL_SETTINGS_OUTLINED),
+                    content=Container(
+                        content=Text(value='Admin', size=14, text_align=TextAlign.CENTER),
+                    )
+                ),
+            ]
+        )
 
         def signup(e):
-            dlg_modal.open = False
-            register(new_email.value, new_password.value, new_name.value, new_ic.value)
+            if new_password.value == confirm_password.value:
+                signup_dlg_modal.open = False
+                register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
+                new_name.value = ''
+                new_ic.value = ''
+                new_email.value = ''
+                new_password.value = ''
+                confirm_password.value = ''
+                page.update()
+            else:
+                print("Passwords do not match")
 
-            new_email.value = ''
-            new_password.value = ''
-            new_name.value = ''
-            page.update()
-
-        dlg_modal = AlertDialog(
+        signup_dlg_modal = AlertDialog(
             modal=False,
             title=Text("Sign Up"),
             content=Text("It's quick and easy."),
@@ -132,17 +133,17 @@ class Login:
                             new_ic,
                             new_email,
                             new_password,
-                            Container(padding=padding.only(top=20, bottom=10),content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
+                            confirm_password,
+                            Container(padding=padding.only(top=20, bottom=10), content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
                     )
                 )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
-            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
 
-        def open_dlg_modal(e):
-            page.dialog = dlg_modal
-            dlg_modal.open = True
+        def open_signup_dlg(e):
+            page.dialog = signup_dlg_modal
+            signup_dlg_modal.open = True
             page.update()
 
         def validate(e: ControlEvent):
@@ -201,7 +202,7 @@ class Login:
                                             email,
                                             password,
                                             login_button,
-                                            TextButton(text='Create new account', width=250, on_click=open_dlg_modal),
+                                            TextButton(text='Create new account', width=250, on_click=open_signup_dlg),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
                                         ],
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
