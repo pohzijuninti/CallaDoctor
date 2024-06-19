@@ -42,6 +42,10 @@ class MedicalRecord:
             page.go("/home")
             page.update()
 
+        def send_medical_record(e):
+            page.go('/mrSelectHospital')
+            page.update()
+
         def name_card():
             is_odd = int(self.name_card['ic'][-1]) % 2 != 0
             if is_odd:
@@ -97,13 +101,6 @@ class MedicalRecord:
                 )
             )
 
-        def display_description(description):
-            if ',' in description:
-                description = description.replace(',', '\n*')
-            if not description.startswith('*'):
-                description = '* ' + description
-            return description
-
         medical_records = GridView(
             runs_count=3,
             child_aspect_ratio=10 / 9,
@@ -125,14 +122,14 @@ class MedicalRecord:
                                         Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
                                              weight=FontWeight.BOLD),
                                         Text(value='Description', color=colors.BLACK),
-                                        Text(value=f'{display_description(self.medical_record[i]["description"])}', color=colors.GREY),
+                                        Text(value=f'{self.medical_record[i]["description"]}', color=colors.GREY),
                                     ]
                                 ),
                                 Row(
                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
                                         Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
-                                        IconButton(icon=icons.SEND, icon_color=colors.BLUE),
+                                        IconButton(icon=icons.SEND, icon_color=colors.BLUE, on_click=send_medical_record)
                                     ]
                                 )
 
@@ -146,6 +143,7 @@ class MedicalRecord:
             route="/medicalRecord",
             padding=50,
             spacing=50,
+            bgcolor=colors.GREY_200,
             controls=[
                 Column(
                     expand=True,
@@ -156,7 +154,7 @@ class MedicalRecord:
                             controls=[
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
-                                    icon_color=colors.WHITE,
+                                    icon_color=colors.BLACK,
                                     on_click=go_home,
                                 ),
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),

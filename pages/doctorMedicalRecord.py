@@ -31,8 +31,7 @@ class DoctorMedicalRecord:
         self.medical_record = json.loads(self.response2.text)
 
     def view(self, page: Page, params: Params, basket: Basket):
-        patientName = None
-        page.title = f'{patientName} - Medical Record'
+
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 900
         page.window_min_height = 630
@@ -42,9 +41,12 @@ class DoctorMedicalRecord:
         user_id = params.user_id
 
         self.get_name_card(user_id)
+        patientName = self.name_card['name']
+        page.title = f'{patientName} - Medical Record'
+
         self.get_medical_records(user_id)
 
-        def go_doctor_home():
+        def go_doctor_home(e):
             page.go(f'/doctorHome/{doctor_id}')
             page.update()
 
@@ -68,7 +70,10 @@ class DoctorMedicalRecord:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            print(response.text)
+            # print(response.text)
+
+            self.get_medical_records(user_id)
+            update_medical_records_view()
 
             dlg_modal.open = False
             title.value = ''
@@ -151,51 +156,80 @@ class DoctorMedicalRecord:
                 )
             )
 
-        def display_description(description):
-            if ',' in description:
-                description = description.replace(',', '\n*')
-            if not description.startswith('*'):
-                description = '* ' + description
-            return description
-
         medical_records = GridView(
             runs_count=3,
             child_aspect_ratio=10 / 9,
         )
 
-        for i in range(len(self.medical_record)):
-            medical_records.controls.append(
-                Container(
-                    border_radius=10,
-                    bgcolor='white',
-                    content=Container(
-                        padding=10,
-                        content=Column(
-                            alignment=MainAxisAlignment.SPACE_BETWEEN,
-                            controls=[
-                                Column(
-                                    controls=[
-                                        Text(value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}', color=colors.GREY),
-                                        Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
-                                             weight=FontWeight.BOLD),
-                                        Text(value='Description', color=colors.BLACK),
-                                        Text(value=f'{display_description(self.medical_record[i]["description"])}', color=colors.GREY),
-                                    ]
-                                ),
-                                Row(
-                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                    controls=[
-                                        Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
-                                    ]
-                                )
+        def delete_medical_record(e):
 
-                            ]
+            record_id = e.control.data
+
+            url = "http://localhost:3000/medicalRecord/delete/"
+
+            payload = f'recordID={record_id}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            self.get_medical_records(user_id)
+            update_medical_records_view()
+
+        def update_medical_records_view():
+            medical_records.controls.clear()
+
+            for i in range(len(self.medical_record)):
+                medical_records.controls.append(
+                    Container(
+                        border_radius=10,
+                        bgcolor='white',
+                        content=Container(
+                            padding=10,
+                            content=Column(
+                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                controls=[
+                                    Column(
+                                        controls=[
+                                            Row(
+                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                controls=[
+                                                    Text(
+                                                        value=f'{svr.convert_date(self.medical_record[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}',
+                                                        color=colors.GREY),
+                                                    IconButton(
+                                                        data=self.medical_record[i]["recordID"],
+                                                        icon_color='red',
+                                                        icon='delete',
+                                                        on_click=delete_medical_record
+                                                    )
+                                                ]
+                                            ),
+                                            Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
+                                                 weight=FontWeight.BOLD),
+                                            Text(value='Description', color=colors.BLACK),
+                                            Text(value=f'{self.medical_record[i]["description"]}', color=colors.GREY),
+                                        ]
+                                    ),
+                                    Row(
+                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                        controls=[
+                                            Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
+                                        ]
+                                    )
+
+                                ]
+                            )
                         )
                     )
                 )
-            )
+            page.update()
+
+        update_medical_records_view()
 
         return View(
+            bgcolor=colors.GREY_200,
             route='/doctorMedicalRecord/:hospital_id/:doctor_id/:user_id',
             padding=50,
             spacing=50,
@@ -209,7 +243,7 @@ class DoctorMedicalRecord:
                             controls=[
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
-                                    icon_color=colors.WHITE,
+                                    icon_color=colors.BLACK,
                                     on_click=go_doctor_home,
                                 ),
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),

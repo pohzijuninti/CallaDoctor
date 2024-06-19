@@ -7,7 +7,7 @@ selected_container = None
 hospital_id = None
 
 
-class SelectHospital:
+class MRSelectHospital:
     def __init__(self):
         pass
 
@@ -119,7 +119,7 @@ class SelectHospital:
 
         return View(
             bgcolor=colors.GREY_200,
-            route="/selectHospital",
+            route="/MRselectHospital",
             padding=50,
             spacing=50,
             controls=[

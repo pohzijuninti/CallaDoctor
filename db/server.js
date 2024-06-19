@@ -383,6 +383,12 @@ app.post('/medicalRecord/add', async (req, res) => {
   res.status(201).json(newRecord);
 });
 
+app.post('/medicalRecord/delete', (req, res) => {
+  const { recordID } = req.body;
+  medicalRecord = medicalRecord.filter(record => record.recordID !== parseInt(recordID, 10));
+  res.status(200).send({ message: "Record deleted successfully" });
+});
+
 let users = [];
 
 const csvWriter = createCsvWriter({

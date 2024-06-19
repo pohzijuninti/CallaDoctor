@@ -55,7 +55,7 @@ class AdminHome:
             width=300,
             bar_hint_text='Select Speciality',
             bar_leading=Container(
-                content=Icon(icons.LOCAL_HOSPITAL_OUTLINED, color=colors.WHITE),
+                content=Icon(icons.LOCAL_HOSPITAL_OUTLINED, color=colors.GREY_800),
             ),
             controls=[
                 ListTile(
@@ -141,17 +141,17 @@ class AdminHome:
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
-                    # colour1 = 'white'
+                    colour1 = 'white'
                     status = 'PENDING'
                     disable = False
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
-                    # colour1 = 'green'
+                    colour1 = 'green'
                     status = 'APPROVED'
                     disable = True
                 else:
                     colour = 'red'
-                    # colour1 = 'red'
+                    colour1 = 'red'
                     status = 'REJECTED'
                     disable = True
 
@@ -262,8 +262,8 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(name='done', size=35, color=colors.WHITE),
-                                                            Text(value="Approve", color=colors.WHITE),
+                                                            Icon(name='done', size=35, color=colour1),
+                                                            Text(value="Approve", color=colour1),
                                                         ]
                                                     )
                                                 )
@@ -278,8 +278,8 @@ class AdminHome:
                                                         alignment=MainAxisAlignment.CENTER,
                                                         horizontal_alignment=CrossAxisAlignment.CENTER,
                                                         controls=[
-                                                            Icon(name=icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colors.WHITE),
-                                                            Text(value="Reject", color=colors.WHITE),
+                                                            Icon(name=icons.DO_NOT_DISTURB_OUTLINED, size=35, color=colour1),
+                                                            Text(value="Reject", color=colour1),
                                                         ]
                                                     )
                                                 )
@@ -299,7 +299,6 @@ class AdminHome:
                 speciality = svr.get_speciality_name(self.doctors[i]["specialityID"])
                 doctors.controls.append(
                     Container(
-                        border=border.all(5, colors.GREY_800),
                         border_radius=10,
                         bgcolor=colors.WHITE,
                         content=Container(
@@ -314,7 +313,7 @@ class AdminHome:
                                         content=Container(
                                             padding=padding.only(top=5, right=5),
                                             alignment=alignment.top_right,
-                                            content=Icon(icons.DELETE_OUTLINED, color=colors.BLACK),
+                                            content=Icon(icons.DELETE_OUTLINED, color=colors.RED),
                                         )
                                     ),
                                     Container(
@@ -500,6 +499,7 @@ class AdminHome:
         update_appointments_view()  # Initialize the ListView with current appointments
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/adminHome/:hospital_id",
             controls=[
                 Row(
@@ -514,7 +514,7 @@ class AdminHome:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.GREY_800,
+                                        bgcolor=colors.GREY,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[

@@ -12,7 +12,6 @@ selected_container = None
 selected_date = None
 selected_time = None
 
-
 class SelectDateTime:
     def __init__(self):
         self.calendar_grid = None
@@ -29,6 +28,7 @@ class SelectDateTime:
         self.response = requests.request("GET", full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
+
 
     def generate_calendar(self, page, doctor_id):
         current_date = datetime.date.today()
@@ -152,6 +152,7 @@ class SelectDateTime:
                             day_container.bgcolor = colors.GREY_200
                             day_container.content.color = colors.RED
                             day_container.update()
+
 
             chosen_day = int(self.chosen_date)
             current_date = datetime.date.today()
@@ -318,6 +319,7 @@ class SelectDateTime:
             route="/selectDateTime/:hospital_id/:doctor_id",
             padding=50,
             spacing=50,
+            bgcolor=colors.GREY_200,
             controls=[
                 Column(
                     expand=True,

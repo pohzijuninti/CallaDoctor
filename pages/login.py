@@ -26,6 +26,7 @@ class Login:
             )
         )
 
+
         def admin_login():
             try:
                 url = "http://localhost:3000/login/admin"
@@ -181,6 +182,7 @@ class Login:
         tabs.on_change = on_change
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/",
             controls=[
                 Container(

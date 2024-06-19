@@ -123,7 +123,6 @@ class Home:
             self.calendar_grid.controls.append(month_grid)
 
         return Container(
-            border=border.all(5, colors.GREY_800),
             border_radius=10,
             bgcolor=colors.WHITE,
             padding=padding.only(left=5, right=5, top=15, bottom=15),
@@ -162,8 +161,6 @@ class Home:
 
         booking_history = ListView(
             expand=True,
-            padding=5,
-            spacing=10,
         )
 
         def update_appointments_view():
@@ -174,14 +171,17 @@ class Home:
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
+                    colour1 = 'white'
                     status = 'PENDING'
                     disable = False
                 elif self.appointments[i]["status"] == 1:
                     colour = 'green'
+                    colour1 = 'green'
                     status = 'APPROVED'
                     disable = True
                 else:
                     colour = 'red'
+                    colour1 = 'red'
                     status = 'REJECTED'
                     disable = True
 
@@ -193,12 +193,13 @@ class Home:
                             bgcolor=colour,
                             padding=padding.only(left=10, top=5, bottom=5),
                             width=400,
-                            height=125,
+                            height=150,
                             content=Row(
                                 expand=True,
                                 alignment=MainAxisAlignment.SPACE_BETWEEN,
                                 controls=[
                                     Container(
+                                        padding=5,
                                         expand=2,
                                         content=Column(
                                             expand=True,
@@ -206,7 +207,7 @@ class Home:
                                             horizontal_alignment=CrossAxisAlignment.CENTER,
                                             controls=[
                                                 Container(
-                                                    expand=True,
+                                                    padding=1,
                                                     content=Row(
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
@@ -219,7 +220,7 @@ class Home:
                                                     ),
                                                 ),
                                                 Container(
-                                                    expand=True,
+                                                    padding=1,
                                                     content=Row(
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
@@ -232,7 +233,7 @@ class Home:
                                                     )
                                                 ),
                                                 Container(
-                                                    expand=True,
+                                                    padding=1,
                                                     content=Row(
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
@@ -246,7 +247,7 @@ class Home:
                                                     )
                                                 ),
                                                 Container(
-                                                    expand=True,
+                                                    padding=1,
                                                     content=Row(
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
@@ -260,7 +261,7 @@ class Home:
                                                     )
                                                 ),
                                                 Container(
-                                                    expand=True,
+                                                    padding=1,
                                                     content=Row(
                                                         expand=True,
                                                         alignment=MainAxisAlignment.START,
@@ -284,8 +285,8 @@ class Home:
                                                 alignment=MainAxisAlignment.CENTER,
                                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                                 controls=[
-                                                    Icon(icons.DELETE_OUTLINED, size=35, color="white"),
-                                                    Text(value="Delete", color=colors.WHITE),
+                                                    Icon(icons.DELETE_OUTLINED, size=30, color=colour1),
+                                                    Text(value="Delete", color=colour1, size=12),
                                                 ]
                                             )
                                         )
@@ -306,7 +307,6 @@ class Home:
             for i in range(len(self.booking_histories)):
                 booking_history.controls.append(
                     Container(
-                        padding=5,
                         content=Container(
                             border_radius=10,
                             bgcolor="white",
@@ -462,6 +462,7 @@ class Home:
 
         return View(
             route="/home",
+            bgcolor=colors.GREY_200,
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -475,7 +476,7 @@ class Home:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.GREY_800,
+                                        bgcolor=colors.WHITE,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
@@ -485,12 +486,12 @@ class Home:
                                                         controls=[
                                                             TextButton(
                                                                 text=name,
-                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.PERSON,
                                                             ),
                                                             TextButton(
                                                                 text='Medical Record',
-                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.FILE_COPY_OUTLINED,
                                                                 on_click=go_medical_record
                                                             ),
@@ -501,7 +502,7 @@ class Home:
                                                     padding=10,
                                                     content=TextButton(
                                                         text='Logout',
-                                                        style=ButtonStyle(color=colors.WHITE),
+                                                        style=ButtonStyle(color=colors.BLACK),
                                                         icon=icons.LOGOUT_OUTLINED,
                                                         on_click=go_login
                                                     ),
@@ -516,7 +517,7 @@ class Home:
                             expand=True,
                             controls=[
                                 Container(
-                                    padding=padding.only(left=5),
+                                    padding=padding.only(left=10),
                                     content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
                                 appointments
@@ -548,7 +549,7 @@ class Home:
                                                     Column(
                                                         controls=[
                                                             Container(
-                                                                padding=padding.only(left=5),
+                                                                # padding=padding.only(left=5),
                                                                 content=Text(
                                                                     value='Booking History',
                                                                     style=TextStyle(size=18, weight=FontWeight.BOLD)
@@ -556,8 +557,6 @@ class Home:
                                                             ),
                                                             Container(
                                                                 expand=True,
-                                                                border_radius=10,
-                                                                bgcolor=colors.GREY_800,
                                                                 width=300,
                                                                 height=100,
                                                                 content=booking_history
