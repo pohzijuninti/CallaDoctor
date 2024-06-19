@@ -17,22 +17,23 @@ class DoctorHome:
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response = None
         self.appointments = None
-
-        self.medicalRecordURL = "http://localhost:3000/medicalRecord/doctor"
-        self.medicalRecord_payload = {}
-        self.medicalRecord_headers = {}
-        self.medicalRecord_response = None
-        self.medicalRecord = None
+        self.booking_histories = None
 
     def get_appointments(self, doctor_id):
         full_url = f"{self.appointmentURL}/{doctor_id}"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.appointments = json.loads(self.response.text)
 
-    def get_medicalRecords(self, doctor_id):
-        full_url = f"{self.medicalRecordURL}/{doctor_id}"
-        self.response = requests.get(full_url, headers=self.headers, data=self.payload)
-        self.medicalRecord = json.loads(self.response.text)
+    def get_booking_histories(self):
+        self.booking_histories = []
+
+        i = 0
+        while i < len(self.appointments):
+            if self.appointments[i]["datetime"] < datetime.datetime.now().timestamp():
+                self.booking_histories.append(self.appointments[i])
+                del self.appointments[i]
+            else:
+                i += 1
 
     def generate_calendar(self, page):
         current_date = datetime.date.today()
@@ -121,7 +122,6 @@ class DoctorHome:
             self.calendar_grid.controls.append(month_grid)
 
         return Container(
-            border=border.all(5, colors.GREY_800),
             border_radius=10,
             bgcolor=colors.WHITE,
             padding=padding.only(left=5, right=5, top=15, bottom=15),
@@ -141,7 +141,7 @@ class DoctorHome:
         doctor_id = int(params.doctor_id)
 
         self.get_appointments(doctor_id)
-        self.get_medicalRecords(doctor_id)
+        self.get_booking_histories()
 
         def go_login(e):
             page.go("/")
@@ -155,10 +155,8 @@ class DoctorHome:
             expand=True,
         )
 
-        medical_records = ListView(
+        booking_history = ListView(
             expand=True,
-            padding=5,
-            spacing=10,
         )
 
         def update_appointments_view():
@@ -341,47 +339,116 @@ class DoctorHome:
                 )
             page.update()
 
-        def update_medicalRecords_view():
-            medical_records.controls.clear()
-            for i in range(len(self.medicalRecord)):
-                medical_records.controls.append(
+        def update_bookingHistories_view():
+            booking_history.controls.clear()
+
+            self.booking_histories = sorted(self.booking_histories, key=lambda appt: appt["datetime"], reverse=True)[
+                                     :10]
+
+            for i in range(len(self.booking_histories)):
+                userID = self.booking_histories[i]['userID']
+
+                url = f"http://localhost:3000/username/{userID}"
+
+                payload = {}
+                headers = {}
+
+                response = requests.request("GET", url, headers=headers, data=payload)
+                name = json.loads(response.text)['name']
+
+                booking_history.controls.append(
                     Container(
-                        border_radius=10,
-                        bgcolor=colors.WHITE,
                         content=Container(
-                            padding=10,
-                            content=Column(
+                            border_radius=10,
+                            bgcolor="white",
+                            padding=5,
+                            height=125,
+                            content=Row(
+                                expand=True,
                                 alignment=MainAxisAlignment.SPACE_BETWEEN,
                                 controls=[
-                                    Column(
-                                        controls=[
-                                            Text(
-                                                value=f'{svr.convert_date(self.medicalRecord[i]["datetime"])}, {svr.convert_time(self.medical_record[i]["datetime"])}',
-                                                color=colors.GREY
+                                    Container(
+                                        expand=True,
+                                        content=Column(
+                                            expand=True,
+                                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                                            controls=[
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.DATE_RANGE_OUTLINED,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{svr.convert_date(self.booking_histories[i]["datetime"])}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    ),
+                                                ),
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.ACCESS_TIME_OUTLINED,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{svr.convert_time(self.booking_histories[i]["datetime"])}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    )
+                                                ),
+                                            Container(
+                                                expand=True,
+                                                content=Row(
+                                                    expand=True,
+                                                    alignment=MainAxisAlignment.START,
+                                                    controls=[
+                                                        Icon(
+                                                            name=icons.LOCAL_HOSPITAL_OUTLINED,
+                                                            color=colors.GREY,
+                                                            size=20),
+                                                        Text(
+                                                            value=f'{svr.get_hospital_name(self.booking_histories[i]["hospitalID"])}',
+                                                            color=colors.GREY_700,
+                                                            size=10)
+                                                    ]
+                                                )
                                             ),
-                                            Text(
-                                                value=f'{self.medicalRecord[i]["title"]}', size=18, color=colors.BLACK,
-                                                weight=FontWeight.BOLD),
-                                            Text(value='Description', color=colors.BLACK),
-                                            Text(
-                                                value=f'{display_description(self.medicalRecord[i]["description"])}',
-                                                color=colors.GREY
-                                            ),
-                                        ]
+                                                Container(
+                                                    expand=True,
+                                                    content=Row(
+                                                        expand=True,
+                                                        alignment=MainAxisAlignment.START,
+                                                        controls=[
+                                                            Icon(
+                                                                name=icons.PERSON,
+                                                                color=colors.GREY,
+                                                                size=20),
+                                                            Text(
+                                                                value=f'{name}',
+                                                                color=colors.GREY_700,
+                                                                size=10)
+                                                        ]
+                                                    )
+                                                ),
+                                            ]
+                                        )
                                     ),
-                                    Row(
-                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                        controls=[
-                                            Text(
-                                                value=f'{svr.get_hospital_name(self.medicalRecord[i]["hospitalID"])}, {svr.get_doctor_name(self.medical_record[i]["doctorID"])}',
-                                                color=colors.BLACK, size=12),
-                                            IconButton(icon=icons.EDIT_OUTLINED, icon_color=colors.BLUE),
-                                        ]
-                                    )
                                 ]
-                            )
-                        )
-                    )
+                            ),
+                        ),
+                    ),
                 )
             page.update()
 
@@ -499,9 +566,10 @@ class DoctorHome:
             return description
 
         update_appointments_view()
-        update_medicalRecords_view()
+        update_bookingHistories_view()
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/doctorHome/:doctor_id",
             controls=[
                 Row(
@@ -516,7 +584,7 @@ class DoctorHome:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.GREY_800,
+                                        bgcolor=colors.GREY,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
@@ -526,7 +594,7 @@ class DoctorHome:
                                                         controls=[
                                                             TextButton(
                                                                 text=f'{svr.get_doctor_name(doctor_id)}',
-                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.PERSON,
                                                             ),
                                                         ]
@@ -536,7 +604,7 @@ class DoctorHome:
                                                     padding=10,
                                                     content=TextButton(
                                                         text='Logout',
-                                                        style=ButtonStyle(color=colors.WHITE),
+                                                        style=ButtonStyle(color=colors.BLACK),
                                                         icon=icons.LOGOUT_OUTLINED,
                                                         on_click=go_login
                                                     ),
@@ -551,7 +619,7 @@ class DoctorHome:
                             expand=True,
                             controls=[
                                 Container(
-                                    padding=padding.only(left=5),
+                                    padding=padding.only(left=10),
                                     content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
                                 appointments
@@ -570,7 +638,6 @@ class DoctorHome:
                                             Container(
                                                 content=Container(
                                                     border_radius=10,
-                                                    bgcolor="red",
                                                     width=300,
                                                     height=300,
                                                     content=self.generate_calendar(page),
@@ -582,7 +649,6 @@ class DoctorHome:
                                                     Column(
                                                         controls=[
                                                             Container(
-                                                                padding=padding.only(left=5),
                                                                 content=Text(
                                                                     value='Booking History',
                                                                     style=TextStyle(size=18, weight=FontWeight.BOLD)
@@ -591,10 +657,9 @@ class DoctorHome:
                                                             Container(
                                                                 expand=True,
                                                                 border_radius=10,
-                                                                bgcolor=colors.GREY_800,
                                                                 width=300,
                                                                 height=100,
-                                                                content=medical_records
+                                                                content=booking_history
                                                             ),
                                                         ]
                                                     ),

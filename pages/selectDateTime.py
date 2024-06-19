@@ -12,6 +12,7 @@ selected_container = None
 selected_date = None
 selected_time = None
 
+
 class SelectDateTime:
     def __init__(self):
         self.calendar_grid = None
@@ -28,7 +29,6 @@ class SelectDateTime:
         self.response = requests.request("GET", full_url, headers=self.headers, data=self.payload)
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
-
 
     def generate_calendar(self, page, doctor_id):
         current_date = datetime.date.today()
@@ -153,13 +153,12 @@ class SelectDateTime:
                             day_container.content.color = colors.RED
                             day_container.update()
 
-
             chosen_day = int(self.chosen_date)
             current_date = datetime.date.today()
             timeslot_date = datetime.date(current_date.year, current_date.month, chosen_day).isoformat()
 
             self.get_timeslots(doctor_id, timeslot_date)
-            # update_timeslots()
+            update_timeslots()
 
     def reset_date_color(self, date):
         # Reset the properties for a specific date
@@ -263,27 +262,20 @@ class SelectDateTime:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            # print(response.text)
-
-            dlg_modal = AlertDialog(
-                modal=False,
-                title=Text("Successful", text_align=TextAlign.CENTER),
-                content=Text("Thanks for choosing us.", text_align=TextAlign.CENTER),
-                actions=[
+            dlg_modal.actions = [
                     Container(
                         content=Column(
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Text(value=f'{selected_date}'),
+                                Text(value=f'{selected_date}'),  # svr.convert_date(selected_time)
                                 Text(value=f'{svr.convert_time(selected_time)}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
                                 TextButton(text='Back To Home', width=150, on_click=close_dlg_modal),
                             ]
-                        ))
-                ],
-                actions_alignment=MainAxisAlignment.CENTER,
-            )
+                        )
+                    )
+                ]
 
             url = "http://localhost:3000/book"
 
@@ -293,10 +285,8 @@ class SelectDateTime:
             }
 
             response = requests.request("POST", url, headers=headers, data=payload)
-            # print(response.text)
 
             page.dialog = dlg_modal
-
             if selected_time is not None:
                 dlg_modal.open = True
                 page.update()
@@ -313,13 +303,20 @@ class SelectDateTime:
             page.go("/home")
             page.update()
 
+        dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Successful", text_align=TextAlign.CENTER),
+            content=Text("Thanks for choosing us.", text_align=TextAlign.CENTER),
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
+
         update_timeslots()
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/selectDateTime/:hospital_id/:doctor_id",
             padding=50,
             spacing=50,
-            bgcolor=colors.GREY_200,
             controls=[
                 Column(
                     expand=True,

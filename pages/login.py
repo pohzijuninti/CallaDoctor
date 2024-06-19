@@ -2,10 +2,9 @@ import flet as ft
 from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
-from db.config import register, login
+from db.config import login
 import requests
 import json
-import datetime
 
 selected_index = None
 
@@ -26,7 +25,6 @@ class Login:
             )
         )
 
-
         def admin_login():
             try:
                 url = "http://localhost:3000/login/admin"
@@ -43,7 +41,9 @@ class Login:
                 page.go(f'/adminHome/{hospital_id}')
                 page.update()
             except:
-                print("Invalid email or password")
+                page.dialog = dlg_modal
+                dlg_modal.open = True
+                page.update()
 
         def doctor_login():
             try:
@@ -63,7 +63,9 @@ class Login:
                 page.go(f'/doctorHome/{doctor_id}')
                 page.update()
             except:
-                print("Invalid email or password")
+                page.dialog = dlg_modal
+                dlg_modal.open = True
+                page.update()
 
         # Setup fields
         img: Image = Image(src=f'login.png', width=350, height=350) # 90CFF9
@@ -71,16 +73,6 @@ class Login:
         password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', width=250, border=InputBorder.UNDERLINE, text_size=14,
                                         password=True, can_reveal_password=True)
         login_button: ElevatedButton = ElevatedButton(text='Login', width=250, disabled=True)
-
-        new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
-        new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
-        new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
-        new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
-                                            password=True, can_reveal_password=True)
-        confirm_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Confirm Password', border=InputBorder.UNDERLINE,
-                                            text_size=14,
-                                            password=True, can_reveal_password=True)
-
         tabs: Tabs = Tabs(
             height=100,
             width=165,
@@ -108,44 +100,25 @@ class Login:
             ]
         )
 
-        def signup(e):
-            if new_password.value == confirm_password.value:
-                signup_dlg_modal.open = False
-                register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
-                new_name.value = ''
-                new_ic.value = ''
-                new_email.value = ''
-                new_password.value = ''
-                confirm_password.value = ''
-                page.update()
-            else:
-                print("Passwords do not match")
-
-        signup_dlg_modal = AlertDialog(
+        dlg_modal = AlertDialog(
             modal=False,
-            title=Text("Sign Up"),
-            content=Text("It's quick and easy."),
+            title=Text("Error", text_align=TextAlign.CENTER),
+            content=Text("Invalid email or password.", text_align=TextAlign.CENTER),
             actions=[
                 Container(
                     content=Column(
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[
-                            new_name,
-                            new_ic,
-                            new_email,
-                            new_password,
-                            confirm_password,
-                            Container(padding=padding.only(top=20, bottom=10), content=ElevatedButton(text="Sign Up", on_click=signup, width=250))]
+                            TextButton(
+                                text='Close', width=150,
+                                on_click=lambda e: (setattr(dlg_modal, 'open', False), page.update())
+                            )
+                        ]
                     )
                 )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
         )
-
-        def open_signup_dlg(e):
-            page.dialog = signup_dlg_modal
-            signup_dlg_modal.open = True
-            page.update()
 
         def validate(e: ControlEvent):
             if all([email.value, password.value]):
@@ -159,6 +132,10 @@ class Login:
             if selected_index is None or selected_index == 0:
                 if login(email.value, password.value):
                     page.go('/home')
+                else:
+                    page.dialog = dlg_modal
+                    dlg_modal.open = True
+                    page.update()
             elif selected_index == 1:
                 doctor_login()
             else:
@@ -173,9 +150,14 @@ class Login:
             else:
                 selected_index = 2
 
+        def go_register(e):
+            page.go("/register")
+            page.update()
+
         def go_clinic_form(e):
             page.go("/clinicForm")
             page.update()
+
         email.on_change = validate
         password.on_change = validate
         login_button.on_click = all_login
@@ -204,7 +186,7 @@ class Login:
                                             email,
                                             password,
                                             login_button,
-                                            TextButton(text='Create new account', width=250, on_click=open_signup_dlg),
+                                            TextButton(text='Create new account', width=250, on_click=go_register),
                                             TextButton(text='Join us', width=250, on_click=go_clinic_form),
                                         ],
                                         horizontal_alignment=CrossAxisAlignment.CENTER,

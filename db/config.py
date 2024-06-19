@@ -61,8 +61,7 @@ def login(email, password):
 
         return True
     except:
-        print("Invalid email or password")
-    return
+        return False
 
 
 def get_name():

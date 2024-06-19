@@ -133,10 +133,10 @@ class SelectDoctor:
             )
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/selectDoctor/:hospital_id",
             padding=50,
             spacing=50,
-            bgcolor=colors.GREY_200,
             controls=[
                 Column(
                     expand=True,

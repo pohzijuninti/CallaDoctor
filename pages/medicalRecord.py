@@ -140,10 +140,10 @@ class MedicalRecord:
             )
 
         return View(
+            bgcolor=colors.GREY_200,
             route="/medicalRecord",
             padding=50,
             spacing=50,
-            bgcolor=colors.GREY_200,
             controls=[
                 Column(
                     expand=True,

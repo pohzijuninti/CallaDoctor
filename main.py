@@ -4,6 +4,7 @@ from flet_route import Routing, path
 
 # Interfaces
 from pages.login import Login
+from pages.register import Register
 from pages.home import Home
 from pages.medicalRecord import MedicalRecord
 from pages.clinicForm import ClinicForm
@@ -15,12 +16,14 @@ from pages.doctorHome import DoctorHome
 from pages.doctorMedicalRecord import DoctorMedicalRecord
 from pages.mdSelectHospital import MRSelectHospital
 
+
 def main(page: Page):
     page.theme_mode = ft.ThemeMode.LIGHT
 
     app_routes = [
         # Interfaces' path
         path(url='/', clear=True, view=Login().view),  # first page url must be '/'
+        path(url='/register', clear=True, view=Register().view),
         path(url='/home', clear=True, view=Home().view),
         path(url='/medicalRecord', clear=False, view=MedicalRecord().view),
         path(url='/mrSelectHospital', clear=False, view=MRSelectHospital().view),

@@ -4,6 +4,7 @@ from flet_route import Params, Basket
 import requests
 import json
 import pages.server as svr
+import datetime
 
 new_specialityID = None
 
@@ -137,6 +138,13 @@ class AdminHome:
             appointments.controls.clear()  # Clear existing controls
 
             self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+
+            index = 0
+            while index < len(self.appointments):
+                if self.appointments[index]["datetime"] < datetime.datetime.now().timestamp():
+                    del self.appointments[index]
+                else:
+                    index += 1
 
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
@@ -367,7 +375,7 @@ class AdminHome:
                                 Text(value=name),
                                 Text(value=doctor),
                                 TextButton(text='Approve', width=150, on_click=lambda e: (
-                                approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                                    approve_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
                             ]
                         ))
                 ],
@@ -410,7 +418,7 @@ class AdminHome:
                                 Text(value=name),
                                 Text(value=doctor),
                                 TextButton(text='Reject', width=150, on_click=lambda e: (
-                                reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
+                                    reject_appointment(book_id), setattr(dlg_modal, 'open', False), page.update())),
                             ]
                         ))
                 ],
@@ -524,7 +532,7 @@ class AdminHome:
                                                         controls=[
                                                             TextButton(
                                                                 text=f'{svr.get_hospital_name(hospital_id)}',
-                                                                style=ButtonStyle(color=colors.WHITE),
+                                                                style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.PERSON,
                                                             ),
                                                         ]
@@ -534,7 +542,7 @@ class AdminHome:
                                                     padding=10,
                                                     content=TextButton(
                                                         text='Logout',
-                                                        style=ButtonStyle(color=colors.WHITE),
+                                                        style=ButtonStyle(color=colors.BLACK),
                                                         icon=icons.LOGOUT_OUTLINED,
                                                         on_click=go_login
                                                     ),

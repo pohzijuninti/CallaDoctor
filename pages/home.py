@@ -461,8 +461,8 @@ class Home:
         update_bookingHistories_view()
 
         return View(
-            route="/home",
             bgcolor=colors.GREY_200,
+            route="/home",
             controls=[
                 Row(
                     alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -476,7 +476,7 @@ class Home:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.WHITE,
+                                        bgcolor=colors.GREY,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
@@ -549,14 +549,15 @@ class Home:
                                                     Column(
                                                         controls=[
                                                             Container(
-                                                                # padding=padding.only(left=5),
                                                                 content=Text(
                                                                     value='Booking History',
                                                                     style=TextStyle(size=18, weight=FontWeight.BOLD)
                                                                 ),
                                                             ),
+
                                                             Container(
                                                                 expand=True,
+                                                                border_radius=10,
                                                                 width=300,
                                                                 height=100,
                                                                 content=booking_history
