@@ -22,6 +22,8 @@ class SelectDateTime:
         self.headers = {}
         self.response = None
         self.timeslots_data = None
+        self.page = None
+        self.timeslot = None
 
     def get_timeslots(self, doctor_id, date):
         full_url = f"{self.url}/{doctor_id}/{date}"
@@ -158,7 +160,7 @@ class SelectDateTime:
             timeslot_date = datetime.date(current_date.year, current_date.month, chosen_day).isoformat()
 
             self.get_timeslots(doctor_id, timeslot_date)
-            update_timeslots()
+            self.update_timeslots()
 
     def reset_date_color(self, date):
         # Reset the properties for a specific date
@@ -171,7 +173,56 @@ class SelectDateTime:
                         day_container.content.color = colors.BLACK  # Reset the text color
                         day_container.update()
 
+    def update_timeslots(self):
+        self.timeslot.controls.clear()
+
+        for i in range(len(self.timeslots_data)):
+            time = svr.convert_time(
+                self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format.
+
+            self.timeslot.controls.append(
+                GestureDetector(
+                    on_tap=self.on_tap,
+                    data=self.timeslots_data[i]['slotDate'],
+                    mouse_cursor=MouseCursor.CLICK,
+                    content=Container(
+                        border_radius=10,
+                        alignment=alignment.center,
+                        bgcolor=colors.WHITE,
+                        content=Text(
+                            value=time,
+                            color=colors.GREY_800,
+                            size=12,
+                        ),
+                    )
+                )
+            )
+        self.page.update()
+
+    def on_tap(self, e):
+        global selected_container
+        global selected_time
+
+        container = e.control.content  # Access the Container inside the GestureDetector
+
+        if selected_container is not None and selected_container != container:
+            selected_container.bgcolor = colors.WHITE
+            selected_container.content.color = colors.GREY_800
+            selected_container.update()
+
+        if container.bgcolor == colors.WHITE:
+            container.bgcolor = colors.GREY_300
+            container.content.color = colors.RED
+            selected_container = container
+            selected_time = e.control.data
+        else:
+            container.bgcolor = colors.WHITE
+            container.content.color = colors.GREY_800
+
+        container.update()
+
     def view(self, page: Page, params: Params, basket: Basket):
+        self.page = page
         page.title = 'Call a Doctor - Select Date & Time'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 800
@@ -181,57 +232,10 @@ class SelectDateTime:
         doctor_id = int(params.doctor_id)
         self.get_timeslots(doctor_id, datetime.date.today().isoformat())
 
-        def on_tap(e):
-            global selected_container
-            global selected_time
-
-            container = e.control.content  # Access the Container inside the GestureDetector
-
-            if selected_container is not None and selected_container != container:
-                selected_container.bgcolor = colors.WHITE
-                selected_container.content.color = colors.GREY_800
-                selected_container.update()
-
-            if container.bgcolor == colors.WHITE:
-                container.bgcolor = colors.GREY_300
-                container.content.color = colors.RED
-                selected_container = container
-                selected_time = e.control.data
-            else:
-                container.bgcolor = colors.WHITE
-                container.content.color = colors.GREY_800
-
-            container.update()
-
-        timeslot = GridView(
+        self.timeslot = GridView(
             runs_count=3,
-            child_aspect_ratio=5/2,
+            child_aspect_ratio=5 / 2,
         )
-
-        def update_timeslots():
-            timeslot.controls.clear()
-
-            for i in range(len(self.timeslots_data)):
-                time = svr.convert_time(self.timeslots_data[i]['slotDate'])  # Unix timestamp, Convert to 12-hour clock format.
-
-                timeslot.controls.append(
-                    GestureDetector(
-                        on_tap=on_tap,
-                        data=self.timeslots_data[i]['slotDate'],
-                        mouse_cursor=MouseCursor.CLICK,
-                        content=Container(
-                            border_radius=10,
-                            alignment=alignment.center,
-                            bgcolor=colors.WHITE,
-                            content=Text(
-                                value=time,
-                                color=colors.GREY_800,
-                                size=12,
-                            ),
-                        )
-                    )
-                )
-            page.update()
 
         def go_select_doctor(e):
             global selected_container
@@ -240,18 +244,9 @@ class SelectDateTime:
             page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
-        def open_dlg_modal(e):
+        def open_confirm_dlg(e):
             global selected_date
             global selected_time
-
-            current_date = datetime.date.today()
-            current_month = current_date.month
-            month_name = calendar.month_name[current_month]
-
-            if self.chosen_date is None:
-                selected_date = f'{current_date.day} {month_name} {current_date.year}'
-            else:
-                selected_date = f'{self.chosen_date} {month_name} {current_date.year}'
 
             url = f"http://localhost:3000/timeslots/update/{doctor_id}/{selected_time}"
 
@@ -262,16 +257,16 @@ class SelectDateTime:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            dlg_modal.actions = [
+            confirm_dlg_modal.actions = [
                     Container(
                         content=Column(
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Text(value=f'{selected_date}'),  # svr.convert_date(selected_time)
+                                Text(value=f'{svr.convert_date(selected_time)}'),
                                 Text(value=f'{svr.convert_time(selected_time)}'),
                                 Text(value=f'{svr.get_hospital_name(hospital_id)}'),
                                 Text(value=f'{svr.get_doctor_name(doctor_id)}'),
-                                TextButton(text='Back To Home', width=150, on_click=close_dlg_modal),
+                                TextButton(text='Back To Home', width=150, on_click=close_confirm_dlg),
                             ]
                         )
                     )
@@ -286,12 +281,11 @@ class SelectDateTime:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            page.dialog = dlg_modal
-            if selected_time is not None:
-                dlg_modal.open = True
-                page.update()
+            page.dialog = confirm_dlg_modal
+            confirm_dlg_modal.open = True
+            page.update()
 
-        def close_dlg_modal(e):
+        def close_confirm_dlg(e):
             global selected_container
             global selected_date
             global selected_time
@@ -299,18 +293,52 @@ class SelectDateTime:
             selected_container = None
             selected_date = None
             selected_time = None
+            self.chosen_date = None
 
             page.go("/home")
             page.update()
 
-        dlg_modal = AlertDialog(
+        confirm_dlg_modal = AlertDialog(
             modal=False,
             title=Text("Successful", text_align=TextAlign.CENTER),
             content=Text("Thanks for choosing us.", text_align=TextAlign.CENTER),
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
-        update_timeslots()
+        def open_error_dlg(e):
+            page.dialog = error_dlg_modal
+            error_dlg_modal.open = True
+            page.update()
+
+        error_dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Error", text_align=TextAlign.CENTER),
+            content=Text("Please select a time.", text_align=TextAlign.CENTER),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            TextButton(
+                                text='Close', width=150,
+                                on_click=lambda e: (setattr(error_dlg_modal, 'open', False), page.update())
+                            )
+                        ]
+                    )
+                )
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
+
+        def open_dlg_modal(e):
+            global selected_time
+
+            if selected_time is None:
+                open_error_dlg(e)
+            else:
+                open_confirm_dlg(e)
+
+        self.update_timeslots()
 
         return View(
             bgcolor=colors.GREY_200,
@@ -342,7 +370,7 @@ class SelectDateTime:
                                     controls=[
                                         Container(
                                             height=300,
-                                            content=timeslot,
+                                            content=self.timeslot,
                                         )
                                     ]
                                 )

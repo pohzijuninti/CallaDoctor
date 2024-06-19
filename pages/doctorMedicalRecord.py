@@ -31,7 +31,6 @@ class DoctorMedicalRecord:
         self.medical_record = json.loads(self.response2.text)
 
     def view(self, page: Page, params: Params, basket: Basket):
-
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 900
         page.window_min_height = 630
@@ -51,8 +50,10 @@ class DoctorMedicalRecord:
             page.update()
 
         title: TextField = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
-        description: TextField = TextField(label='Description', width=250, border=InputBorder.UNDERLINE, text_size=14,
-                                           multiline=True, min_lines=3, max_lines=3)
+        description: TextField = TextField(
+            label='Description', width=250, border=InputBorder.UNDERLINE, text_size=14,
+            multiline=True, min_lines=3, max_lines=3
+        )
 
         def open_dlg_modal(e):
             page.dialog = dlg_modal
@@ -90,15 +91,15 @@ class DoctorMedicalRecord:
                         controls=[
                             title,
                             description,
-                            Container(padding=padding.only(top=20, bottom=10),
-                                      content=ElevatedButton(text="Done",
-                                                             on_click=close_dlg,
-                                                             width=250))]
+                            Container(
+                                padding=padding.only(top=20, bottom=10),
+                                content=ElevatedButton(text="Done", on_click=close_dlg, width=250)
+                            )
+                        ]
                     )
                 )
             ],
             actions_alignment=MainAxisAlignment.CENTER,
-            # on_dismiss=lambda e: print("Modal dialog dismissed!"),
         )
 
         def name_card():
@@ -137,10 +138,7 @@ class DoctorMedicalRecord:
                                     alignment=MainAxisAlignment.CENTER,
                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                     controls=[
-                                        Icon(icons.PERSON,
-                                             color=colors.BLACK,
-                                             size=50,
-                                             ),
+                                        Icon(icons.PERSON, color=colors.BLACK, size=50),
                                     ]
                                 ),
                                 Column(
@@ -206,8 +204,7 @@ class DoctorMedicalRecord:
                                                     )
                                                 ]
                                             ),
-                                            Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK,
-                                                 weight=FontWeight.BOLD),
+                                            Text(value=f'{self.medical_record[i]["title"]}', size=18, color=colors.BLACK, weight=FontWeight.BOLD),
                                             Text(value='Description', color=colors.BLACK),
                                             Text(value=f'{self.medical_record[i]["description"]}', color=colors.GREY),
                                         ]

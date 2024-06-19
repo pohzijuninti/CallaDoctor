@@ -128,6 +128,7 @@ class AdminHome:
 
         appointments = ListView(
             expand=True,
+            padding=padding.only(right=5)
         )
 
         doctors = GridView(
@@ -137,8 +138,15 @@ class AdminHome:
         def update_appointments_view():
             appointments.controls.clear()  # Clear existing controls
 
-            self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+            # Sort by date then time
+            self.appointments.sort(
+                key=lambda appt: (
+                    svr.convert_date(appt["datetime"]),
+                    svr.convert_time(appt["datetime"])
+                )
+            )
 
+            # Remove passed appointments
             index = 0
             while index < len(self.appointments):
                 if self.appointments[index]["datetime"] < datetime.datetime.now().timestamp():
@@ -522,7 +530,7 @@ class AdminHome:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.GREY,
+                                        bgcolor=colors.GREY_400,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
@@ -557,7 +565,7 @@ class AdminHome:
                             expand=2,
                             controls=[
                                 Container(
-                                    padding=padding.only(left=5),
+                                    padding=padding.only(left=10, right=10),
                                     content=Text(value='Appointment', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                                 ),
                                 appointments

@@ -161,12 +161,19 @@ class Home:
 
         booking_history = ListView(
             expand=True,
+            spacing=10,
         )
 
         def update_appointments_view():
             appointments.controls.clear()
 
-            self.appointments.sort(key=lambda appt: svr.convert_time(appt["datetime"]))
+            # Sort by date then time
+            self.appointments.sort(
+                key=lambda appt: (
+                    svr.convert_date(appt["datetime"]),
+                    svr.convert_time(appt["datetime"])
+                )
+            )
 
             for i in range(len(self.appointments)):
                 if self.appointments[i]["status"] == 0:
@@ -301,8 +308,7 @@ class Home:
         def update_bookingHistories_view():
             booking_history.controls.clear()
 
-            self.booking_histories = sorted(self.booking_histories, key=lambda appt: appt["datetime"], reverse=True)[
-                                     :10]
+            self.booking_histories = sorted(self.booking_histories, key=lambda appt: appt["datetime"], reverse=True)[:10]
 
             for i in range(len(self.booking_histories)):
                 booking_history.controls.append(
@@ -476,7 +482,7 @@ class Home:
                                         expand=True,
                                         border_radius=10,
                                         width=200,
-                                        bgcolor=colors.GREY,
+                                        bgcolor=colors.GREY_400,
                                         content=Column(
                                             alignment=MainAxisAlignment.SPACE_BETWEEN,
                                             controls=[
@@ -523,7 +529,6 @@ class Home:
                                 appointments
                             ]
                         ),
-
                         Column(
                             horizontal_alignment=CrossAxisAlignment.END,
                             controls=[
