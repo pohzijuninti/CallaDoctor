@@ -18,18 +18,15 @@ class Register:
         new_name: TextField = TextField(icon=icons.PERSON, label='Name', border=InputBorder.UNDERLINE, text_size=14)
         new_ic: TextField = TextField(icon=icons.CREDIT_CARD, label='IC', border=InputBorder.UNDERLINE, text_size=14)
         new_email: TextField = TextField(icon=icons.SHORT_TEXT_OUTLINED, label='Email', border=InputBorder.UNDERLINE, text_size=14)
-        new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE, text_size=14,
-                                            password=True, can_reveal_password=True)
+        new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE,
+                                            text_size=14, password=True, can_reveal_password=True)
         confirm_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Confirm Password', border=InputBorder.UNDERLINE,
-                                            text_size=14,
-                                            password=True, can_reveal_password=True)
-
+                                            text_size=14, password=True, can_reveal_password=True)
 
         def signup(e):
             if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
                 title = 'Error'
                 message = 'Please fill up the form.'
-
             elif new_password.value != confirm_password.value:
                 title = 'Error'
                 message = 'Passwords do not match.'
@@ -38,43 +35,15 @@ class Register:
                 title = 'Successful Registration'
                 message = 'Thank you! You have successfully registered.'
 
+            dlg_modal.title = Text(title, text_align=TextAlign.CENTER)
+            dlg_modal.content = Text(message, text_align=TextAlign.CENTER)
+
             page.dialog = dlg_modal
             dlg_modal.open = True
             page.update()
 
-            # if new_password.value == confirm_password.value:
-            #     dlg_modal.open = False
-            #     register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
-            #     new_name.value = ''
-            #     new_ic.value = ''
-            #     new_email.value = ''
-            #     new_password.value = ''
-            #     confirm_password.value = ''
-            #     page.go('/')
-            #     page.update()
-            # else:
-            #     page.dialog = dlg_modal
-            #     dlg_modal.open = True
-            #     page.update()
-
-
-
-
-        if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
-            title = 'Error'
-            message = 'Please fill up the form.'
-        elif new_password.value != confirm_password.value:
-            title = 'Error'
-            message = 'Passwords do not match.'
-        else:
-            register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
-            title = 'Successful Registration'
-            message = 'Thank you! You have successfully registered.'
-
         dlg_modal = AlertDialog(
             modal=False,
-            title=Text(title, text_align=TextAlign.CENTER),
-            content=Text(message, text_align=TextAlign.CENTER),
             actions=[
                 Container(
                     content=Column(
