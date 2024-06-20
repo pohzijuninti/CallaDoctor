@@ -2,7 +2,6 @@ from flet import *
 from flet_route import Params, Basket
 from db.config import register
 
-
 class Register:
     def __init__(self):
         pass
@@ -27,42 +26,50 @@ class Register:
             if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
                 title = 'Error'
                 message = 'Please fill up the form.'
+                is_successful = False
             elif new_password.value != confirm_password.value:
                 title = 'Error'
                 message = 'Passwords do not match.'
+                is_successful = False
             else:
                 register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
                 title = 'Successful Registration'
                 message = 'Thank you! You have successfully registered.'
+                is_successful = True
 
             dlg_modal.title = Text(title, text_align=TextAlign.CENTER)
             dlg_modal.content = Text(message, text_align=TextAlign.CENTER)
-
-            page.dialog = dlg_modal
-            dlg_modal.open = True
-            page.update()
-
-        dlg_modal = AlertDialog(
-            modal=False,
-            actions=[
+            dlg_modal.actions = [
                 Container(
                     content=Column(
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[
                             TextButton(
-                                text='Close', width=150,
-                                on_click=lambda e: (setattr(dlg_modal, 'open', False), page.update())
+                                text='Go to Login Page' if is_successful else 'Close',
+                                width=150,
+                                on_click=lambda e: (
+                                    setattr(dlg_modal, 'open', False),
+                                    page.update(),
+                                    go_login(e) if is_successful else None
+                                )
                             )
                         ]
                     )
                 )
-            ],
-            actions_alignment=MainAxisAlignment.CENTER,
-        )
+            ]
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
 
         def go_login(e):
             page.go("/")
             page.update()
+
+        dlg_modal = AlertDialog(
+            modal=False,
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
 
         return View(
             bgcolor=colors.GREY_200,
@@ -107,4 +114,3 @@ class Register:
                 )
             ]
         )
-

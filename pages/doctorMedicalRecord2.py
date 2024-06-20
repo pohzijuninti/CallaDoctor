@@ -8,7 +8,7 @@ import datetime
 import pages.server as svr
 
 
-class DoctorMedicalRecord:
+class DoctorMedicalRecord2:
 
     def __init__(self):
         self.name_card_url = "http://localhost:3000/username"
@@ -44,10 +44,6 @@ class DoctorMedicalRecord:
         page.title = f'{patientName} - Medical Record'
 
         self.get_medical_records(user_id)
-
-        def go_doctor_home(e):
-            page.go(f'/doctorHome/{doctor_id}')
-            page.update()
 
         def go_patient_list(hospital_id, doctor_id):
             page.go(f"/doctor/patientList/{hospital_id}/{doctor_id}")
@@ -231,7 +227,7 @@ class DoctorMedicalRecord:
 
         return View(
             bgcolor=colors.GREY_200,
-            route='/doctorMedicalRecord/:hospital_id/:doctor_id/:user_id',
+            route='/doctorMedicalRecord2/:hospital_id/:doctor_id/:user_id',
             padding=50,
             spacing=50,
             controls=[
@@ -245,7 +241,7 @@ class DoctorMedicalRecord:
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
                                     icon_color=colors.BLACK,
-                                    on_click=go_doctor_home,
+                                    on_click=lambda e: go_patient_list(hospital_id, doctor_id)
                                 ),
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]

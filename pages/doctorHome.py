@@ -18,6 +18,7 @@ class DoctorHome:
         self.response = None
         self.appointments = None
         self.booking_histories = None
+        self.hospital_id = None
 
     def get_appointments(self, doctor_id):
         full_url = f"{self.appointmentURL}/{doctor_id}"
@@ -147,8 +148,8 @@ class DoctorHome:
             page.go("/")
             page.update()
 
-        def go_patient_list(doctor_id):
-            page.go(f"/doctor/patientList/{doctor_id}")
+        def go_patient_list(hospital_id, doctor_id):
+            page.go(f"/doctor/patientList/{hospital_id}/{doctor_id}")
             page.update()
 
         def go_doctor_medical_record(hospital_id, user_id):
@@ -611,7 +612,7 @@ class DoctorHome:
                                                                 text='Patient List',
                                                                 style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.PEOPLE_OUTLINED,
-                                                                on_click=lambda e: go_patient_list(doctor_id)
+                                                                on_click=lambda e: go_patient_list(self.hospital_id, doctor_id)
                                                             ),
                                                         ]
                                                     ),

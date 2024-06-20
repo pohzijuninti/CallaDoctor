@@ -322,6 +322,15 @@ app.post('/doctor/delete/:doctorID', (req, res) => {
   res.json(deletedDoctor[0]);
 });
 
+app.get('/doctor/get/:doctorID', (req, res) => {
+  const doctorID = parseInt(req.params.doctorID, 10);
+  const doctor = doctors.find(doc => doc.doctorID === doctorID);
+
+  if (doctor) {
+    res.json({ hospitalID: doctor.hospitalID });
+  }
+});
+
 app.get('/doctor/:hospitalID', (req, res) => {
   const { hospitalID } = req.params;
 
@@ -436,6 +445,9 @@ app.post('/user', (req, res) => {
     });
 });
 
+app.get('/user/get', (req, res) => {
+  res.send(users);
+})
 
 app.get('/username/:userID', (req, res) => {
   const userID = req.params.userID;

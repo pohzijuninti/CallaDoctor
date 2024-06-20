@@ -16,6 +16,7 @@ from pages.doctorHome import DoctorHome
 from pages.doctorMedicalRecord import DoctorMedicalRecord
 from pages.mdSelectHospital import MRSelectHospital
 from pages.patientList import PatientList
+from pages.doctorMedicalRecord2 import DoctorMedicalRecord2
 
 
 def main(page: Page):
@@ -34,8 +35,9 @@ def main(page: Page):
         path(url='/selectDateTime/:hospital_id/:doctor_id', clear=False, view=SelectDateTime().view),
         path(url='/adminHome/:hospital_id', clear=False, view=AdminHome().view),
         path(url='/doctorHome/:doctor_id', clear=False, view=DoctorHome().view),
-        path(url='/doctor/patientList/:doctor_id', clear=False, view=PatientList().view),
+        path(url='/doctor/patientList/:hospital_id/:doctor_id', clear=False, view=PatientList().view),
         path(url='/doctorMedicalRecord/:hospital_id/:doctor_id/:user_id', clear=False, view=DoctorMedicalRecord().view),
+        path(url='/doctorMedicalRecord2/:hospital_id/:doctor_id/:user_id', clear=False, view=DoctorMedicalRecord2().view),
     ]
     Routing(page=page, app_routes=app_routes)
     page.go(page.route)
