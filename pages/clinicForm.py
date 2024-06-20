@@ -46,10 +46,10 @@ class ClinicForm:
             page.go("/")
             page.update()
 
-        name = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        address = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        phone_number = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.WHITE)
-        email = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.WHITE)
+        name = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.BLACK)
+        address = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.BLACK)
+        phone_number = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.BLACK)
+        email = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.BLACK)
 
         def open_dlg_modal(e):
             if name.value and address.value and phone_number.value and email.value:
@@ -117,8 +117,8 @@ class ClinicForm:
                         controls=[
                             TextButton(
                                 on_click=open_dlg_modal,
-                                text="Submit", style=ButtonStyle(color=colors.WHITE),
-                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.WHITE,
+                                text="Submit", style=ButtonStyle(color=colors.BLACK),
+                                icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.BLACK,
                             )
                         ]
                     ),
@@ -140,7 +140,7 @@ class ClinicForm:
                             controls=[
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
-                                    icon_color=colors.WHITE,
+                                    icon_color=colors.BLACK,
                                     on_click=go_login,
                                 ),
                                 Text(value='Fill in details', style=TextStyle(size=24, weight=FontWeight.BOLD)),

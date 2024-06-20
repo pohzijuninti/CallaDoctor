@@ -24,26 +24,57 @@ class Register:
                                             text_size=14,
                                             password=True, can_reveal_password=True)
 
+
         def signup(e):
-            if new_password.value == confirm_password.value:
-                dlg_modal.open = False
-                register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
-                new_name.value = ''
-                new_ic.value = ''
-                new_email.value = ''
-                new_password.value = ''
-                confirm_password.value = ''
-                page.go('/')
-                page.update()
+            if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
+                title = 'Error'
+                message = 'Please fill up the form.'
+
+            elif new_password.value != confirm_password.value:
+                title = 'Error'
+                message = 'Passwords do not match.'
             else:
-                page.dialog = dlg_modal
-                dlg_modal.open = True
-                page.update()
+                register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
+                title = 'Successful Registration'
+                message = 'Thank you! You have successfully registered.'
+
+            page.dialog = dlg_modal
+            dlg_modal.open = True
+            page.update()
+
+            # if new_password.value == confirm_password.value:
+            #     dlg_modal.open = False
+            #     register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
+            #     new_name.value = ''
+            #     new_ic.value = ''
+            #     new_email.value = ''
+            #     new_password.value = ''
+            #     confirm_password.value = ''
+            #     page.go('/')
+            #     page.update()
+            # else:
+            #     page.dialog = dlg_modal
+            #     dlg_modal.open = True
+            #     page.update()
+
+
+
+
+        if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
+            title = 'Error'
+            message = 'Please fill up the form.'
+        elif new_password.value != confirm_password.value:
+            title = 'Error'
+            message = 'Passwords do not match.'
+        else:
+            register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
+            title = 'Successful Registration'
+            message = 'Thank you! You have successfully registered.'
 
         dlg_modal = AlertDialog(
             modal=False,
-            title=Text("Error", text_align=TextAlign.CENTER),
-            content=Text("Passwords do not match.", text_align=TextAlign.CENTER),
+            title=Text(title, text_align=TextAlign.CENTER),
+            content=Text(message, text_align=TextAlign.CENTER),
             actions=[
                 Container(
                     content=Column(
@@ -60,6 +91,10 @@ class Register:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
+        def go_login(e):
+            page.go("/")
+            page.update()
+
         return View(
             bgcolor=colors.GREY_200,
             route="/register",
@@ -72,7 +107,16 @@ class Register:
                                     alignment=MainAxisAlignment.CENTER,
                                     horizontal_alignment=CrossAxisAlignment.CENTER,
                                     controls=[
-                                        Text(value='Welcome to Call A Doctor! ', style=TextStyle(size=18)),
+                                        Row(
+                                            controls=[
+                                                IconButton(
+                                                    icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
+                                                    icon_color=colors.BLACK,
+                                                    on_click=go_login,
+                                                ),
+                                                Text(value='Welcome to Call A Doctor! ', style=TextStyle(size=18)),
+                                            ]
+                                        ),
                                         new_name,
                                         new_ic,
                                         new_email,

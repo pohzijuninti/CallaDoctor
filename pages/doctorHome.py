@@ -147,6 +147,10 @@ class DoctorHome:
             page.go("/")
             page.update()
 
+        def go_patient_list(doctor_id):
+            page.go(f"/doctor/patientList/{doctor_id}")
+            page.update()
+
         def go_doctor_medical_record(hospital_id, user_id):
             page.go(f"/doctorMedicalRecord/{hospital_id}/{doctor_id}/{user_id}")
             page.update()
@@ -602,6 +606,12 @@ class DoctorHome:
                                                                 text=f'{svr.get_doctor_name(doctor_id)}',
                                                                 style=ButtonStyle(color=colors.BLACK),
                                                                 icon=icons.PERSON,
+                                                            ),
+                                                            TextButton(
+                                                                text='Patient List',
+                                                                style=ButtonStyle(color=colors.BLACK),
+                                                                icon=icons.PEOPLE_OUTLINED,
+                                                                on_click=lambda e: go_patient_list(doctor_id)
                                                             ),
                                                         ]
                                                     ),
