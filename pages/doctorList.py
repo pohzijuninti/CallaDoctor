@@ -3,6 +3,7 @@ from flet import *
 from flet_route import Params, Basket
 import requests
 import json
+import ast
 
 class DoctorList:
     def __init__(self):
@@ -23,24 +24,32 @@ class DoctorList:
 
         self.get_doctors()
 
+        medical_record = ast.literal_eval(params.medicalRecord)
+
         def go_medical_record(e):
             page.go("/medicalRecord")
             page.update()
 
-        def send_medical_record(e, doctorID):
-            recordID = None
-            print(doctorID)
-            print(recordID)
-            # url = "http://localhost:3000/share/medicalRecord"
-            #
-            # payload = f'doctorID={doctorID}&recordID={recordID}'
-            # headers = {
-            #     'Content-Type': 'application/x-www-form-urlencoded'
-            # }
-            #
-            # response = requests.request("POST", url, headers=headers, data=payload)
-            #
-            # print(response.text)
+        def send_medical_record(e, docID):
+            print(docID)
+            recordID = medical_record['recordID']
+            datetime1 = medical_record['datetime']
+            title = medical_record['title']
+            description = medical_record['description']
+            hospital_id = medical_record['hospitalID']
+            doctor_id = medical_record['doctorID']
+            user_id = medical_record['userID']
+
+            url = "http://localhost:3000/share/medicalRecord"
+
+            payload = f'recordID={recordID}&datetime={datetime1}&title={title}&description={description}&hospitalID={hospital_id}&doctorID={doctor_id}&userID={user_id}&sharedDoctorID={docID}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            print(response.text)
 
             dlg_modal.open = False
             page.update()
@@ -52,6 +61,7 @@ class DoctorList:
         def open_dlg_modal(e):
             dlg_modal.content = Text(f"Do you really want to send the medical record to {e.control.data['name']}?")
             page.dialog = dlg_modal
+            dlg_modal.data = e.control.data['doctorID']
             dlg_modal.open = True
             page.update()
 
@@ -60,7 +70,7 @@ class DoctorList:
             title=ft.Text("Please confirm"),
             content=ft.Text(""),
             actions=[
-                ft.TextButton(text="Yes", on_click=send_medical_record),
+                ft.TextButton(text="Yes", on_click=lambda e: send_medical_record(e, dlg_modal.data)),
                 ft.TextButton(text="No", on_click=handle_close),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
@@ -106,7 +116,7 @@ class DoctorList:
             padding=50,
             spacing=50,
             bgcolor=colors.GREY_200,
-            route="/doctorList",
+            route="/doctorList/:medicalRecord",
             controls=[
                 Column(
                     expand=True,
@@ -119,7 +129,7 @@ class DoctorList:
                                     on_click=go_medical_record,
                                 ),
                                 Text(
-                                    value='Patient List',
+                                    value='Doctor List',
                                     style=TextStyle(size=24, weight=FontWeight.BOLD)
                                 ),
                             ]

@@ -28,7 +28,7 @@ def main(page: Page):
         path(url='/register', clear=True, view=Register().view),
         path(url='/home', clear=True, view=Home().view),
         path(url='/medicalRecord', clear=False, view=MedicalRecord().view),
-        path(url='/doctorList', clear=False, view=DoctorList().view),
+        path(url='/doctorList/:medicalRecord', clear=False, view=DoctorList().view),
         path(url='/clinicForm', clear=False, view=ClinicForm().view),
         path(url='/selectHospital', clear=False, view=SelectHospital().view),
         path(url='/selectDoctor/:hospital_id', clear=False, view=SelectDoctor().view),

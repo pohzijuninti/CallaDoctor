@@ -372,6 +372,18 @@ app.get('/medicalRecord/doctor/:doctorID', (req, res) => {
   res.json(doctorRecords);
 });
 
+app.get('/medicalRecord/user/doctor/:userID/:doctorID', (req, res) => {
+  const { userID, doctorID } = req.params;
+
+  // Filter records based on userID and doctorID
+  const filteredRecords = medicalRecord.filter(record =>
+    record.userID === userID && record.doctorID == doctorID
+  );
+
+  // Respond with the filtered records
+  res.json(filteredRecords);
+});
+
 let medicalRecordCounter = 206;
 
 app.post('/medicalRecord/add', async (req, res) => {
@@ -410,24 +422,44 @@ app.post('/medicalRecord/delete', (req, res) => {
 let sharedMedicalRecords = [];
 
 app.post('/share/medicalRecord', (req, res) => {
-  const { doctorID, recordID } = req.body;
+  const { recordID, datetime, title, description, hospitalID, doctorID, userID, sharedDoctorID } = req.body;
 
-  // Validate the input data
-  if (!doctorID || !recordID) {
-    return res.status(400).send('doctorID and recordID are required.');
+  if (!recordID || !datetime || !title || !description || !hospitalID || !doctorID || !userID || !sharedDoctorID) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
 
-  // Create a new shared medical record object
-  const sharedMedicalRecord = {
-    doctorID: parseInt(doctorID),
+  const newSharedRecord = {
     recordID: parseInt(recordID),
+    datetime: parseInt(datetime),
+    title,
+    description,
+    hospitalID: parseInt(hospitalID),
+    doctorID: parseInt(doctorID),
+    userID,
+    sharedDoctorID: parseInt(sharedDoctorID)
   };
 
-  // Add the new record to the sharedMedicalRecords array
-  sharedMedicalRecords.push(sharedMedicalRecord);
+  sharedMedicalRecords.push(newSharedRecord);
 
-  // Send a success response
-  res.status(201).send(sharedMedicalRecord);
+  res.send(newSharedRecord);
+});
+
+app.get('/shareMedicalRecord', (req, res) => {
+  res.send(sharedMedicalRecords);
+});
+
+app.get('/shareMedicalRecord/user/doctorID/:userID/:sharedDoctorID', (req, res) => {
+  const { userID, sharedDoctorID } = req.params;
+
+  // Filter records based on userID and sharedDoctorID
+  const filteredRecords = sharedMedicalRecords.filter(record =>
+    record.userID === userID && record.sharedDoctorID == sharedDoctorID
+  );
+
+  // Respond with the filtered records
+  if (filteredRecords.length > 0) {
+    res.json(filteredRecords);
+  }
 });
 
 let users = [];

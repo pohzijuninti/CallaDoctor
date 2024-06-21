@@ -19,16 +19,27 @@ class DoctorMedicalRecord:
         self.response2 = None
         self.name_card = None
         self.medical_record = None
+        self.shared_record = None
 
     def get_name_card(self, user_id):
         full_url = f'{self.name_card_url}/{user_id}'
         self.response1 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.name_card = json.loads(self.response1.text)
 
-    def get_medical_records(self, user_id):
-        full_url = f"{self.medical_record_url}/{user_id}"
-        self.response2 = requests.get(full_url, headers=self.headers, data=self.payload)
+    def get_medical_records(self, user_id, doctor_id):
+        url = f"http://localhost:3000/medicalRecord/user/doctor/{user_id}/{doctor_id}"
+        self.response2 = requests.get(url, headers=self.headers, data=self.payload)
         self.medical_record = json.loads(self.response2.text)
+
+    def get_shared_records(self, user_id, doctor_id):
+        url = f"http://localhost:3000/shareMedicalRecord/user/doctorID/{user_id}/{doctor_id}"
+
+        payload = {}
+        headers = {}
+
+        response = requests.request("GET", url, headers=headers, data=payload)
+
+        self.shared_record = json.loads(response.text)
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -43,14 +54,11 @@ class DoctorMedicalRecord:
         patientName = self.name_card['name']
         page.title = f'{patientName} - Medical Record'
 
-        self.get_medical_records(user_id)
+        self.get_medical_records(user_id, doctor_id)
+        self.get_shared_records(user_id, doctor_id)
 
         def go_doctor_home(e):
             page.go(f'/doctorHome/{doctor_id}')
-            page.update()
-
-        def go_patient_list(hospital_id, doctor_id):
-            page.go(f"/doctor/patientList/{hospital_id}/{doctor_id}")
             page.update()
 
         title: TextField = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
@@ -77,7 +85,7 @@ class DoctorMedicalRecord:
 
             # print(response.text)
 
-            self.get_medical_records(user_id)
+            self.get_medical_records(user_id, doctor_id)
             update_medical_records_view()
 
             dlg_modal.open = False
@@ -158,7 +166,57 @@ class DoctorMedicalRecord:
                 )
             )
 
+        shared_records = GridView(
+            padding=padding.only(top=10),
+            runs_count=3,
+            child_aspect_ratio=10 / 9,
+        )
+
+        for j in range(len(self.shared_record)):
+            shared_records.controls.append(
+                Container(
+                    border_radius=10,
+                    bgcolor='white',
+                    content=Container(
+                        padding=10,
+                        content=Column(
+                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            controls=[
+                                Column(
+                                    controls=[
+                                        Row(
+                                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                            controls=[
+                                                Text(
+                                                    value=f'{svr.convert_date(self.shared_record[j]["datetime"])}, '
+                                                          f'{svr.convert_time(self.shared_record[j]["datetime"])}',
+                                                    color=colors.GREY),
+                                            ]
+                                        ),
+                                        Text(value=f'{self.shared_record[j]["title"]}', size=18,
+                                             color=colors.BLACK, weight=FontWeight.BOLD),
+                                        Text(value='Description', color=colors.BLACK),
+                                        Text(value=f'{self.shared_record[j]["description"]}',
+                                             color=colors.GREY),
+                                    ]
+                                ),
+                                Row(
+                                    alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                    controls=[
+                                        Text(
+                                            value=f'{svr.get_hospital_name(self.shared_record[j]["hospitalID"])}\n{svr.get_doctor_name(self.shared_record[j]["doctorID"])}',
+                                            color=colors.BLACK, size=12),
+                                    ]
+                                )
+
+                            ]
+                        )
+                    )
+                )
+            )
+
         medical_records = GridView(
+            padding=padding.only(top=10),
             runs_count=3,
             child_aspect_ratio=10 / 9,
         )
@@ -176,7 +234,7 @@ class DoctorMedicalRecord:
 
             response = requests.request("POST", url, headers=headers, data=payload)
 
-            self.get_medical_records(user_id)
+            self.get_medical_records(user_id, doctor_id)
             update_medical_records_view()
 
         def update_medical_records_view():
@@ -235,10 +293,8 @@ class DoctorMedicalRecord:
             padding=50,
             spacing=50,
             controls=[
-                Column(
+                ListView(
                     expand=True,
-                    alignment=MainAxisAlignment.CENTER,
-                    horizontal_alignment=CrossAxisAlignment.START,
                     controls=[
                         Row(
                             controls=[
@@ -250,20 +306,26 @@ class DoctorMedicalRecord:
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]
                         ),
-                        Row(
-                            alignment=MainAxisAlignment.SPACE_BETWEEN,
-                            vertical_alignment=CrossAxisAlignment.START,
-                            controls=[
-                                name_card(),
-                                ElevatedButton(
-                                    on_click=open_dlg_modal,
-                                    content=Text('Add Medical Record')
-                                ),
-                            ]
+                        Container(
+                            content=Row(
+                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                vertical_alignment=CrossAxisAlignment.START,
+                                controls=[
+                                    name_card(),
+                                    ElevatedButton(
+                                        on_click=open_dlg_modal,
+                                        content=Text('Add Medical Record')
+                                    ),
+                                ]
+                            ),
                         ),
                         Container(
                             expand=True,
                             content=medical_records,
+                        ),
+                        Container(
+                            expand=True,
+                            content=shared_records,
                         ),
                     ]
                 ),

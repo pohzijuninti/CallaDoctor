@@ -42,7 +42,7 @@ class MedicalRecord:
             page.update()
 
         def send_medical_record(e):
-            page.go('/doctorList')
+            page.go(f'/doctorList/{e.control.data}')
             page.update()
 
         def name_card():
@@ -128,7 +128,7 @@ class MedicalRecord:
                                     alignment=MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
                                         Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
-                                        IconButton(icon=icons.SEND, icon_color=colors.BLUE, on_click=send_medical_record)
+                                        IconButton(icon=icons.SEND, data=self.medical_record[i], icon_color=colors.BLUE, on_click=lambda e: send_medical_record(e))
                                     ]
                                 )
 
