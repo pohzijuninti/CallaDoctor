@@ -7,7 +7,6 @@ from db.config import get_name, get_userID
 import pages.server as svr
 import datetime
 
-
 class MedicalRecord:
     def __init__(self):
         self.medical_record_url = "http://localhost:3000/medicalRecord"
@@ -43,7 +42,7 @@ class MedicalRecord:
             page.update()
 
         def send_medical_record(e):
-            page.go('/mrSelectHospital')
+            page.go('/doctorList')
             page.update()
 
         def name_card():

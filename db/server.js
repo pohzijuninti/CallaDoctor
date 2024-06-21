@@ -9,7 +9,7 @@ app.use(express.json());
 // add body-parser middleware to parse request bodies
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const hospital = [
+const hospitals = [
   {
     "hospitalID": 1,
     "name": "Pantai Hospital Penang",
@@ -261,7 +261,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/hospital', (req, res) => {
-  res.send(hospital);
+  res.send(hospitals);
+});
+
+app.get('/hospital/name/:hospitalID', (req, res) => {
+  const hospitalID = parseInt(req.params.hospitalID, 10);
+  const hospital = hospitals.find(h => h.hospitalID === hospitalID);
+
+  if (hospital) {
+    res.json({ name: hospital.name });
+  }
 });
 
 app.get('/speciality', (req, res) => {
@@ -396,6 +405,29 @@ app.post('/medicalRecord/delete', (req, res) => {
   const { recordID } = req.body;
   medicalRecord = medicalRecord.filter(record => record.recordID !== parseInt(recordID, 10));
   res.status(200).send({ message: "Record deleted successfully" });
+});
+
+let sharedMedicalRecords = [];
+
+app.post('/share/medicalRecord', (req, res) => {
+  const { doctorID, recordID } = req.body;
+
+  // Validate the input data
+  if (!doctorID || !recordID) {
+    return res.status(400).send('doctorID and recordID are required.');
+  }
+
+  // Create a new shared medical record object
+  const sharedMedicalRecord = {
+    doctorID: parseInt(doctorID),
+    recordID: parseInt(recordID),
+  };
+
+  // Add the new record to the sharedMedicalRecords array
+  sharedMedicalRecords.push(sharedMedicalRecord);
+
+  // Send a success response
+  res.status(201).send(sharedMedicalRecord);
 });
 
 let users = [];
