@@ -456,10 +456,7 @@ app.get('/shareMedicalRecord/user/doctorID/:userID/:sharedDoctorID', (req, res) 
     record.userID === userID && record.sharedDoctorID == sharedDoctorID
   );
 
-  // Respond with the filtered records
-  if (filteredRecords.length > 0) {
-    res.json(filteredRecords);
-  }
+  res.json(filteredRecords);
 });
 
 let users = [];
@@ -530,7 +527,7 @@ app.post('/login/admin', async (req, res) => {
   const { email, password } = req.body;
 
   // Find the hospital admin by email
-  const hospitalAdmin = hospital.find(h => h.email === email);
+  const hospitalAdmin = hospitals.find(h => h.email === email);
   if (!hospitalAdmin) {
     return res.status(401).send('Invalid email or password');
   }

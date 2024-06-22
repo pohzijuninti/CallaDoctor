@@ -16,6 +16,7 @@ class PatientList:
         full_url = "http://localhost:3000/user/get"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.patients = json.loads(self.response.text)
+        print(len(self.patients))
 
     def get_hospital_id(self, docID):
         url = f"http://localhost:3000/doctor/get/{docID}"

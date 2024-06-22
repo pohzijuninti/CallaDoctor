@@ -46,25 +46,47 @@ class MedicalRecord:
             page.update()
 
         def name_card():
+
             is_odd = int(self.name_card['ic'][-1]) % 2 != 0
-            if is_odd:
-                gender = "Male"
-            else:
-                gender = "Female"
+            gender = "Male" if is_odd else "Female"
 
             current_date = datetime.datetime.now()
 
-            current_year_two_digit = int(str(current_date.year)[-2:])
-            current_year = int(str(current_date.year))
+            current_year = current_date.year
             ic_year = int(self.name_card['ic'][:2])
 
-            if ic_year <= current_year_two_digit:
-                birth_year = 2000 + ic_year
-            else:
-                birth_year = 1900 + ic_year
+            current_year_two_digit = int(str(current_year)[-2:])
 
-            age = str(current_year - birth_year) + ' years old'
-            caution = 'Allergic to Panadol'
+            birth_year = 2000 + ic_year if ic_year <= current_year_two_digit else 1900 + ic_year
+
+            age = f"{current_year - birth_year} years old"
+            caution = self.name_card['caution']
+
+            caution_text = Text(value=f'{caution}', style=TextStyle(color=colors.RED)) if caution else None
+
+            content_controls = [
+                Row(
+                    controls=[
+                        Column(
+                            expand=1,
+                            alignment=MainAxisAlignment.CENTER,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Icon(icons.PERSON, color=colors.BLACK, size=50),
+                            ]
+                        ),
+                        Column(
+                            expand=2,
+                            controls=[
+                                Text(value=f"{get_name()}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
+                            ]
+                        ),
+                    ]
+                ),
+            ]
+
+            if caution_text:
+                content_controls[0].controls[1].controls.append(caution_text)
 
             return Container(
                 width=300,
@@ -73,30 +95,7 @@ class MedicalRecord:
                 bgcolor="white",
                 content=Column(
                     alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        Row(
-                            controls=[
-                                Column(
-                                    expand=1,
-                                    alignment=MainAxisAlignment.CENTER,
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    controls=[
-                                        Icon(icons.PERSON,
-                                             color=colors.BLACK,
-                                             size=50,
-                                             ),
-                                    ]
-                                ),
-                                Column(
-                                    expand=2,
-                                    controls=[
-                                        Text(value=f"{get_name()}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
-                                        Text(value=f"**{caution}**", style=TextStyle(color=colors.RED)),
-                                    ]
-                                ),
-                            ]
-                        ),
-                    ]
+                    controls=content_controls
                 )
             )
 

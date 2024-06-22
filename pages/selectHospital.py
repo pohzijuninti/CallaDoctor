@@ -109,8 +109,19 @@ class SelectHospital:
                             alignment=MainAxisAlignment.SPACE_EVENLY,
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             controls=[
-                                Image(src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),
-                                Text(value=f'{svr.hospitalList[i]["name"]}', color=colors.BLACK, size=12),
+                                Row(
+                                    expand=1,
+                                    alignment=MainAxisAlignment.END,
+                                    controls=[
+                                        IconButton(icon=icons.INFO, icon_color='grey')
+                                    ]
+                                ),
+                                Image(expand=3, src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),
+                                Container(
+                                    expand=1,
+                                    padding=padding.only(top=5),
+                                    content=Text(value=f'{svr.hospitalList[i]["name"]}', color=colors.BLACK, size=12, text_align=TextAlign.CENTER),
+                                )
                             ]
                         ),
                     ),

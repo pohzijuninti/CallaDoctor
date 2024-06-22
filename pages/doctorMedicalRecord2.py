@@ -40,7 +40,6 @@ class DoctorMedicalRecord2:
         response = requests.request("GET", url, headers=headers, data=payload)
 
         self.shared_record = json.loads(response.text)
-        print('share', self.shared_record)
 
     def view(self, page: Page, params: Params, basket: Basket):
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -134,7 +133,34 @@ class DoctorMedicalRecord2:
                 birth_year = 1900 + ic_year
 
             age = str(current_year - birth_year) + ' years old'
-            caution = 'Allergic to Panadol'
+            print(self.name_card)
+            caution = ''
+
+            caution_text = Text(value=f'{caution}', style=TextStyle(color=colors.RED)) if caution else None
+
+            content_controls = [
+                Row(
+                    controls=[
+                        Column(
+                            expand=1,
+                            alignment=MainAxisAlignment.CENTER,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Icon(icons.PERSON, color=colors.BLACK, size=50),
+                            ]
+                        ),
+                        Column(
+                            expand=2,
+                            controls=[
+                                Text(value=f"{self.name_card['name']}\n{self.name_card['ic']}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
+                            ]
+                        ),
+                    ]
+                ),
+            ]
+
+            if caution_text:
+                content_controls[0].controls[1].controls.append(caution_text)
 
             return Container(
                 width=300,
@@ -143,27 +169,7 @@ class DoctorMedicalRecord2:
                 bgcolor="white",
                 content=Column(
                     alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        Row(
-                            controls=[
-                                Column(
-                                    expand=1,
-                                    alignment=MainAxisAlignment.CENTER,
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    controls=[
-                                        Icon(icons.PERSON, color=colors.BLACK, size=50),
-                                    ]
-                                ),
-                                Column(
-                                    expand=2,
-                                    controls=[
-                                        Text(value=f"{self.name_card['name']}\n{self.name_card['ic']}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
-                                        Text(value=f"**{caution}**", style=TextStyle(color=colors.RED)),
-                                    ]
-                                ),
-                            ]
-                        ),
-                    ]
+                    controls=content_controls
                 )
             )
 
