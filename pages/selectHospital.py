@@ -14,7 +14,7 @@ class SelectHospital:
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Hospital'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_min_width = 800
+        page.window_min_width = 900
         page.window_min_height = 630
 
         def go_home(e):
@@ -22,6 +22,10 @@ class SelectHospital:
             selected_container = None
 
             page.go("/home")
+            page.update()
+
+        def go_hospital_info(e):
+            page.go(f"/hospital/info/{e.control.data}")
             page.update()
 
         def go_select_doctor(e):
@@ -113,7 +117,12 @@ class SelectHospital:
                                     expand=1,
                                     alignment=MainAxisAlignment.END,
                                     controls=[
-                                        IconButton(icon=icons.INFO, icon_color='grey')
+                                        IconButton(
+                                            data=int(svr.hospitalList[i]["hospitalID"]),
+                                            icon=icons.INFO,
+                                            icon_color='grey',
+                                            on_click=go_hospital_info
+                                        ),
                                     ]
                                 ),
                                 Image(expand=3, src=f'{svr.hospitalList[i]["image"]}', fit=ImageFit.COVER),

@@ -15,35 +15,50 @@ const hospitals = [
     "name": "Pantai Hospital Penang",
     "image": "pantai.png",
     "email": "pantai@gmail.com",
-    "password": "$2a$10$grRJEbGhuED/Rz.9T0.SCOdPxESFm4CTBKs1d67s3W3wk8.uSDGsq"
+    "password": "$2a$10$grRJEbGhuED/Rz.9T0.SCOdPxESFm4CTBKs1d67s3W3wk8.uSDGsq",
+    "map": "pantaimap.png",
+    "location": "82, Jalan Tengah, Bayan Baru, 11900 Bayan Lepas, Pulau Pinang",
+    "description": "Pantai Hospital Penang is a private hospital in George Town within the Malaysian state of Penang. Established in 1997, the 190-bed specialist hospital at Bayan Baru offers services in Radiotherapy & Oncology, Cardiology, Dentistry, Neurology, Neurosurgery and Cardiothoracic Surgery. It also houses the only Stroke Center in the Northern Region."
   },
   {
     "hospitalID": 2,
     "name": "Island Hospital Penang",
     "image": "island.jpeg",
     "email": "island@gmail.com",
-    "password": "$2a$10$ZVb20qG6EasQgkDZNT31yuIRAaR7MMcstvoYQyZK7v03PU1q9XyMO"
+    "password": "$2a$10$ZVb20qG6EasQgkDZNT31yuIRAaR7MMcstvoYQyZK7v03PU1q9XyMO",
+    "map": "islandmap.png",
+    "location": "308, Jln Macalister, 10450 George Town, Pulau Pinang",
+    "description": "Island Hospital was founded in 1996, with the construction of the hospital eventually taking a mere 10 months. In 2017, the Penang state government announced plans to build an extension to the existing facility, named Island Medical City, at Peel Avenue.[3] Upon completion, the project is expected to expand the hospital's capacity to 1000 beds. Planned facilities also include a healthcare traveler hotel and medical suites."
   },
   {
     "hospitalID": 3,
     "name": "Gleneagles Hospital Penang",
     "image": "gmc.jpeg",
     "email": "gmc@gmail.com",
-    "password": "$2a$10$pbpLhUoBd0A/QQ2KvHYG9e7NVnlD6IVjDpyggctfeU23sxlxdlvrK"
+    "password": "$2a$10$pbpLhUoBd0A/QQ2KvHYG9e7NVnlD6IVjDpyggctfeU23sxlxdlvrK",
+    "map": "gmcmap.png",
+    "location": "1, Jalan Pangkor, 110050 George Town, Pulau Pinang",
+    "description": "Gleneagles Hospital Penang (GPG) is a private hospital in George Town within the Malaysian state of Penang. Established in 1973, the 360-bed tertiary care provider houses over 85 doctors which cover a wide array of medical specialties, supported by more than 1,100 employees (nurses, allied health personnel and support staff). The hospital now consists of its original six-storey building and a 19-storey annex."
   },
   {
     "hospitalID": 4,
     "name": "Sunway Medical Centre Penang",
     "image": "sunway.jpeg",
     "email": "sunway@gmail.com",
-    "password": "$2a$10$IgdR5tTZmmzH00kYZ8BgVe88CXfpWcXIDg5CTuE/l7cGYBfpcYS92"
+    "password": "$2a$10$IgdR5tTZmmzH00kYZ8BgVe88CXfpWcXIDg5CTuE/l7cGYBfpcYS92",
+    "map": "sunwaymap.png",
+    "location": "3106, Lebuh Tenggiri 2 Pusat Bandar Seberang Jaya, 13700 Perai, Pulau Pinang",
+    "description": "Established in 2022, the 330-bed healthcare facility at Seberang Jaya is the third hospital opened by Malaysian conglomerate Sunway Group. Services provided by the hospital include, but not limited to, radiology, cardiology, nephrology, neurology, internal medicine, general surgery, robot-assisted surgery and arthroscopy."
   },
   {
     "hospitalID": 5,
     "name": "Penang Adventist Hospital",
     "image": "adventist.jpeg",
     "email": "adventist@gmail.com",
-    "password": "$2a$10$VQgehZMx9m9Q2X3OaNUCneupSP6SVhSkSKRFRX3l0OBlhcDvYket."
+    "password": "$2a$10$VQgehZMx9m9Q2X3OaNUCneupSP6SVhSkSKRFRX3l0OBlhcDvYket.",
+    "map": "adventistmap.png",
+    "location": "465, Jalan Burma, 10350 George Town, Pulau Pinang",
+    "description": "Penang Adventist Hospital is a non-profit hospital in George Town within the Malaysian state of Penang. Established in 1924, the 200-bed medical institution is part of an international network of hospitals operated by the Seventh-day Adventist Church. The hospital is well known in the community for its promotion of a healthy vegetarian diet and charity work to assist needy patients, particularly heart patients."
   },
 ];
 
@@ -273,8 +288,30 @@ app.get('/hospital/name/:hospitalID', (req, res) => {
   }
 });
 
+// Route handler to get hospital details by hospitalID
+app.get('/hospital/:hospitalID', (req, res) => {
+  const hospitalID = parseInt(req.params.hospitalID); // Extract hospitalID from request params
+
+  // Find the hospital in the hospitals array based on hospitalID
+  const hospital = hospitals.find(hospital => hospital.hospitalID === hospitalID);
+
+  // If hospital is found, return it as JSON response
+  res.json(hospital);
+});
+
 app.get('/speciality', (req, res) => {
   res.send(speciality);
+});
+
+// Route handler to get speciality details by specialityID
+app.get('/speciality/:specialityID', (req, res) => {
+  const specialityID = parseInt(req.params.specialityID); // Extract specialityID from request params
+
+  // Find the speciality in the speciality array based on specialityID
+  const foundSpeciality = speciality.find(spec => spec.specialityID === specialityID);
+
+  // If speciality is found, return it as JSON response
+  res.json(foundSpeciality);
 });
 
 app.get('/doctor', (req, res) => {
@@ -331,13 +368,15 @@ app.post('/doctor/delete/:doctorID', (req, res) => {
   res.json(deletedDoctor[0]);
 });
 
+// Route handler to get doctor details by doctorID
 app.get('/doctor/get/:doctorID', (req, res) => {
-  const doctorID = parseInt(req.params.doctorID, 10);
-  const doctor = doctors.find(doc => doc.doctorID === doctorID);
+  const doctorID = parseInt(req.params.doctorID); // Extract doctorID from request params
 
-  if (doctor) {
-    res.json({ hospitalID: doctor.hospitalID });
-  }
+  // Find the doctor in the doctors array based on doctorID
+  const doctor = doctors.find(doctor => doctor.doctorID === doctorID);
+
+  // If doctor is found, return it as JSON response
+  res.json(doctor);
 });
 
 app.get('/doctor/:hospitalID', (req, res) => {
@@ -466,19 +505,21 @@ const csvWriter = createCsvWriter({
   header: [
     { id: 'userID', title: 'userID' },
     { id: 'name', title: 'name' },
-    { id: 'ic', title: 'IC' } // Added IC to the header
+    { id: 'ic', title: 'IC' },
+    { id: 'caution', title: 'caution' }
   ],
-  append: true // Append mode to avoid overwriting existing data
+  append: true
 });
 
 // Read existing users from CSV if it exists
 if (fs.existsSync('user.csv')) {
   const csv = fs.readFileSync('user.csv', 'utf8');
-  const lines = csv.split('\n').slice(1); // Remove header
+  const lines = csv.trim().split('\n'); // Split into lines and trim to avoid empty lines
+
   lines.forEach(line => {
     if (line.trim()) {
-      const [userID, name, ic] = line.split(','); // Added IC in parsing
-      users.push({ userID, name, ic });
+      const [userID, name, ic, caution] = line.split(','); // Split by comma
+      users.push({ userID, name, ic, caution });
     }
   });
 }
@@ -488,7 +529,8 @@ app.post('/user', (req, res) => {
   const user = {
     userID: req.body.userID,
     name: req.body.name,
-    ic: req.body.ic // Fixed case to match body input
+    ic: req.body.ic,
+    caution: req.body.caution || '' // Default caution to an empty string if not provided
   };
 
   // Add the new user to the users array
@@ -510,12 +552,49 @@ app.get('/user/get', (req, res) => {
   res.send(users);
 })
 
-app.get('/username/:userID', (req, res) => {
-  const userID = req.params.userID;
-  const user = users.find(u => u.userID == userID);
+app.get('/user/:userID', (req, res) => {
+  const { userID } = req.params;
+
+  // Find the user by userID
+  const user = users.find(u => u.userID === userID);
 
   if (user) {
-    res.send({ name: user.name, ic: user.ic });
+      res.json(user);
+  } else {
+      res.status(404).send({ error: 'User not found' });
+  }
+});
+
+
+// POST route to update the caution field for a specific user
+app.post('/user/caution', (req, res) => {
+  const { userID, caution } = req.body;
+
+  const user = users.find(u => u.userID === userID);
+
+  if (user) {
+    user.caution = caution;
+
+    // Rewrite the CSV file with updated users
+    const csvWriter = createCsvWriter({
+      path: 'user.csv',
+      header: [
+        { id: 'userID', title: 'userID' },
+        { id: 'name', title: 'name' },
+        { id: 'ic', title: 'IC' },
+        { id: 'caution', title: 'caution' }
+      ]
+    });
+
+    csvWriter.writeRecords(users)
+      .then(() => {
+        console.log('User caution updated in CSV file');
+        res.send(user);
+      })
+      .catch(err => {
+        console.error('Error writing to CSV file', err);
+        res.status(500).send({ error: 'Internal Server Error' });
+      });
   } else {
     res.status(404).send({ error: 'User not found' });
   }

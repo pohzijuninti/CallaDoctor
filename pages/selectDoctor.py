@@ -34,6 +34,11 @@ class SelectDoctor:
 
         self.get_doctors(hospital_id)
 
+
+        def go_doctor_info(e):
+            page.go(f'/doctor/info/{e.control.data}')
+            page.update()
+
         def go_select_hospital(e):
             global selected_container
             selected_container = None
@@ -109,14 +114,26 @@ class SelectDoctor:
                                 alignment=MainAxisAlignment.CENTER,
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 controls=[
+                                    Row(
+                                        expand=1,
+                                        alignment=MainAxisAlignment.END,
+                                        controls=[
+                                            IconButton(
+                                                data=self.doctors[i]["doctorID"],
+                                                icon=icons.INFO,
+                                                icon_color='grey',
+                                                on_click=go_doctor_info
+                                            ),
+                                        ]
+                                    ),
                                     Container(
-                                        expand=3,
+                                        expand=5,
                                         padding=padding.only(top=10),
                                         content=doctor_image,
                                     ),
                                     Column(
                                         horizontal_alignment=CrossAxisAlignment.CENTER,
-                                        expand=1,
+                                        expand=2,
                                         controls=[
                                             Text(value=f'{self.doctors[i]["name"]}', color=colors.BLACK, size=12),
                                             Text(
@@ -144,11 +161,14 @@ class SelectDoctor:
                     controls=[
                         Row(
                             controls=[
-                                TextButton(
-                                    text=f'{svr.get_hospital_name(hospital_id)}',
+                                IconButton(
                                     style=ButtonStyle(color=colors.GREY_800),
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED, icon_color=colors.GREY_800,
                                     on_click=go_select_hospital
+                                ),
+                                Text(
+                                    value=svr.get_hospital_name(hospital_id),
+                                    style=TextStyle(size=24, weight=FontWeight.BOLD)
                                 ),
                             ]
                         ),

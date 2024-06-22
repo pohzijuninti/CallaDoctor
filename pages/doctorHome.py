@@ -214,7 +214,7 @@ class DoctorHome:
                     action1 = None
                     action2 = None
 
-                url = f"http://localhost:3000/username/{userID}"
+                url = f"http://localhost:3000/user/{userID}"
 
                 payload = {}
                 headers = {}
@@ -359,7 +359,7 @@ class DoctorHome:
             for i in range(len(self.booking_histories)):
                 userID = self.booking_histories[i]['userID']
 
-                url = f"http://localhost:3000/username/{userID}"
+                url = f"http://localhost:3000/user/{userID}"
 
                 payload = {}
                 headers = {}
@@ -473,7 +473,7 @@ class DoctorHome:
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
                     userID = self.appointments[i]["userID"]
 
-            url = f"http://localhost:3000/username/{userID}"
+            url = f"http://localhost:3000/user/{userID}"
 
             payload = {}
             headers = {}
@@ -484,7 +484,7 @@ class DoctorHome:
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Approve Appointment"),
-                content=Text("Are you sure?"),
+                content=Text("Are you sure?", text_align=TextAlign.CENTER),
                 actions=[
                     Container(
                         content=Column(
@@ -515,7 +515,7 @@ class DoctorHome:
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
                     userID = self.appointments[i]["userID"]
 
-            url = f"http://localhost:3000/username/{userID}"
+            url = f"http://localhost:3000/user/{userID}"
 
             payload = {}
             headers = {}
@@ -526,7 +526,7 @@ class DoctorHome:
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Reject Appointment"),
-                content=Text("Are you sure?"),
+                content=Text("Are you sure?", text_align=TextAlign.CENTER),
                 actions=[
                     Container(
                         content=Column(

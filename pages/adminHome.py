@@ -172,7 +172,7 @@ class AdminHome:
                     disable = True
 
                 userID = self.appointments[i]['userID']
-                url = f"http://localhost:3000/username/{userID}"
+                url = f"http://localhost:3000/user/{userID}"
 
                 payload = {}
                 headers = {}
@@ -361,7 +361,7 @@ class AdminHome:
                     userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
 
-            url = f"http://localhost:3000/username/{userID}"
+            url = f"http://localhost:3000/user/{userID}"
 
             payload = {}
             headers = {}
@@ -404,7 +404,7 @@ class AdminHome:
                     userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
 
-            url = f"http://localhost:3000/username/{userID}"
+            url = f"http://localhost:3000/user/{userID}"
 
             payload = {}
             headers = {}
@@ -415,7 +415,7 @@ class AdminHome:
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Reject Appointment"),
-                content=Text("Are you sure?"),
+                content=Text("Are you sure?", text_align=TextAlign.CENTER),
                 actions=[
                     Container(
                         content=Column(
@@ -474,7 +474,7 @@ class AdminHome:
             dlg_modal = AlertDialog(
                 modal=False,
                 title=Text("Delete Doctor"),
-                content=Text("Are you sure?"),
+                content=Text("Are you sure?", text_align=TextAlign.CENTER),
                 actions=[
                     Container(
                         content=Column(

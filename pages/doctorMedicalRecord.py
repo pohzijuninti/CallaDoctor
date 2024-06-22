@@ -7,12 +7,9 @@ import time
 import datetime
 import pages.server as svr
 
-
 class DoctorMedicalRecord:
 
     def __init__(self):
-        self.name_card_url = "http://localhost:3000/username"
-        self.medical_record_url = "http://localhost:3000/medicalRecord"
         self.payload = '='
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response1 = None
@@ -22,7 +19,7 @@ class DoctorMedicalRecord:
         self.shared_record = None
 
     def get_name_card(self, user_id):
-        full_url = f'{self.name_card_url}/{user_id}'
+        full_url = f'http://localhost:3000/user/{user_id}'
         self.response1 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.name_card = json.loads(self.response1.text)
 
@@ -33,12 +30,7 @@ class DoctorMedicalRecord:
 
     def get_shared_records(self, user_id, doctor_id):
         url = f"http://localhost:3000/shareMedicalRecord/user/doctorID/{user_id}/{doctor_id}"
-
-        payload = {}
-        headers = {}
-
-        response = requests.request("GET", url, headers=headers, data=payload)
-
+        response = requests.request("GET", url, headers=self.headers, data=self.payload)
         self.shared_record = json.loads(response.text)
 
     def view(self, page: Page, params: Params, basket: Basket):
@@ -57,13 +49,17 @@ class DoctorMedicalRecord:
         self.get_medical_records(user_id, doctor_id)
         self.get_shared_records(user_id, doctor_id)
 
-        def go_doctor_home(e):
+        def go_doctor_home(doctor_id):
             page.go(f'/doctorHome/{doctor_id}')
             page.update()
 
-        title: TextField = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
-        description: TextField = TextField(
+        title = TextField(label='Title', width=250, border=InputBorder.UNDERLINE, text_size=14)
+        description = TextField(
             label='Description', width=250, border=InputBorder.UNDERLINE, text_size=14,
+            multiline=True, min_lines=3, max_lines=3
+        )
+        caution = TextField(
+            label='Caution', width=250, border=InputBorder.UNDERLINE, text_size=14,
             multiline=True, min_lines=3, max_lines=3
         )
 
@@ -72,22 +68,56 @@ class DoctorMedicalRecord:
             dlg_modal.open = True
             page.update()
 
+        def edit_caution(e):
+            page.dialog = caution_dlg_modal
+            caution_dlg_modal.open = True
+            page.update()
+
+        def close_caution_dlg(e):
+            url = "http://localhost:3000/user/caution"
+            payload = f'userID={user_id}&caution={caution.value}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            response = requests.request("POST", url, headers=headers, data=payload)
+            self.get_name_card(user_id)
+            update_name_card_view()
+            caution_dlg_modal.open = False
+            caution.value = ''
+            page.update()
+
+        caution_dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Edit Caution"),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            caution,
+                            Container(
+                                padding=padding.only(top=20, bottom=10),
+                                content=ElevatedButton(text="Done",
+                                                       on_click=close_caution_dlg,
+                                                       width=250)
+                            )
+                        ]
+                    )
+                )
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
+
         def close_dlg(e):
             current_unix_time = int(time.time())
             url = "http://localhost:3000/medicalRecord/add"
-
             payload = f'datetime={current_unix_time}&title={title.value}&description={description.value}&hospitalID={hospital_id}&doctorID={doctor_id}&userID={user_id}'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-
             response = requests.request("POST", url, headers=headers, data=payload)
-
-            # print(response.text)
-
             self.get_medical_records(user_id, doctor_id)
             update_medical_records_view()
-
             dlg_modal.open = False
             title.value = ''
             description.value = ''
@@ -114,26 +144,42 @@ class DoctorMedicalRecord:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
-        def name_card():
+        def create_name_card():
             is_odd = int(self.name_card['ic'][-1]) % 2 != 0
-            if is_odd:
-                gender = "Male"
-            else:
-                gender = "Female"
-
+            gender = "Male" if is_odd else "Female"
             current_date = datetime.datetime.now()
-
             current_year_two_digit = int(str(current_date.year)[-2:])
             current_year = int(str(current_date.year))
             ic_year = int(self.name_card['ic'][:2])
+            birth_year = 2000 + ic_year if ic_year <= current_year_two_digit else 1900 + ic_year
+            age = f"{current_year - birth_year} years old"
+            caution = self.name_card.get('caution', '')
 
-            if ic_year <= current_year_two_digit:
-                birth_year = 2000 + ic_year
-            else:
-                birth_year = 1900 + ic_year
+            caution_text = Text(value=f'{caution}', style=TextStyle(color=colors.RED)) if caution else None
 
-            age = str(current_year - birth_year) + ' years old'
-            caution = 'Allergic to Panadol'
+            content_controls = [
+                Row(
+                    controls=[
+                        Column(
+                            expand=1,
+                            alignment=MainAxisAlignment.CENTER,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            controls=[
+                                Icon(icons.PERSON, color=colors.BLACK, size=50),
+                            ]
+                        ),
+                        Column(
+                            expand=2,
+                            controls=[
+                                Text(value=f"{self.name_card['name']}\n{self.name_card['ic']}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
+                            ]
+                        ),
+                    ]
+                ),
+            ]
+
+            if caution_text:
+                content_controls[0].controls[1].controls.append(caution_text)
 
             return Container(
                 width=300,
@@ -142,29 +188,13 @@ class DoctorMedicalRecord:
                 bgcolor="white",
                 content=Column(
                     alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        Row(
-                            controls=[
-                                Column(
-                                    expand=1,
-                                    alignment=MainAxisAlignment.CENTER,
-                                    horizontal_alignment=CrossAxisAlignment.CENTER,
-                                    controls=[
-                                        Icon(icons.PERSON, color=colors.BLACK, size=50),
-                                    ]
-                                ),
-                                Column(
-                                    expand=2,
-                                    controls=[
-                                        Text(value=f"{self.name_card['name']}\n{self.name_card['ic']}\n{gender}\n{age}", style=TextStyle(color=colors.BLACK)),
-                                        Text(value=f"**{caution}**", style=TextStyle(color=colors.RED)),
-                                    ]
-                                ),
-                            ]
-                        ),
-                    ]
+                    controls=content_controls
                 )
             )
+
+        def update_name_card_view():
+            name_card_container.content = create_name_card()
+            page.update()
 
         shared_records = GridView(
             padding=padding.only(top=10),
@@ -208,7 +238,6 @@ class DoctorMedicalRecord:
                                             color=colors.BLACK, size=12),
                                     ]
                                 )
-
                             ]
                         )
                     )
@@ -222,24 +251,18 @@ class DoctorMedicalRecord:
         )
 
         def delete_medical_record(e):
-
             record_id = e.control.data
-
             url = "http://localhost:3000/medicalRecord/delete/"
-
             payload = f'recordID={record_id}'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-
             response = requests.request("POST", url, headers=headers, data=payload)
-
             self.get_medical_records(user_id, doctor_id)
             update_medical_records_view()
 
         def update_medical_records_view():
             medical_records.controls.clear()
-
             for i in range(len(self.medical_record)):
                 medical_records.controls.append(
                     Container(
@@ -277,7 +300,6 @@ class DoctorMedicalRecord:
                                             Text(value=f'{svr.get_hospital_name(self.medical_record[i]["hospitalID"])}\n{svr.get_doctor_name(self.medical_record[i]["doctorID"])}', color=colors.BLACK, size=12),
                                         ]
                                     )
-
                                 ]
                             )
                         )
@@ -286,6 +308,8 @@ class DoctorMedicalRecord:
             page.update()
 
         update_medical_records_view()
+
+        name_card_container = Container(content=create_name_card())
 
         return View(
             bgcolor=colors.GREY_200,
@@ -301,23 +325,31 @@ class DoctorMedicalRecord:
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
                                     icon_color=colors.BLACK,
-                                    on_click=go_doctor_home,
+                                    on_click=lambda e: go_doctor_home(doctor_id)
                                 ),
                                 Text(value='Medical Record', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]
                         ),
-                        Container(
-                            content=Row(
-                                alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                vertical_alignment=CrossAxisAlignment.START,
-                                controls=[
-                                    name_card(),
-                                    ElevatedButton(
-                                        on_click=open_dlg_modal,
-                                        content=Text('Add Medical Record')
-                                    ),
-                                ]
-                            ),
+                        Row(
+                            alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            vertical_alignment=CrossAxisAlignment.START,
+                            controls=[
+                                name_card_container,
+                                Column(
+                                    horizontal_alignment=CrossAxisAlignment.END,
+                                    alignment=MainAxisAlignment.END,
+                                    controls=[
+                                        ElevatedButton(
+                                            on_click=open_dlg_modal,
+                                            content=Text('Add Medical Record')
+                                        ),
+                                        ElevatedButton(
+                                            on_click=edit_caution,
+                                            content=Text('Edit Caution')
+                                        ),
+                                    ]
+                                )
+                            ]
                         ),
                         Container(
                             expand=True,

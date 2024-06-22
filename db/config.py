@@ -50,7 +50,7 @@ def login(email, password):
         login = auth.sign_in_with_email_and_password(email, password)
         userID = auth.get_account_info(login['idToken'])['users'][0]['localId']
 
-        url = f"http://localhost:3000/username/{userID}"
+        url = f"http://localhost:3000/user/{userID}"
 
         payload = {}
         headers = {}

@@ -9,8 +9,6 @@ import datetime
 
 class MedicalRecord:
     def __init__(self):
-        self.medical_record_url = "http://localhost:3000/medicalRecord"
-        self.name_card_url ="http://localhost:3000/username"
         self.payload = '='
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response1 = None
@@ -19,12 +17,12 @@ class MedicalRecord:
         self.name_card = None
 
     def get_name_card(self):
-        full_url = f'{self.name_card_url}/{get_userID()}'
+        full_url = f'http://localhost:3000/user/{get_userID()}'
         self.response1 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.name_card = json.loads(self.response1.text)
 
     def get_medical_records(self):
-        full_url = f"{self.medical_record_url}/{get_userID()}"
+        full_url = f"http://localhost:3000/medicalRecord/{get_userID()}"
         self.response2 = requests.get(full_url, headers=self.headers, data=self.payload)
         self.medical_record = json.loads(self.response2.text)
 
@@ -60,6 +58,7 @@ class MedicalRecord:
             birth_year = 2000 + ic_year if ic_year <= current_year_two_digit else 1900 + ic_year
 
             age = f"{current_year - birth_year} years old"
+
             caution = self.name_card['caution']
 
             caution_text = Text(value=f'{caution}', style=TextStyle(color=colors.RED)) if caution else None
