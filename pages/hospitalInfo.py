@@ -4,10 +4,12 @@ from flet_route import Params, Basket
 import requests
 import json
 
+
 class HospitalInfo():
     def __init__(self):
         self.hospital = None
 
+    # Fetches hospital info for the specified hospital ID
     def get_hospital_info(self, hospital_id):
         url = f"http://localhost:3000/hospital/{hospital_id}"
 
@@ -18,6 +20,7 @@ class HospitalInfo():
 
         self.hospital = json.loads(response.text)
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         hospital_id = int(params.hospital_id)
         self.get_hospital_info(hospital_id)
@@ -28,6 +31,7 @@ class HospitalInfo():
         page.window_min_width = 900
         page.window_min_height = 630
 
+        # Navigate to select hospital page
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
@@ -65,12 +69,10 @@ class HospitalInfo():
                                 fit=ImageFit.FILL,
                             ),
                         ),
-
                         Container(
                             padding=10,
                             content=Text('Location: ' + self.hospital['location'])
                         ),
-
                         Container(
                             padding=10,
                             content=Image(
@@ -80,7 +82,6 @@ class HospitalInfo():
                                 fit=ImageFit.COVER,
                             ),
                         ),
-
                         Container(
                             padding=10,
                             content=Text(self.hospital['description'])

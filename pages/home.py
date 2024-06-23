@@ -19,6 +19,7 @@ class Home:
         self.appointments = None
         self.booking_histories = None
 
+    # Fetch appointments from the server
     def get_appointments(self):
         full_url = f"{self.url}/{get_userID()}"
         # Perform the HTTP request to fetch appointments
@@ -26,9 +27,9 @@ class Home:
         # Store the response text data
         self.appointments = json.loads(self.response.text)
 
+    # Separate booking histories from upcoming appointments
     def get_booking_histories(self):
         self.booking_histories = []
-
         i = 0
         while i < len(self.appointments):
             if self.appointments[i]["datetime"] < datetime.datetime.now().timestamp():
@@ -37,6 +38,7 @@ class Home:
             else:
                 i += 1
 
+    # Generate the calendar view
     def generate_calendar(self, page):
         current_date = datetime.date.today()
         current_year = current_date.year
@@ -133,6 +135,7 @@ class Home:
             )
         )
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -143,14 +146,17 @@ class Home:
         self.get_booking_histories()
         name = get_name()
 
+        # Navigate to login page
         def go_login(e):
             page.go("/")
             page.update()
 
+        # Navigate to select hospital page
         def go_select_hospital(e):
             page.go("/selectHospital")
             page.update()
 
+        # Navigate to medical record page
         def go_medical_record(e):
             page.go("/medicalRecord")
             page.update()
@@ -164,6 +170,7 @@ class Home:
             spacing=10,
         )
 
+        # Update the appointments view
         def update_appointments_view():
             appointments.controls.clear()
 
@@ -305,9 +312,11 @@ class Home:
                 )
             page.update()
 
+        # Update the booking histories view
         def update_bookingHistories_view():
             booking_history.controls.clear()
 
+            # Sort by datetime in descending order and keeps only the 10 most recent
             self.booking_histories = sorted(self.booking_histories, key=lambda appt: appt["datetime"], reverse=True)[:10]
 
             for i in range(len(self.booking_histories)):
@@ -407,9 +416,11 @@ class Home:
                 )
             page.update()
 
+        # Open a modal dialog to confirm the deletion of an appointment.
         def open_dlg_modal(e):
-            book_id = e.control.data
+            book_id = e.control.data  # Get the booking ID from the control's data
 
+            # Find the appointment details for the given booking ID
             for i in range(len(self.appointments)):
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
@@ -441,7 +452,9 @@ class Home:
             dlg_modal.open = True
             page.update()
 
+        # Delete an appointment and update the available timeslots.
         def delete_appointment(book_id):
+            # Send a request to delete the appointment with the given booking ID
             url = f"http://localhost:3000/appointment/delete/{book_id}"
             payload = {}
             headers = {}
@@ -449,6 +462,7 @@ class Home:
             response = requests.request("POST", url, headers=headers, data=payload)
             temp = json.loads(response.text)
 
+            # Send a request to update the timeslot for the doctor associated with the appointment
             url2 = f"http://localhost:3000/timeslots/update/{temp['doctorID']}/{temp['datetime']}"
             payload2 = 'blockDate=0'
             headers2 = {
@@ -456,15 +470,14 @@ class Home:
             }
 
             response2 = requests.request("POST", url2, headers=headers2, data=payload2)
-            # print(response2.text)
 
             self.get_appointments()
             self.get_booking_histories()
             update_appointments_view()
             update_bookingHistories_view()
 
-        update_appointments_view()
-        update_bookingHistories_view()
+        update_appointments_view()  # Initialize the GridView with current appointments
+        update_bookingHistories_view()  # Initialize the GridView with current booking histories
 
         return View(
             bgcolor=colors.GREY_200,

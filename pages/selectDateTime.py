@@ -25,6 +25,7 @@ class SelectDateTime:
         self.page = None
         self.timeslot = None
 
+    # Fetches available time slots for a specific doctor on a given date
     def get_timeslots(self, doctor_id, date):
         full_url = f"{self.url}/{doctor_id}/{date}"
         # Perform the HTTP request to fetch time slots
@@ -32,6 +33,7 @@ class SelectDateTime:
         # Store the response text data
         self.timeslots_data = json.loads(self.response.text)
 
+    # Generate a calendar UI with clickable dates for selecting appointment date
     def generate_calendar(self, page, doctor_id):
         current_date = datetime.date.today()
         current_year = current_date.year
@@ -137,6 +139,7 @@ class SelectDateTime:
             )
         )
 
+    # Handles click event on a date in the calendar
     def date_clicked(self, doctor_id, date):
         if date:
             # Reset the previously chosen date
@@ -162,6 +165,7 @@ class SelectDateTime:
             self.get_timeslots(doctor_id, timeslot_date)
             self.update_timeslots()
 
+    # Resets the appearance of a selected date back to default
     def reset_date_color(self, date):
         # Reset the properties for a specific date
         for month_grid in self.calendar_grid.controls:
@@ -173,6 +177,7 @@ class SelectDateTime:
                         day_container.content.color = colors.BLACK  # Reset the text color
                         day_container.update()
 
+    # Update the time slots view
     def update_timeslots(self):
         self.timeslot.controls.clear()
 
@@ -199,17 +204,20 @@ class SelectDateTime:
             )
         self.page.update()
 
+    # Handles tap event on a time slot
     def on_tap(self, e):
         global selected_container
         global selected_time
 
         container = e.control.content  # Access the Container inside the GestureDetector
 
+        # Deselect previously selected timeslot if any
         if selected_container is not None and selected_container != container:
             selected_container.bgcolor = colors.WHITE
             selected_container.content.color = colors.GREY_800
             selected_container.update()
 
+        # Toggle selection of the current timeslot's card
         if container.bgcolor == colors.WHITE:
             container.bgcolor = colors.GREY_300
             container.content.color = colors.RED
@@ -221,6 +229,7 @@ class SelectDateTime:
 
         container.update()
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         self.page = page
         page.title = 'Call a Doctor - Select Date & Time'
@@ -237,6 +246,7 @@ class SelectDateTime:
             child_aspect_ratio=5 / 2,
         )
 
+        # Navigate to select doctor page
         def go_select_doctor(e):
             global selected_container
             selected_container = None
@@ -244,17 +254,21 @@ class SelectDateTime:
             page.go(f'/selectDoctor/{hospital_id}')
             page.update()
 
+        # Open a confirmation dialog for the selected appointment date and time
         def open_confirm_dlg(e):
             global selected_date
             global selected_time
 
+            # Construct the URL to update the timeslot availability for a specific doctor and time
             url = f"http://localhost:3000/timeslots/update/{doctor_id}/{selected_time}"
 
+            # Prepare the payload to indicate that the timeslot should be blocked
             payload = 'blockDate=1'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
 
+            # Send a POST request to the server to update the timeslot availability
             response = requests.request("POST", url, headers=headers, data=payload)
 
             confirm_dlg_modal.actions = [
@@ -272,19 +286,23 @@ class SelectDateTime:
                     )
                 ]
 
+            # URL for the endpoint where booking information will be sent
             url = "http://localhost:3000/book"
 
+            # Constructing the payload with user ID, hospital ID, doctor ID, and selected appointment datetime
             payload = f'userID={get_userID()}&hospitalID={hospital_id}&doctorID={doctor_id}&datetime={selected_time}'
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
 
+            # Making a POST request to the specified URL with headers and payload data
             response = requests.request("POST", url, headers=headers, data=payload)
 
             page.dialog = confirm_dlg_modal
             confirm_dlg_modal.open = True
             page.update()
 
+        # Close the confirmation dialog and navigates to the home page
         def close_confirm_dlg(e):
             global selected_container
             global selected_date
@@ -305,6 +323,7 @@ class SelectDateTime:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
+        # Opens a dialog when no time slot is selected
         def open_error_dlg(e):
             page.dialog = error_dlg_modal
             error_dlg_modal.open = True
@@ -330,6 +349,7 @@ class SelectDateTime:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
+        # Open the confirmation dialog if a time slot is selected, otherwise opens an error dialog
         def open_dlg_modal(e):
             global selected_time
 
@@ -338,7 +358,7 @@ class SelectDateTime:
             else:
                 open_confirm_dlg(e)
 
-        self.update_timeslots()
+        self.update_timeslots()  # Initialize the GridView with current timeslots
 
         return View(
             bgcolor=colors.GREY_200,

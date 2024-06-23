@@ -1,4 +1,3 @@
-import flet as ft
 from flet import *
 from flet_route import Params, Basket
 from flet_core.control_event import ControlEvent
@@ -6,6 +5,7 @@ from db.config import login
 import requests
 import json
 
+# Initialize global variable
 selected_index = None
 
 
@@ -13,6 +13,7 @@ class Login:
     def __init__(self):
         pass
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Login'
         page.window_min_width = 900
@@ -25,6 +26,7 @@ class Login:
             )
         )
 
+        # Function for admin login
         def admin_login():
             try:
                 url = "http://localhost:3000/login/admin"
@@ -38,13 +40,15 @@ class Login:
 
                 hospital_id = json.loads(response.text)['hospitalID']
 
+                # Redirect to admin home page
                 page.go(f'/adminHome/{hospital_id}')
                 page.update()
-            except:
+            except: # Show error dialog if login fails
                 page.dialog = dlg_modal
                 dlg_modal.open = True
                 page.update()
 
+        # Function for doctor login
         def doctor_login():
             try:
                 url = "http://localhost:3000/login/doctor"
@@ -60,9 +64,10 @@ class Login:
 
                 doctor_id = json.loads(response.text)['doctorID']
 
+                # Redirect to doctor home page
                 page.go(f'/doctorHome/{doctor_id}')
                 page.update()
-            except:
+            except:  # Show error dialog if login fails
                 page.dialog = dlg_modal
                 dlg_modal.open = True
                 page.update()
@@ -100,6 +105,7 @@ class Login:
             ]
         )
 
+        # Dialog for displaying login error
         dlg_modal = AlertDialog(
             modal=False,
             title=Text("Error", text_align=TextAlign.CENTER),
@@ -120,6 +126,7 @@ class Login:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
+        # Validate login form fields
         def validate(e: ControlEvent):
             if all([email.value, password.value]):
                 login_button.disabled = False
@@ -127,6 +134,7 @@ class Login:
                 login_button.disabled = True
             page.update()
 
+        # Perform login based on selected tab
         def all_login(e: ControlEvent):
             global selected_index
             if selected_index is None or selected_index == 0:
@@ -141,6 +149,7 @@ class Login:
             else:
                 admin_login()
 
+        # Handle tab change events
         def on_change(e: ControlEvent):
             global selected_index
             if int(e.data) == 0:
@@ -150,14 +159,17 @@ class Login:
             else:
                 selected_index = 2
 
+        # Navigate to registration page
         def go_register(e):
             page.go("/register")
             page.update()
 
+        # Navigate to clinic form page
         def go_clinic_form(e):
             page.go("/clinicForm")
             page.update()
 
+        # Assign event handlers to UI elements
         email.on_change = validate
         password.on_change = validate
         login_button.on_click = all_login

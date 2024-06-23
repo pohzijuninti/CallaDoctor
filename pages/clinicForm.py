@@ -13,6 +13,7 @@ class ClinicForm:
         self.response = None
         self.potentialCustomers = None
 
+    # Fetch potential customers from backend
     def get_potentialCustomers(self):
         try:
             self.response = requests.get(self.potentialCustomersURL, headers=self.headers, data=self.payload)
@@ -21,6 +22,7 @@ class ClinicForm:
 
             max_id = -1
 
+            # Find the maximum potentialCustomerID
             for customer in self.potentialCustomers:
                 if "potentialCustomerID" in customer:
                     if customer["potentialCustomerID"] > max_id:
@@ -36,36 +38,44 @@ class ClinicForm:
             print(f"JSON decode error: {e}")
             return -1
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Clinic Form'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 800
         page.window_min_height = 630
 
+        # Navigate to login page
         def go_login(e):
             page.go("/")
             page.update()
 
+        # Setup fields
         name = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.BLACK)
         address = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.BLACK)
         phone_number = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.BLACK)
         email = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.BLACK)
 
+        # Open dialog modal on form submission
         def open_dlg_modal(e):
+            # Check if all fields are filled
             if name.value and address.value and phone_number.value and email.value:
                 url = "http://localhost:3000/clinic/form"
 
+                # Prepare payload for POST request
                 payload = f'hospitalName={name.value}&address={address.value}&phone={phone_number.value}&email={email.value}'
                 headers = {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
 
                 try:
+                    # Send POST request to submit clinic form
                     response = requests.post(url, headers=headers, data=payload)
                     response.raise_for_status()  # Raise an exception for HTTP errors
-                    form = response.json()
+                    form = response.json()  # Parse JSON response
                     print(form)
 
+                    # Get the latest potential customer ID
                     id = self.get_potentialCustomers()
                     if id == -1:
                         print("Failed to get potential customers.")
@@ -107,6 +117,7 @@ class ClinicForm:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
+        # Function to display submit button
         def display_button():
             return Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN,

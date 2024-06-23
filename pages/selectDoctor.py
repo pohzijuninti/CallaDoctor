@@ -5,7 +5,7 @@ import pages.server as svr
 import requests
 import json
 
-
+# Initialize global variables
 selected_container = None
 doctor_id = None
 
@@ -18,11 +18,13 @@ class SelectDoctor:
         self.doctor_response = None
         self.doctors = None
 
+    # Fetches doctors for the specified hospital ID
     def get_doctors(self, hospital_id):
         full_url = f"{self.doctorsURL}/{hospital_id}"
         self.doctor_response = requests.get(full_url, headers=self.doctor_headers, data=self.doctor_payload)
         self.doctors = json.loads(self.doctor_response.text)['doctors']
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -31,14 +33,14 @@ class SelectDoctor:
 
         hospital_id = int(params.hospital_id)
         svr.get_doctor_details(hospital_id),
-
         self.get_doctors(hospital_id)
 
-
+        # Navigate to doctor info page
         def go_doctor_info(e):
             page.go(f'/doctor/info/{e.control.data}')
             page.update()
 
+        # Navigate to select hospital page
         def go_select_hospital(e):
             global selected_container
             selected_container = None
@@ -46,6 +48,7 @@ class SelectDoctor:
             page.go("/selectHospital")
             page.update()
 
+        # Navigate to select datetime page
         def go_select_datetime(e):
             global selected_container
             selected_container = None
@@ -54,14 +57,17 @@ class SelectDoctor:
                 page.go(f'/selectDateTime/{hospital_id}/{doctor_id}')
                 page.update()
 
+        # Handle tap event on a doctor's card
         def on_tap(e):
             global selected_container
             global doctor_id
 
+            # Deselect previously selected doctor if any
             if selected_container is not None and selected_container != e.control:
                 selected_container.content.border = None
                 selected_container.update()
 
+            # Toggle selection of the current doctor's card
             if e.control.content.border is None or selected_container != e.control:
                 e.control.content.border = border.all(10, colors.BLUE_100)
                 selected_container = e.control
@@ -79,6 +85,7 @@ class SelectDoctor:
             padding=30,
         )
 
+        # Function to display next button
         def display_button():
             return Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -98,6 +105,7 @@ class SelectDoctor:
             )
 
         for i in range(len(self.doctors)):
+            # Determine doctor's image or default icon
             image_src = self.doctors[i]["image"]
             doctor_image = Image(src=image_src, fit=ImageFit.FIT_HEIGHT) if image_src else Icon(icons.PERSON, color='black', size=140)
 

@@ -2,10 +2,12 @@ from flet import *
 from flet_route import Params, Basket
 from db.config import register
 
+
 class Register:
     def __init__(self):
         pass
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Register'
         page.window_min_width = 900
@@ -22,54 +24,99 @@ class Register:
         confirm_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Confirm Password', border=InputBorder.UNDERLINE,
                                             text_size=14, password=True, can_reveal_password=True)
 
+        # Function to handle the signup process
         def signup(e):
             if new_name.value == '' or new_ic.value == '' or new_email.value == '' or new_password.value == '':
-                title = 'Error'
-                message = 'Please fill up the form.'
-                is_successful = False
+                open_empty_dlg(e)
             elif new_password.value != confirm_password.value:
-                title = 'Error'
-                message = 'Passwords do not match.'
-                is_successful = False
+                open_error_dlg(e)
             else:
+                # Perform registration using provided data
                 register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
-                title = 'Successful Registration'
-                message = 'Thank you! You have successfully registered.'
-                is_successful = True
+                open_successful_dlg(e)
 
-            dlg_modal.title = Text(title, text_align=TextAlign.CENTER)
-            dlg_modal.content = Text(message, text_align=TextAlign.CENTER)
-            dlg_modal.actions = [
+        # Opens a dialog when the registration form fields are not filled up
+        def open_empty_dlg(e):
+            page.dialog = empty_dlg_modal
+            empty_dlg_modal.open = True
+            page.update()
+
+        empty_dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Error", text_align=TextAlign.CENTER),
+            content=Text("Please fill up the form.", text_align=TextAlign.CENTER),
+            actions=[
                 Container(
                     content=Column(
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[
                             TextButton(
-                                text='Go to Login Page' if is_successful else 'Close',
-                                width=150,
-                                on_click=lambda e: (
-                                    setattr(dlg_modal, 'open', False),
-                                    page.update(),
-                                    go_login(e) if is_successful else None
-                                )
+                                text='Close', width=150,
+                                on_click=lambda e: (setattr(empty_dlg_modal, 'open', False),page.update())
                             )
                         ]
                     )
                 )
-            ]
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
 
-            page.dialog = dlg_modal
-            dlg_modal.open = True
+        # Opens a dialog when passwords do not match during registration
+        def open_error_dlg(e):
+            page.dialog = error_dlg_modal
+            error_dlg_modal.open = True
             page.update()
 
+        error_dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Error", text_align=TextAlign.CENTER),
+            content=Text("Passwords do not match.", text_align=TextAlign.CENTER),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            TextButton(
+                                text='Close', width=150,
+                                on_click=lambda e: (setattr(error_dlg_modal, 'open', False), page.update())
+                            )
+                        ]
+                    )
+                )
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
+
+        # Opens a dialog when registration is successful
+        def open_successful_dlg(e):
+            page.dialog = successful_dlg_modal
+            successful_dlg_modal.open = True
+            page.update()
+
+        successful_dlg_modal = AlertDialog(
+            modal=False,
+            title=Text("Successful Registration", text_align=TextAlign.CENTER),
+            content=Text("Thank you! You have successfully registered.", text_align=TextAlign.CENTER),
+            actions=[
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            TextButton(
+                                text='Go to Login Page', width=150,
+                                on_click=lambda e: (setattr(successful_dlg_modal, 'open', False), page.update(), go_login(e))
+                            )
+                        ]
+                    )
+                )
+            ],
+            actions_alignment=MainAxisAlignment.CENTER,
+        )
+
+        # Function to navigate to login page
         def go_login(e):
             page.go("/")
             page.update()
-
-        dlg_modal = AlertDialog(
-            modal=False,
-            actions_alignment=MainAxisAlignment.CENTER,
-        )
 
         return View(
             bgcolor=colors.GREY_200,

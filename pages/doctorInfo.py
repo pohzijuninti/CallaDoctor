@@ -4,12 +4,14 @@ from flet_route import Params, Basket
 import requests
 import json
 
+
 class DoctorInfo():
     def __init__(self):
         self.doctor_info = None
         self.hospital_name = None
         self.speciality_name = None
 
+    # Fetches doctor info for the specified doctor ID
     def get_doctor_info(self, doctor_id):
         url = f"http://localhost:3000/doctor/get/{doctor_id}"
 
@@ -20,6 +22,7 @@ class DoctorInfo():
         self.doctor_info = json.loads(response.text)
         print(self.doctor_info)
 
+    # Fetches hospital name for the specified doctor ID
     def get_hospital_name(self, doctor_id):
         url = f"http://localhost:3000/hospital/name/{doctor_id}"
 
@@ -29,6 +32,7 @@ class DoctorInfo():
         response = requests.request("GET", url, headers=headers, data=payload)
         self.hospital_name = json.loads(response.text)['name']
 
+    # Fetches speciality name for the specified speciality ID
     def get_speciality(self, speciality_id):
         url = f"http://localhost:3000/speciality/{speciality_id}"
 
@@ -38,8 +42,8 @@ class DoctorInfo():
         response = requests.request("GET", url, headers=headers, data=payload)
         self.speciality_name = json.loads(response.text)['name']
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
-
         doctor_id = int(params.doctor_id)
         self.get_doctor_info(doctor_id)
         self.get_hospital_name(self.doctor_info['hospitalID'])
@@ -51,7 +55,7 @@ class DoctorInfo():
         page.window_min_width = 900
         page.window_min_height = 630
 
-
+        # Navigate to select doctor page
         def go_select_doctor(e):
             hospital_id = self.doctor_info['hospitalID']
             page.go(f'/selectDoctor/{hospital_id}')

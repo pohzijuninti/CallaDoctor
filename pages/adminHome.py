@@ -6,6 +6,7 @@ import json
 import pages.server as svr
 import datetime
 
+# Initialize global variable
 new_specialityID = None
 
 
@@ -23,16 +24,19 @@ class AdminHome:
         self.doctor_response = None
         self.doctors = None
 
+    # Fetches appointments for the specified hospital ID
     def get_appointments(self, hospital_id):
         full_url = f"{self.appointmentURL}/{hospital_id}"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.appointments = json.loads(self.response.text)
 
+    # Fetches doctors for the specified hospital ID
     def get_doctors(self, hospital_id):
         full_url = f"{self.doctorsURL}/{hospital_id}"
         self.doctor_response = requests.get(full_url, headers=self.doctor_headers, data=self.doctor_payload)
         self.doctors = json.loads(self.doctor_response.text)['doctors']
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Admin'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -44,6 +48,7 @@ class AdminHome:
         self.get_appointments(hospital_id)
         self.get_doctors(hospital_id)
 
+        # Handles the closure of the speciality selection anchor
         def close_anchor(e):
             global new_specialityID
             new_specialityID = e.control.data
@@ -68,15 +73,18 @@ class AdminHome:
             ]
         )
 
+        # Navigate to login page
         def go_login(e):
             page.go("/")
             page.update()
 
+        # Opens the modal dialog for adding a new doctor
         def open_dlg_modal(e):
             page.dialog = dlg_modal
             dlg_modal.open = True
             page.update()
 
+        # Adds a new doctor to the hospital's doctor list
         def add_doctor(name, hospitalID, email):
             try:
                 url = "http://localhost:3000/doctor/add"
@@ -96,6 +104,7 @@ class AdminHome:
                 print('Add doctor failed', e)
             return
 
+        # Finalizes the process of adding a new doctor and closes the dialog
         def done(e):
             dlg_modal.open = False
             add_doctor(new_name.value, hospital_id, new_email.value)
@@ -135,6 +144,7 @@ class AdminHome:
             expand=True,
         )
 
+        # Updates the appointments view
         def update_appointments_view():
             appointments.controls.clear()  # Clear existing controls
 
@@ -155,6 +165,8 @@ class AdminHome:
                     index += 1
 
             for i in range(len(self.appointments)):
+                userID = self.appointments[i]['userID']
+
                 if self.appointments[i]["status"] == 0:
                     colour = 'grey'
                     colour1 = 'white'
@@ -171,13 +183,14 @@ class AdminHome:
                     status = 'REJECTED'
                     disable = True
 
-                userID = self.appointments[i]['userID']
+                # Construct the URL to fetch user details based on userID.
                 url = f"http://localhost:3000/user/{userID}"
-
                 payload = {}
                 headers = {}
 
+                # Send a GET request to the server to retrieve user information.
                 response = requests.request("GET", url, headers=headers, data=payload)
+                # Extract the user's name from the response JSON data.
                 name = json.loads(response.text)['name']
 
                 appointments.controls.append(
@@ -309,6 +322,7 @@ class AdminHome:
                 )
             page.update()
 
+        # Update the doctors view
         def update_doctors_view():
             doctors.controls.clear()  # Clear existing controls
             for i in range(len(self.doctors)):
@@ -351,9 +365,11 @@ class AdminHome:
                 )
             page.update()
 
+        # Opens the modal dialog for approving an appointment
         def approve_dlg_modal(e):
-            book_id = e.control.data
+            book_id = e.control.data  # Get the booking ID from the control's data
 
+            # Find the appointment details for the given booking ID
             for i in range(len(self.appointments)):
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
@@ -361,12 +377,14 @@ class AdminHome:
                     userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
 
+            # Construct the URL to fetch user details based on userID.
             url = f"http://localhost:3000/user/{userID}"
-
             payload = {}
             headers = {}
 
+            # Send a GET request to the server to retrieve user information.
             response = requests.request("GET", url, headers=headers, data=payload)
+            # Extract the user's name from the response JSON data.
             name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
@@ -395,8 +413,9 @@ class AdminHome:
             page.update()
 
         def reject_dlg_modal(e):
-            book_id = e.control.data
+            book_id = e.control.data  # Get the booking ID from the control's data
 
+            # Find the appointment details for the given booking ID
             for i in range(len(self.appointments)):
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
@@ -404,12 +423,14 @@ class AdminHome:
                     userID = self.appointments[i]["userID"]
                     doctor = svr.get_doctor_name(self.appointments[i]["doctorID"])
 
+            # Construct the URL to fetch user details based on userID.
             url = f"http://localhost:3000/user/{userID}"
-
             payload = {}
             headers = {}
 
+            # Send a GET request to the server to retrieve user information.
             response = requests.request("GET", url, headers=headers, data=payload)
+            # Extract the user's name from the response JSON data.
             name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
@@ -437,6 +458,7 @@ class AdminHome:
             dlg_modal.open = True
             page.update()
 
+        # Approve the appointment with the specified book ID
         def approve_appointment(book_id):
             url = f"http://localhost:3000/appointment/approve/{book_id}"
             payload = {}
@@ -449,6 +471,7 @@ class AdminHome:
             self.get_appointments(hospital_id)
             update_appointments_view()
 
+        # Reject the appointment with the specified book ID
         def reject_appointment(book_id):
             url = f"http://localhost:3000/appointment/reject/{book_id}"
             payload = {}
@@ -462,9 +485,11 @@ class AdminHome:
             self.get_appointments(hospital_id)
             update_appointments_view()
 
+        # Opens the modal dialog for confirming deletion of a doctor
         def delete_dlg_modal(e):
-            doctor_id = e.control.data
+            doctor_id = e.control.data  # Get the doctor ID from the control's data
 
+            # Find the doctor details for the given doctor ID
             for i in range(len(self.doctors)):
                 if self.doctors[i]["doctorID"] == doctor_id:
                     name = self.doctors[i]["name"]
@@ -494,6 +519,7 @@ class AdminHome:
             dlg_modal.open = True
             page.update()
 
+        # Delete the doctor with the specified doctor ID
         def delete_doctor(doctor_id):
             url = f"http://localhost:3000/doctor/delete/{doctor_id}"
             payload = {}
@@ -505,6 +531,7 @@ class AdminHome:
             self.get_doctors(hospital_id)
             update_doctors_view()
 
+        # Displays the doctor's image if available; otherwise, shows a default icon
         def display_doc_image(img):
             if img == "":
                 return Icon(icons.PERSON, color=colors.BLACK, size=140)

@@ -3,6 +3,7 @@ from flet import *
 from flet_route import Params, Basket
 import pages.server as svr
 
+# Initialize global variables
 selected_container = None
 hospital_id = None
 
@@ -11,12 +12,14 @@ class SelectHospital:
     def __init__(self):
         pass
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Select Hospital'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
         page.window_min_width = 900
         page.window_min_height = 630
 
+        # Navigate to home page
         def go_home(e):
             global selected_container
             selected_container = None
@@ -24,10 +27,12 @@ class SelectHospital:
             page.go("/home")
             page.update()
 
+        # Navigate to hospital info page
         def go_hospital_info(e):
             page.go(f"/hospital/info/{e.control.data}")
             page.update()
 
+        # Navigate to select doctor page
         def go_select_doctor(e):
             global selected_container
             selected_container = None
@@ -36,11 +41,13 @@ class SelectHospital:
                 page.go(f'/selectDoctor/{hospital_id}')
                 page.update()
 
+        # Handle click event on hospital search result
         def on_click(e):
             global hospital_id
             hospital_id = e.control.data
             go_select_doctor(e)
 
+        # Create a search bar with hospital list
         search_bar: SearchBar = SearchBar(
             width=300,
             bar_hint_text='Search...',
@@ -57,14 +64,17 @@ class SelectHospital:
             ]
         )
 
+        # Handle tap event on a hospital's card
         def on_tap(e):
             global selected_container
             global hospital_id
 
+            # Deselect previously selected doctor if any
             if selected_container is not None and selected_container != e.control:
                 selected_container.content.border = None
                 selected_container.update()
 
+            # Toggle selection of the current hospital's card
             if e.control.content.border is None or selected_container != e.control:
                 e.control.content.border = border.all(10, colors.BLUE_100)
                 selected_container = e.control
@@ -82,6 +92,7 @@ class SelectHospital:
             padding=30,
         )
 
+        # Function to display next button
         def display_button():
             return Row(
                 alignment=MainAxisAlignment.SPACE_BETWEEN,

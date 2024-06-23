@@ -4,6 +4,7 @@ from flet_route import Params, Basket
 import requests
 import json
 
+
 class PatientList:
     def __init__(self):
         self.headers = {}
@@ -12,12 +13,14 @@ class PatientList:
         self.patients = None
         self.hospital_id = None
 
+    # Fetch users from the server
     def get_users(self):
         full_url = "http://localhost:3000/user/get"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.patients = json.loads(self.response.text)
         print(self.patients)
 
+    # Fetch hospital ID for the specified doctor ID
     def get_hospital_id(self, docID):
         url = f"http://localhost:3000/doctor/get/{docID}"
 
@@ -27,7 +30,7 @@ class PatientList:
         response = requests.request("GET", url, headers=headers, data=payload)
         self.hospital_id = json.loads(response.text)['hospitalID']
 
-
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Doctor - Patient List'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -35,15 +38,15 @@ class PatientList:
         page.window_min_height = 630
 
         doctor_id = int(params.doctor_id)
-
         self.get_users()
         self.get_hospital_id(doctor_id)
 
-
+        # Navigate to doctor home page
         def go_doctor_home(e):
             page.go(f'/doctorHome/{doctor_id}')
             page.update()
 
+        # Navigate to doctor medical record page
         def go_doctor_medical_record(hospital_id, user_id):
             page.go(f"/doctorMedicalRecord2/{hospital_id}/{doctor_id}/{user_id}")
             page.update()
@@ -54,6 +57,7 @@ class PatientList:
             padding=20,
         )
 
+        # Update the patients view
         def update_patient_view():
             patients.controls.clear()
 
@@ -77,7 +81,7 @@ class PatientList:
                     ),
                 )
 
-        update_patient_view()
+        update_patient_view()  # Initialize the GridView with current patients
 
         return View(
             padding=50,

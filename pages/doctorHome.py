@@ -20,14 +20,15 @@ class DoctorHome:
         self.booking_histories = None
         self.hospital_id = None
 
+    # Fetches appointments for the specified doctor ID
     def get_appointments(self, doctor_id):
         full_url = f"{self.appointmentURL}/{doctor_id}"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.appointments = json.loads(self.response.text)
 
+    # Separate booking histories from upcoming appointments
     def get_booking_histories(self):
         self.booking_histories = []
-
         i = 0
         while i < len(self.appointments):
             if self.appointments[i]["datetime"] < datetime.datetime.now().timestamp():
@@ -36,6 +37,7 @@ class DoctorHome:
             else:
                 i += 1
 
+    # Generate the calendar view
     def generate_calendar(self, page):
         current_date = datetime.date.today()
         current_year = current_date.year
@@ -133,6 +135,7 @@ class DoctorHome:
             )
         )
 
+    # Main view function for the page
     def view(self, page: Page, params: Params, basket: Basket):
         page.title = 'Call a Doctor - Doctor'
         page.horizontal_alignment = ft.MainAxisAlignment.CENTER
@@ -140,18 +143,20 @@ class DoctorHome:
         page.window_min_height = 630
 
         doctor_id = int(params.doctor_id)
-
         self.get_appointments(doctor_id)
         self.get_booking_histories()
 
+        # Navigate to login page
         def go_login(e):
             page.go("/")
             page.update()
 
+        # Navigate to the patient list page for a specific doctor at a hospital
         def go_patient_list(hospital_id, doctor_id):
             page.go(f"/doctor/patientList/{hospital_id}/{doctor_id}")
             page.update()
 
+        # Navigate to the medical record page for a specific patient with a doctor at a hospital
         def go_doctor_medical_record(hospital_id, user_id):
             page.go(f"/doctorMedicalRecord/{hospital_id}/{doctor_id}/{user_id}")
             page.update()
@@ -165,6 +170,7 @@ class DoctorHome:
             spacing=10,
         )
 
+        # Update the appointments view
         def update_appointments_view():
             appointments.controls.clear()
 
@@ -214,12 +220,14 @@ class DoctorHome:
                     action1 = None
                     action2 = None
 
+                # Construct the URL to fetch user details based on userID.
                 url = f"http://localhost:3000/user/{userID}"
-
                 payload = {}
                 headers = {}
 
+                # Send a GET request to the server to retrieve user information.
                 response = requests.request("GET", url, headers=headers, data=payload)
+                # Extract the user's name from the response JSON data.
                 name = json.loads(response.text)['name']
 
                 appointments.controls.append(
@@ -351,6 +359,7 @@ class DoctorHome:
                 )
             page.update()
 
+        # Update the booking histories view
         def update_bookingHistories_view():
             booking_history.controls.clear()
 
@@ -463,9 +472,11 @@ class DoctorHome:
                 )
             page.update()
 
+        # Opens the modal dialog for approving an appointment
         def approve_dlg_modal(e):
-            book_id = e.control.data
+            book_id = e.control.data  # Get the booking ID from the control's data
 
+            # Find the appointment details for the given booking ID
             for i in range(len(self.appointments)):
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
@@ -473,12 +484,14 @@ class DoctorHome:
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
                     userID = self.appointments[i]["userID"]
 
+            # Construct the URL to fetch user details based on userID.
             url = f"http://localhost:3000/user/{userID}"
-
             payload = {}
             headers = {}
 
+            # Send a GET request to the server to retrieve user information.
             response = requests.request("GET", url, headers=headers, data=payload)
+            # Extract the user's name from the response JSON data.
             name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
@@ -506,8 +519,9 @@ class DoctorHome:
             page.update()
 
         def reject_dlg_modal(e):
-            book_id = e.control.data
+            book_id = e.control.data  # Get the booking ID from the control's data
 
+            # Find the appointment details for the given booking ID
             for i in range(len(self.appointments)):
                 if self.appointments[i]["bookID"] == book_id:
                     date = svr.convert_date(self.appointments[i]["datetime"])
@@ -515,12 +529,14 @@ class DoctorHome:
                     hospital = svr.get_hospital_name(self.appointments[i]["hospitalID"])
                     userID = self.appointments[i]["userID"]
 
+            # Construct the URL to fetch user details based on userID.
             url = f"http://localhost:3000/user/{userID}"
-
             payload = {}
             headers = {}
 
+            # Send a GET request to the server to retrieve user information.
             response = requests.request("GET", url, headers=headers, data=payload)
+            # Extract the user's name from the response JSON data.
             name = json.loads(response.text)['name']
 
             dlg_modal = AlertDialog(
@@ -547,6 +563,7 @@ class DoctorHome:
             dlg_modal.open = True
             page.update()
 
+        # Approve the appointment with the specified book ID
         def approve_appointment(book_id):
             url = f"http://localhost:3000/appointment/approve/{book_id}"
             payload = {}
@@ -558,6 +575,7 @@ class DoctorHome:
             self.get_appointments(doctor_id)
             update_appointments_view()
 
+        # Reject the appointment with the specified book ID
         def reject_appointment(book_id):
             url = f"http://localhost:3000/appointment/reject/{book_id}"
             payload = {}
@@ -569,6 +587,7 @@ class DoctorHome:
             self.get_appointments(doctor_id)
             update_appointments_view()
 
+        # Format a description string
         def display_description(description):
             if ',' in description:
                 description = description.replace(',', '\n*')
@@ -576,8 +595,8 @@ class DoctorHome:
                 description = '* ' + description
             return description
 
-        update_appointments_view()
-        update_bookingHistories_view()
+        update_appointments_view()   # Initialize the GridView with current appointments
+        update_bookingHistories_view()   # Initialize the GridView with current booking histories
 
         return View(
             bgcolor=colors.GREY_200,
