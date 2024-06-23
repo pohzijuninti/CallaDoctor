@@ -7,11 +7,26 @@ import json
 
 class ClinicForm:
     def __init__(self):
+        self.page = None
         self.potentialCustomersURL = "http://localhost:3000/potential/customer"
         self.payload = '='
         self.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self.response = None
         self.potentialCustomers = None
+
+        # Setup fields
+        self.name = TextField(
+            icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.BLACK
+        )
+        self.address = TextField(
+            icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.BLACK
+        )
+        self.phone_number = TextField(
+            icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.BLACK
+            )
+        self.email = TextField(
+            icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.BLACK
+        )
 
     # Fetch potential customers from backend
     def get_potentialCustomers(self):
@@ -38,84 +53,80 @@ class ClinicForm:
             print(f"JSON decode error: {e}")
             return -1
 
-    # Main view function for the page
-    def view(self, page: Page, params: Params, basket: Basket):
-        page.title = 'Call a Doctor - Clinic Form'
-        page.horizontal_alignment = ft.MainAxisAlignment.CENTER
-        page.window_min_width = 800
-        page.window_min_height = 630
+    # Open dialog modal on form submission
+    def open_dlg_modal(self, page, e):
+        self.page = page
 
-        # Navigate to login page
-        def go_login(e):
-            page.go("/")
-            page.update()
+        # Check if all fields are filled
+        if self.name.value and self.address.value and self.phone_number.value and self.email.value:
+            url = "http://localhost:3000/clinic/form"
 
-        # Setup fields
-        name = TextField(icon=icons.LOCAL_HOSPITAL_OUTLINED, label='Hospital Name', border=InputBorder.UNDERLINE, color=colors.BLACK)
-        address = TextField(icon=icons.LOCATION_ON_OUTLINED, label='Address', border=InputBorder.UNDERLINE, color=colors.BLACK)
-        phone_number = TextField(icon=icons.LOCAL_PHONE_OUTLINED, label='Phone Number', border=InputBorder.UNDERLINE, color=colors.BLACK)
-        email = TextField(icon=icons.EMAIL_OUTLINED, label='Email', border=InputBorder.UNDERLINE, color=colors.BLACK)
+            # Prepare payload for POST request
+            payload = f'hospitalName={self.name.value}&address={self.address.value}&phone={self.phone_number.value}&email={self.email.value}'
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
 
-        # Open dialog modal on form submission
-        def open_dlg_modal(e):
-            # Check if all fields are filled
-            if name.value and address.value and phone_number.value and email.value:
-                url = "http://localhost:3000/clinic/form"
+            try:
+                # Send POST request to submit clinic form
+                response = requests.post(url, headers=headers, data=payload)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                form = response.json()  # Parse JSON response
+                print(form)
 
-                # Prepare payload for POST request
-                payload = f'hospitalName={name.value}&address={address.value}&phone={phone_number.value}&email={email.value}'
-                headers = {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                # Get the latest potential customer ID
+                id = self.get_potentialCustomers()
+                if id == -1:
+                    print("Failed to get potential customers.")
+                    return
 
-                try:
-                    # Send POST request to submit clinic form
-                    response = requests.post(url, headers=headers, data=payload)
-                    response.raise_for_status()  # Raise an exception for HTTP errors
-                    form = response.json()  # Parse JSON response
-                    print(form)
-
-                    # Get the latest potential customer ID
-                    id = self.get_potentialCustomers()
-                    if id == -1:
-                        print("Failed to get potential customers.")
-                        return
-
-                    dlg_modal.actions = [
+                dlg_modal = AlertDialog(
+                    modal=False,
+                    title=Text("Thank You", text_align=TextAlign.CENTER),
+                    content=Text("We have received your application and will get back to you soon."),
+                    actions=[
                         Container(
                             content=Column(
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 controls=[
                                     Text(f'Your code is #{id}'),
-                                    Text(f'{name.value}'),
-                                    Text(f'{address.value}'),
-                                    Text(f'{phone_number.value}'),
-                                    Text(f'{email.value}'),
+                                    Text(f'{self.name.value}'),
+                                    Text(f'{self.address.value}'),
+                                    Text(f'{self.phone_number.value}'),
+                                    Text(f'{self.email.value}'),
                                     Container(
                                         padding=padding.only(top=20, bottom=10),
-                                        content=ElevatedButton(text="Back to Login", width=250, on_click=go_login)
+                                        content=ElevatedButton(text="Back to Login", width=250, on_click=self.go_login)
                                     )
                                 ]
                             )
                         )
-                    ]
+                    ],
+                    actions_alignment=MainAxisAlignment.CENTER,
+                )
 
-                    page.dialog = dlg_modal
-                    dlg_modal.open = True
-                    page.update()
-                except requests.exceptions.RequestException as e:
-                    print(f"Request error: {e}")
-                except json.JSONDecodeError as e:
-                    print(f"JSON decode error: {e}")
-            else:
-                print("Please fill in all fields.")
+                self.page.dialog = dlg_modal
+                dlg_modal.open = True
+                self.page.update()
+            except requests.exceptions.RequestException as e:
+                print(f"Request error: {e}")
+            except json.JSONDecodeError as e:
+                print(f"JSON decode error: {e}")
+        else:
+            print("Please fill in all fields.")
 
-        dlg_modal = AlertDialog(
-            modal=False,
-            title=Text("Thank You", text_align=TextAlign.CENTER),
-            content=Text("We have received your application and will get back to you soon."),
-            actions_alignment=MainAxisAlignment.CENTER,
-        )
+    # Navigate to login page
+    def go_login(self, e):
+        self.page.go("/")
+        self.page.update()
+
+    # Main view function for the page
+    def view(self, page: Page, params: Params, basket: Basket):
+        self.page = page
+        page.title = 'Call a Doctor - Clinic Form'
+        page.horizontal_alignment = ft.MainAxisAlignment.CENTER
+        page.window_min_width = 800
+        page.window_min_height = 630
 
         # Function to display submit button
         def display_button():
@@ -127,7 +138,7 @@ class ClinicForm:
                         horizontal_alignment=CrossAxisAlignment.END,
                         controls=[
                             TextButton(
-                                on_click=open_dlg_modal,
+                                on_click=lambda e: self.open_dlg_modal(page, e),
                                 text="Submit", style=ButtonStyle(color=colors.BLACK),
                                 icon=icons.ARROW_FORWARD_IOS_OUTLINED, icon_color=colors.BLACK,
                             )
@@ -152,7 +163,7 @@ class ClinicForm:
                                 IconButton(
                                     icon=icons.ARROW_BACK_IOS_NEW_OUTLINED,
                                     icon_color=colors.BLACK,
-                                    on_click=go_login,
+                                    on_click=self.go_login,
                                 ),
                                 Text(value='Fill in details', style=TextStyle(size=24, weight=FontWeight.BOLD)),
                             ]
@@ -164,10 +175,10 @@ class ClinicForm:
                                 alignment=MainAxisAlignment.CENTER,
                                 horizontal_alignment=CrossAxisAlignment.CENTER,
                                 controls=[
-                                    name,
-                                    address,
-                                    phone_number,
-                                    email,
+                                    self.name,
+                                    self.address,
+                                    self.phone_number,
+                                    self.email,
                                 ]
                             )
                         ),

@@ -18,7 +18,6 @@ class PatientList:
         full_url = "http://localhost:3000/user/get"
         self.response = requests.get(full_url, headers=self.headers, data=self.payload)
         self.patients = json.loads(self.response.text)
-        print(self.patients)
 
     # Fetch hospital ID for the specified doctor ID
     def get_hospital_id(self, docID):

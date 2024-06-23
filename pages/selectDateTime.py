@@ -272,19 +272,19 @@ class SelectDateTime:
             response = requests.request("POST", url, headers=headers, data=payload)
 
             confirm_dlg_modal.actions = [
-                    Container(
-                        content=Column(
-                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                            controls=[
-                                Text(value=f'{svr.convert_date(selected_time)}'),
-                                Text(value=f'{svr.convert_time(selected_time)}'),
-                                Text(value=f'{svr.get_hospital_name(hospital_id)}'),
-                                Text(value=f'{svr.get_doctor_name(doctor_id)}'),
-                                TextButton(text='Back To Home', width=150, on_click=close_confirm_dlg),
-                            ]
-                        )
+                Container(
+                    content=Column(
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        controls=[
+                            Text(value=f'{svr.convert_date(selected_time)}'),
+                            Text(value=f'{svr.convert_time(selected_time)}'),
+                            Text(value=f'{svr.get_hospital_name(hospital_id)}'),
+                            Text(value=f'{svr.get_doctor_name(doctor_id)}'),
+                            TextButton(text='Back To Home', width=150, on_click=close_confirm_dlg),
+                        ]
                     )
-                ]
+                )
+            ]
 
             # URL for the endpoint where booking information will be sent
             url = "http://localhost:3000/book"

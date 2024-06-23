@@ -52,7 +52,7 @@ class Register:
                         controls=[
                             TextButton(
                                 text='Close', width=150,
-                                on_click=lambda e: (setattr(empty_dlg_modal, 'open', False),page.update())
+                                on_click=lambda e: (close_dialog(empty_dlg_modal))
                             )
                         ]
                     )
@@ -78,7 +78,7 @@ class Register:
                         controls=[
                             TextButton(
                                 text='Close', width=150,
-                                on_click=lambda e: (setattr(error_dlg_modal, 'open', False), page.update())
+                                on_click=lambda e: (close_dialog(error_dlg_modal))
                             )
                         ]
                     )
@@ -104,7 +104,7 @@ class Register:
                         controls=[
                             TextButton(
                                 text='Go to Login Page', width=150,
-                                on_click=lambda e: (setattr(successful_dlg_modal, 'open', False), page.update(), go_login(e))
+                                on_click=lambda e: (close_dialog(successful_dlg_modal), go_login(e))
                             )
                         ]
                     )
@@ -113,7 +113,12 @@ class Register:
             actions_alignment=MainAxisAlignment.CENTER,
         )
 
-        # Function to navigate to login page
+        # Close dialog function with update
+        def close_dialog(dialog):
+            setattr(dialog, 'open', False)
+            page.update()
+
+        # Navigate to login page
         def go_login(e):
             page.go("/")
             page.update()

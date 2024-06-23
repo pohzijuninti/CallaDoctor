@@ -31,3 +31,6 @@ ctrl + c
 
 # Find server link
 ifconfig
+
+# Install Testing Framework
+pip install pytest
