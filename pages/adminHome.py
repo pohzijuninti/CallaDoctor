@@ -498,7 +498,7 @@ class AdminHome:
 
             dlg_modal = AlertDialog(
                 modal=False,
-                title=Text("Delete Doctor"),
+                title=Text("Delete Doctor", text_align=TextAlign.CENTER),
                 content=Text("Are you sure?", text_align=TextAlign.CENTER),
                 actions=[
                     Container(

@@ -148,7 +148,7 @@ class ClinicForm:
             )
 
         return View(
-            bgcolor=colors.GREY_200,
+            bgcolor=colors.WHITE,
             route="/clinicForm",
             padding=50,
             spacing=50,

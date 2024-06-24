@@ -176,7 +176,7 @@ class Login:
         tabs.on_change = on_change
 
         return View(
-            bgcolor=colors.GREY_200,
+            bgcolor=colors.WHITE,
             route="/",
             controls=[
                 Container(

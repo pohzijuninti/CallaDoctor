@@ -120,7 +120,7 @@ class Register:
             page.update()
 
         return View(
-            bgcolor=colors.GREY_200,
+            bgcolor=colors.WHITE,
             route="/register",
             controls=[
                 Container(
