@@ -22,7 +22,7 @@ class Register:
         new_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Password', border=InputBorder.UNDERLINE,
                                             text_size=14, password=True, can_reveal_password=True)
         confirm_password: TextField = TextField(icon=icons.LOCK_OUTLINED, label='Confirm Password', border=InputBorder.UNDERLINE,
-                                            text_size=14, password=True, can_reveal_password=True)
+                                                text_size=14, password=True, can_reveal_password=True)
 
         # Function to handle the signup process
         def signup(e):
@@ -34,6 +34,7 @@ class Register:
                 # Perform registration using provided data
                 register(new_email.value, confirm_password.value, new_name.value, new_ic.value)
                 open_successful_dlg(e)
+                go_login(e)
 
         # Opens a dialog when the registration form fields are not filled up
         def open_empty_dlg(e):
@@ -52,7 +53,7 @@ class Register:
                         controls=[
                             TextButton(
                                 text='Close', width=150,
-                                on_click=lambda e: (close_dialog(empty_dlg_modal))
+                                on_click=lambda e: (setattr(empty_dlg_modal, 'open', False), page.update())
                             )
                         ]
                     )
@@ -78,7 +79,7 @@ class Register:
                         controls=[
                             TextButton(
                                 text='Close', width=150,
-                                on_click=lambda e: (close_dialog(error_dlg_modal))
+                                on_click=lambda e: (setattr(error_dlg_modal, 'open', False), page.update())
                             )
                         ]
                     )
@@ -103,8 +104,8 @@ class Register:
                         horizontal_alignment=CrossAxisAlignment.CENTER,
                         controls=[
                             TextButton(
-                                text='Go to Login Page', width=150,
-                                on_click=lambda e: (close_dialog(successful_dlg_modal), go_login(e))
+                                text='Close', width=150,
+                                on_click=lambda e: (setattr(successful_dlg_modal, 'open', False), page.update())
                             )
                         ]
                     )
@@ -112,11 +113,6 @@ class Register:
             ],
             actions_alignment=MainAxisAlignment.CENTER,
         )
-
-        # Close dialog function with update
-        def close_dialog(dialog):
-            setattr(dialog, 'open', False)
-            page.update()
 
         # Navigate to login page
         def go_login(e):
