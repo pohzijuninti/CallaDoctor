@@ -2,8 +2,6 @@ import unittest
 from unittest.mock import patch, Mock, MagicMock
 import requests
 from pages.clinicForm import ClinicForm
-from pages.selectDateTime import SelectDateTime
-import datetime
 
 
 class AutomatedTesting(unittest.TestCase):
@@ -99,6 +97,73 @@ class AutomatedTesting(unittest.TestCase):
             "http://localhost:3000/clinic/form",
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
             data=f'hospitalName={form.name.value}&address={form.address.value}&phone={form.phone_number.value}&email={form.email.value}'
+        )
+
+    @patch('requests.post')
+    def test_book_appointment(self, mock_post):
+        # Construct the URL and payload
+        url = "http://localhost:3000/book"
+        doctor_id = 21
+        hospital_id = 1
+        selected_time = 1719223200
+
+        payload = {
+            'userID': "ABC123",
+            'hospitalID': hospital_id,
+            'doctorID': doctor_id,
+            'datetime': selected_time
+        }
+
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'success': True}
+        mock_post.return_value = mock_response
+
+        # Send POST request to book the appointment
+        response = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}, data=payload)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200, f"Expected status code 200 but got {response.status_code}")
+
+        # Assert the response content
+        response_data = response.json()
+        self.assertIn('success', response_data, "Booking was not successful")
+
+    @patch('requests.post')
+    def test_add_doctor_and_success(self, mock_post):
+        # Mock response from the server when adding a doctor
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'doctor': {'name': 'Dr. Heng Ong Huat', 'specialityID': 11}}
+        mock_post.return_value = mock_response
+
+        # Input parameters
+        name = "Dr. Heng Ong Huat"
+        speciality_id = 11
+        hospital_id = 1
+        email = "ohheng@example.com"
+
+        # URL and payload
+        url = "http://localhost:3000/doctor/add"
+        expected_payload = f"name={name}&specialityID={speciality_id}&hospitalID={hospital_id}&email={email}"
+        expected_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+        # Send a mock POST request directly
+        response = requests.post(url, headers=expected_headers, data=expected_payload)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200, f"Expected status code 200 but got {response.status_code}")
+
+        # Assert the response content
+        response_data = response.json()
+        self.assertIn('doctor', response_data, "Doctor not added successfully")
+        self.assertEqual(
+            response_data['doctor']['name'], name,
+            f"Expected doctor name '{name}' but got '{response_data['doctor']['name']}'"
+        )
+        self.assertEqual(
+            response_data['doctor']['specialityID'], speciality_id,
+            f"Expected speciality ID '{speciality_id}' but got '{response_data['doctor']['specialityID']}'"
         )
 
 

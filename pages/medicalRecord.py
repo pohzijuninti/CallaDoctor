@@ -52,13 +52,21 @@ class MedicalRecord:
         # Generate user's name card based on fetched data
         def name_card():
             # Determine gender based on the last digit of IC number
-            is_odd = int(self.name_card['ic'][-1]) % 2 != 0
+            ic_number = self.name_card['ic']
+
+            # Extract digits from ic_number
+            digits = ''.join(c for c in ic_number if c.isdigit())
+
+            # Take the first 12 digits
+            ic_digits = digits[:12]
+
+            is_odd = int(ic_digits[-1]) % 2 != 0
             gender = "Male" if is_odd else "Female"
 
             # Calculate user's age based on IC birth year
             current_date = datetime.datetime.now()
             current_year = current_date.year
-            ic_year = int(self.name_card['ic'][:2])
+            ic_year = int(ic_digits[:2])
             current_year_two_digit = int(str(current_year)[-2:])
             birth_year = 2000 + ic_year if ic_year <= current_year_two_digit else 1900 + ic_year
             age = f"{current_year - birth_year} years old"
